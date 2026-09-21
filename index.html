@@ -80,7 +80,7 @@
             <form onsubmit="ejecutarLogin(event)" class="space-y-4">
                 <div>
                     <label class="block text-xs font-medium text-verde-ingles mb-1">Usuario</label>
-                    <input type="text" id="login-usuario" required placeholder="paulo, nico o tadeo" class="w-full p-2.5 bg-beige-base border border-beige-border rounded-xl text-xs sm:text-sm focus:ring-1 focus:ring-verde-ingles focus:outline-none">
+                    <input type="text" id="login-usuario" required placeholder="Usuario" class="w-full p-2.5 bg-beige-base border border-beige-border rounded-xl text-xs sm:text-sm focus:ring-1 focus:ring-verde-ingles focus:outline-none">
                 </div>
                 <div>
                     <label class="block text-xs font-medium text-verde-ingles mb-1">Contraseña</label>
@@ -305,7 +305,7 @@
     <script>
         const SUPABASE_URL = 'https://nwkmdonyrqantliwlebi.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im53a21kb255cnFhbnRsaXdsZWJpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk5MzU0NjAsImV4cCI6MjEwNTUxMTQ2MH0.lh28WPqEKoWBUycuaVf_6tnG0LK_sVLpxP0Yd6lhlxY';
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        const db = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
 
         let usuarioActual = null;
         let recetas = [];
@@ -315,10 +315,16 @@
         let estadoExpandido = {};
 
         window.onload = async function() {
-            const session = (await supabase.auth.getSession()).data.session;
-            if (session) {
-                usuarioActual = session.user;
-                mostrarAppPrincipal();
+            try {
+                if (db) {
+                    const session = (await db.auth.getSession()).data.session;
+                    if (session) {
+                        usuarioActual = session.user;
+                        mostrarAppPrincipal();
+                    }
+                }
+            } catch (err) {
+                console.error('Error al recuperar sesión:', err);
             }
 
             document.addEventListener('click', function(e) {
@@ -341,27 +347,50 @@
             const errDiv = document.getElementById('login-error');
             const btnSubmit = document.getElementById('btn-login-submit');
 
+            const mostrarError = (msg) => {
+                errDiv.innerText = msg;
+                errDiv.classList.remove('hidden');
+                btnSubmit.disabled = false;
+                btnSubmit.innerText = "Ingresar";
+            };
+
             errDiv.classList.add('hidden');
             btnSubmit.disabled = true;
             btnSubmit.innerText = "Ingresando...";
 
+            if (!db) {
+                mostrarError("No se pudo cargar Supabase (librería bloqueada o sin internet). Desactivá el bloqueador de anuncios y recargá.");
+                return;
+            }
+
             const email = usuario.includes('@') ? usuario : `${usuario}@recetario.local`;
 
-            const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+            try {
+                const { data, error } = await db.auth.signInWithPassword({ email, password });
 
-            if (error) {
-                errDiv.innerText = "Usuario o contraseña incorrectos.";
-                errDiv.classList.remove('hidden');
+                if (error) {
+                    console.error('Error de login:', error);
+                    const detalle = error.message || 'desconocido';
+                    if (/invalid login credentials/i.test(detalle)) {
+                        mostrarError("Usuario o contraseña incorrectos.");
+                    } else {
+                        mostrarError("Error de Supabase: " + detalle);
+                    }
+                    return;
+                }
+
+                usuarioActual = data.user;
                 btnSubmit.disabled = false;
                 btnSubmit.innerText = "Ingresar";
-            } else {
-                usuarioActual = data.user;
                 mostrarAppPrincipal();
+            } catch (err) {
+                console.error('Error de conexión:', err);
+                mostrarError("No se pudo conectar con la base de datos. Puede estar pausada en Supabase o no haber internet.");
             }
         }
 
         async function cerrarSesion() {
-            await supabase.auth.signOut();
+            await db.auth.signOut();
             usuarioActual = null;
             document.getElementById('app-principal').classList.add('hidden');
             document.getElementById('pantalla-login').classList.remove('hidden');
@@ -378,7 +407,7 @@
         }
 
         async function cargarRecetas() {
-            const { data, error } = await supabase.from('recetas').select('*').order('created_at', { ascending: false });
+            const { data, error } = await db.from('recetas').select('*').order('created_at', { ascending: false });
 
             if (error) {
                 console.error("Error cargando recetas:", error);
@@ -821,10 +850,10 @@
             };
 
             if (id) {
-                const { error } = await supabase.from('recetas').update(datosReceta).eq('id', id);
+                const { error } = await db.from('recetas').update(datosReceta).eq('id', id);
                 if (error) alert("Error al actualizar la receta: " + error.message);
             } else {
-                const { error } = await supabase.from('recetas').insert([datosReceta]);
+                const { error } = await db.from('recetas').insert([datosReceta]);
                 if (error) alert("Error al guardar la receta: " + error.message);
             }
 
@@ -876,7 +905,7 @@
 
         async function eliminarReceta(id) {
             if (confirm("¿Seguro que deseas eliminar esta receta?")) {
-                const { error } = await supabase.from('recetas').delete().eq('id', id);
+                const { error } = await db.from('recetas').delete().eq('id', id);
                 if (error) {
                     alert("Error al eliminar la receta: " + error.message);
                 } else {
