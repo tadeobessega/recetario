@@ -1,7 +1,14 @@
 {
   "name": "recetario",
+  "main": "worker.js",
   "compatibility_date": "2026-09-21",
   "assets": {
-    "directory": "./"
+    "directory": "./",
+    "binding": "ASSETS"
+  },
+  "vars": {
+    // Opcional. Plantilla del servicio de monetización, con {url} donde va el destino.
+    // Vacío = redirección directa, sin monetizar.
+    "MONETIZAR_URL": ""
   }
 }

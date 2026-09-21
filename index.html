@@ -84,9 +84,23 @@
                 </div>
                 <h1 class="text-xl font-semibold text-verde-ingles">Mi Recetario</h1>
                 <p id="login-subtitulo" class="text-sm text-gray-500">Inicia sesión para ver tus recetas</p>
+                <p id="login-aviso-enlace" class="hidden text-xs text-verde-ingles bg-beige-base border border-beige-border rounded-lg p-2.5">Ingresá o creá tu cuenta para ver lo que te compartieron.</p>
             </div>
 
-            <form onsubmit="ejecutarLogin(event)" class="space-y-5">
+            <div id="bloque-google" class="space-y-4">
+                <button type="button" onclick="ingresarConGoogle()" class="w-full flex items-center justify-center gap-3 bg-white border border-beige-border hover:bg-beige-base text-gray-700 py-3 rounded-xl text-sm font-medium shadow-soft transition">
+                    <svg class="w-5 h-5" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+                    <span>Continuar con Google</span>
+                </button>
+                <div id="google-mensaje" class="hidden"></div>
+                <div class="flex items-center gap-3 text-xs text-gray-400">
+                    <span class="flex-1 h-px bg-beige-border"></span>
+                    <span>o con usuario o email</span>
+                    <span class="flex-1 h-px bg-beige-border"></span>
+                </div>
+            </div>
+
+            <form id="form-login" onsubmit="ejecutarLogin(event)" class="space-y-5">
                 <div>
                     <label class="block text-sm font-medium text-verde-ingles mb-2">Usuario</label>
                     <input type="text" id="login-usuario" required placeholder="Usuario" class="w-full p-3 bg-beige-base border border-beige-border rounded-xl text-sm focus:ring-1 focus:ring-verde-ingles focus:outline-none">
@@ -94,6 +108,10 @@
                 <div>
                     <label class="block text-sm font-medium text-verde-ingles mb-2">Contraseña</label>
                     <input type="password" id="login-password" required placeholder="••••••••" class="w-full p-3 bg-beige-base border border-beige-border rounded-xl text-sm focus:ring-1 focus:ring-verde-ingles focus:outline-none">
+                </div>
+
+                <div class="flex justify-end -mt-2">
+                    <button type="button" onclick="mostrarModoAuth('olvide')" class="text-xs text-gray-500 hover:text-verde-ingles underline">¿Olvidaste tu contraseña?</button>
                 </div>
 
                 <div id="login-error" class="hidden text-sm text-rojo-excluir text-center font-medium bg-red-50 p-2 rounded-lg border border-red-200"></div>
@@ -130,13 +148,37 @@
                 </button>
                 <p class="text-center text-sm text-gray-500">¿Ya tenés cuenta? <button type="button" onclick="mostrarRegistro(false)" class="text-verde-ingles font-medium underline">Ingresá</button></p>
             </form>
+
+            <form id="form-olvide" onsubmit="enviarRecuperacion(event)" class="hidden space-y-5">
+                <p class="text-sm text-gray-500">Ingresá el email de tu cuenta y te enviamos un enlace para crear una contraseña nueva.</p>
+                <div>
+                    <label class="block text-sm font-medium text-verde-ingles mb-2">Email</label>
+                    <input type="email" id="olvide-email" required placeholder="tu@email.com" class="w-full p-3 bg-beige-base border border-beige-border rounded-xl text-sm focus:ring-1 focus:ring-verde-ingles focus:outline-none">
+                </div>
+                <div id="olvide-mensaje" class="hidden"></div>
+                <button type="submit" id="btn-olvide" class="w-full bg-verde-ingles hover:bg-verde-hover text-white py-3 rounded-xl text-sm font-medium shadow-soft transition flex items-center justify-center gap-2"><span>Enviar enlace</span></button>
+                <p class="text-center text-sm text-gray-500"><button type="button" onclick="mostrarModoAuth('login')" class="text-verde-ingles font-medium underline">Volver a ingresar</button></p>
+            </form>
+
+            <form id="form-nueva-clave" onsubmit="guardarNuevaClave(event)" class="hidden space-y-5">
+                <div>
+                    <label class="block text-sm font-medium text-verde-ingles mb-2">Nueva contraseña</label>
+                    <input type="password" id="clave-nueva" required minlength="6" placeholder="Mínimo 6 caracteres" class="w-full p-3 bg-beige-base border border-beige-border rounded-xl text-sm focus:ring-1 focus:ring-verde-ingles focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-verde-ingles mb-2">Repetir contraseña</label>
+                    <input type="password" id="clave-repetir" required minlength="6" placeholder="Repetí la contraseña" class="w-full p-3 bg-beige-base border border-beige-border rounded-xl text-sm focus:ring-1 focus:ring-verde-ingles focus:outline-none">
+                </div>
+                <div id="clave-mensaje" class="hidden"></div>
+                <button type="submit" id="btn-nueva-clave" class="w-full bg-verde-ingles hover:bg-verde-hover text-white py-3 rounded-xl text-sm font-medium shadow-soft transition flex items-center justify-center gap-2"><span>Guardar contraseña</span></button>
+            </form>
         </div>
     </div>
 
     <!-- APP PRINCIPAL -->
     <div id="app-principal" class="hidden min-h-screen flex flex-col">
         <header class="bg-verde-ingles text-beige-card shadow-soft sticky top-0 z-30">
-            <div class="max-w-4xl mx-auto px-4 sm:px-6 py-3.5 flex flex-row justify-between items-center gap-3">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 pt-3.5 pb-2.5 flex flex-row justify-between items-center gap-3">
                 <div class="flex items-center gap-2.5">
                     <div class="p-2 bg-verde-hover/60 rounded-xl">
                         <svg class="w-5 h-5 text-mostaza" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -147,23 +189,39 @@
                 </div>
 
                 <div class="flex items-center gap-2 sm:gap-3">
-                    <nav class="flex bg-verde-hover/50 p-1 rounded-xl">
-                        <button id="tab-btn-filtrar" onclick="cambiarPestana('filtrar')" class="px-3.5 py-2 rounded-lg text-sm font-medium transition flex items-center gap-1.5 bg-beige-card text-verde-ingles shadow-sm">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                            <span class="hidden sm:inline">Recetas</span>
-                        </button>
-                        <button id="tab-btn-agregar" onclick="cambiarPestana('agregar')" class="px-3.5 py-2 rounded-lg text-sm font-medium transition flex items-center gap-1.5 text-beige-card hover:text-white">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-                            <span class="hidden sm:inline">Agregar</span>
-                        </button>
-                    </nav>
-
-                    <button id="btn-avatar-header" onclick="abrirPerfil()" title="Mi perfil" class="rounded-full ring-2 ring-white/20 hover:ring-white/70 transition"></button>
-
+                    <button onclick="cambiarPestana('agregar')" title="Agregar receta" class="flex items-center gap-1.5 bg-mostaza hover:bg-mostaza-hover text-white px-3 sm:px-4 py-2 rounded-xl text-sm font-medium transition">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                        <span class="hidden sm:inline">Agregar receta</span>
+                    </button>
+                    <button id="btn-avatar-header" onclick="verPerfilPropio()" title="Mi perfil" class="rounded-full ring-2 ring-white/20 hover:ring-white/70 transition"></button>
                     <button onclick="cerrarSesion()" title="Cerrar Sesión" class="p-2 text-green-200 hover:text-white hover:bg-verde-hover/60 rounded-xl transition">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
                     </button>
                 </div>
+            </div>
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 pb-3">
+                <nav class="flex gap-1 bg-verde-hover/50 p-1 rounded-xl">
+                        <button id="tab-btn-inicio" onclick="cambiarPestana('inicio')" class="flex-1">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                            <span>Inicio</span>
+                        </button>
+                        <button id="tab-btn-filtrar" onclick="cambiarPestana('filtrar')" class="flex-1">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
+                            <span>Recetas</span>
+                        </button>
+                        <button id="tab-btn-colecciones" onclick="cambiarPestana('colecciones')" class="flex-1">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                            <span>Colecciones</span>
+                        </button>
+                        <button id="tab-btn-explorar" onclick="cambiarPestana('explorar')" class="flex-1">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                            <span>Explorar</span>
+                        </button>
+                        <button id="tab-btn-perfil" onclick="verPerfilPropio()" class="flex-1">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                            <span>Perfil</span>
+                        </button>
+                </nav>
             </div>
         </header>
 
@@ -180,6 +238,13 @@
                         <span id="contador-resultados" class="text-sm text-gray-500 bg-beige-base px-2.5 py-1 rounded-full border border-beige-border font-medium">
                             0 recetas
                         </span>
+                    </div>
+
+                    <div id="filtro-tipo" class="flex flex-wrap gap-2">
+                        <button type="button" data-tipo-filtro="" onclick="setTipoFiltro('')">Todas</button>
+                        <button type="button" data-tipo-filtro="almuerzo_cena" onclick="setTipoFiltro('almuerzo_cena')">Almuerzo / cena</button>
+                        <button type="button" data-tipo-filtro="desayuno_merienda" onclick="setTipoFiltro('desayuno_merienda')">Desayuno / merienda</button>
+                        <button type="button" data-tipo-filtro="postre" onclick="setTipoFiltro('postre')">Postre</button>
                     </div>
 
                     <div class="relative">
@@ -261,6 +326,24 @@
                             <input type="text" id="input-descripcion" placeholder="Ej: Plato clásico crocante con puré cremoso" class="w-full p-3 bg-beige-base border border-beige-border rounded-xl text-sm focus:ring-1 focus:ring-verde-ingles focus:outline-none">
                         </div>
 
+                        <div>
+                            <label class="block text-sm font-semibold text-verde-ingles mb-2">Tipo de comida *</label>
+                            <div class="flex flex-wrap gap-2">
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="tipo-comida" value="almuerzo_cena" required class="sr-only peer">
+                                    <span class="block px-4 py-2.5 rounded-xl border border-beige-border bg-beige-base text-sm text-gray-600 peer-checked:bg-verde-ingles peer-checked:text-white peer-checked:border-verde-ingles transition">Almuerzo / cena</span>
+                                </label>
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="tipo-comida" value="desayuno_merienda" required class="sr-only peer">
+                                    <span class="block px-4 py-2.5 rounded-xl border border-beige-border bg-beige-base text-sm text-gray-600 peer-checked:bg-verde-ingles peer-checked:text-white peer-checked:border-verde-ingles transition">Desayuno / merienda</span>
+                                </label>
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="tipo-comida" value="postre" required class="sr-only peer">
+                                    <span class="block px-4 py-2.5 rounded-xl border border-beige-border bg-beige-base text-sm text-gray-600 peer-checked:bg-verde-ingles peer-checked:text-white peer-checked:border-verde-ingles transition">Postre</span>
+                                </label>
+                            </div>
+                        </div>
+
                         <div class="space-y-1.5">
                             <label class="block text-sm font-semibold text-verde-ingles">Ingredientes de la receta *</label>
                             <div class="relative">
@@ -337,18 +420,80 @@
                     </form>
                 </div>
             </section>
+
+            <!-- INICIO (timeline) -->
+            <section id="pestana-inicio" class="hidden space-y-6">
+                <div class="flex items-start justify-between gap-3">
+                    <div>
+                        <h2 class="text-xl font-semibold text-verde-ingles">Novedades</h2>
+                        <p class="text-sm text-gray-500 mt-1">Las recetas nuevas de la gente que seguís.</p>
+                    </div>
+                    <button type="button" onclick="cargarTimeline(true)" title="Actualizar" class="p-2.5 rounded-xl border border-beige-border bg-white text-gray-500 hover:text-verde-ingles hover:bg-beige-base transition">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                    </button>
+                </div>
+                <div id="timeline-lista" class="flex flex-col gap-5"></div>
+            </section>
+
+            <!-- COLECCIONES -->
+            <section id="pestana-colecciones" class="hidden space-y-8">
+                <div class="space-y-6">
+                    <div class="flex items-start justify-between gap-3">
+                        <div>
+                            <h2 class="text-xl font-semibold text-verde-ingles">Mis colecciones</h2>
+                            <p class="text-sm text-gray-500 mt-1">Agrupá tus recetas y compartilas con un enlace.</p>
+                        </div>
+                        <button type="button" onclick="abrirEditorColeccion()" class="flex items-center gap-1.5 bg-verde-ingles hover:bg-verde-hover text-white px-4 py-2.5 rounded-xl text-sm font-medium shadow-soft transition shrink-0">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                            <span>Nueva</span>
+                        </button>
+                    </div>
+                    <div id="colecciones-lista"></div>
+                </div>
+                <div id="bloque-col-guardadas" class="hidden space-y-6">
+                    <div>
+                        <h2 class="text-xl font-semibold text-verde-ingles">Guardadas</h2>
+                        <p class="text-sm text-gray-500 mt-1">Colecciones de otras personas que guardaste.</p>
+                    </div>
+                    <div id="colecciones-guardadas-lista" class="grid grid-cols-1 sm:grid-cols-2 gap-5"></div>
+                </div>
+            </section>
+
+            <!-- EXPLORAR -->
+            <section id="pestana-explorar" class="hidden space-y-6">
+                <div>
+                    <h2 class="text-xl font-semibold text-verde-ingles">Explorar</h2>
+                    <p class="text-sm text-gray-500 mt-1">Buscá personas por nombre o usuario.</p>
+                </div>
+                <div class="relative">
+                    <svg class="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    <input type="text" id="input-buscar-personas" oninput="buscarPersonasDebounce()" placeholder="Buscar personas..." class="w-full pl-11 pr-4 py-3 bg-white border border-beige-border rounded-xl text-sm focus:ring-1 focus:ring-verde-ingles focus:outline-none">
+                </div>
+                <div class="space-y-4">
+                    <h3 id="explorar-titulo" class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Personas nuevas</h3>
+                    <div id="explorar-lista" class="flex flex-col gap-3"></div>
+                </div>
+            </section>
+
+            <!-- PERFIL -->
+            <section id="pestana-perfil" class="hidden">
+                <div id="perfil-contenido"></div>
+            </section>
+
+            <!-- DETALLE (receta o colección abierta) -->
+            <section id="pestana-detalle" class="hidden">
+                <div id="detalle-contenido"></div>
+            </section>
         </main>
     </div>
 
 
-    <!-- MODAL PERFIL -->
-    <div id="modal-perfil" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/30" onclick="if(event.target===this) cerrarPerfil()">
-        <div class="bg-white w-full max-w-sm rounded-2xl p-7 shadow-soft-lg border border-beige-border space-y-6">
+    <!-- MODAL EDITAR PERFIL -->
+    <div id="modal-perfil" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/30" onclick="if(event.target===this) cerrarEditorPerfil()">
+        <div class="bg-white w-full max-w-sm rounded-2xl p-7 shadow-soft-lg border border-beige-border space-y-6 max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center">
-                <h2 class="text-lg font-semibold text-verde-ingles">Mi perfil</h2>
-                <button type="button" onclick="cerrarPerfil()" title="Cerrar" class="p-2 rounded-lg text-gray-400 hover:text-verde-ingles hover:bg-beige-base transition">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                </button>
+                <h2 class="text-lg font-semibold text-verde-ingles">Editar perfil</h2>
+                <button type="button" onclick="cerrarEditorPerfil()" title="Cerrar" class="p-2 rounded-lg text-gray-400 hover:text-verde-ingles hover:bg-beige-base transition"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
             </div>
 
             <div class="flex flex-col items-center gap-3">
@@ -368,6 +513,14 @@
                     <label class="block text-sm font-medium text-verde-ingles mb-2">Nombre</label>
                     <input type="text" id="perfil-nombre" maxlength="40" class="w-full p-3 bg-beige-base border border-beige-border rounded-xl text-sm focus:ring-1 focus:ring-verde-ingles focus:outline-none">
                 </div>
+                <div>
+                    <label class="block text-sm font-medium text-verde-ingles mb-2">Bio</label>
+                    <textarea id="perfil-bio" rows="3" maxlength="280" placeholder="Contá algo sobre vos y lo que te gusta cocinar" class="w-full p-3 bg-beige-base border border-beige-border rounded-xl text-sm focus:ring-1 focus:ring-verde-ingles focus:outline-none"></textarea>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-verde-ingles mb-2">Enlace (Instagram, web...)</label>
+                    <input type="text" id="perfil-link" maxlength="200" placeholder="https://instagram.com/tu_usuario" class="w-full p-3 bg-beige-base border border-beige-border rounded-xl text-sm focus:ring-1 focus:ring-verde-ingles focus:outline-none">
+                </div>
             </div>
 
             <div id="perfil-mensaje" class="hidden text-sm text-center font-medium p-2.5 rounded-lg border"></div>
@@ -376,7 +529,53 @@
         </div>
     </div>
 
+    <!-- MODAL COLECCIÓN -->
+    <div id="modal-coleccion" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/30" onclick="if(event.target===this) cerrarEditorColeccion()">
+        <div class="bg-white w-full max-w-md rounded-2xl p-7 shadow-soft-lg border border-beige-border space-y-6 max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center">
+                <h2 id="col-titulo-modal" class="text-lg font-semibold text-verde-ingles">Nueva colección</h2>
+                <button type="button" onclick="cerrarEditorColeccion()" title="Cerrar" class="p-2 rounded-lg text-gray-400 hover:text-verde-ingles hover:bg-beige-base transition"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+            </div>
+            <div>
+                    <label class="block text-sm font-medium text-verde-ingles mb-2">Nombre</label>
+                    <input type="text" id="col-nombre" maxlength="60" placeholder="Ej: Cenas rápidas" class="w-full p-3 bg-beige-base border border-beige-border rounded-xl text-sm focus:ring-1 focus:ring-verde-ingles focus:outline-none">
+                </div>
+            <div>
+                    <label class="block text-sm font-medium text-verde-ingles mb-2">Descripción (opcional)</label>
+                    <input type="text" id="col-descripcion" maxlength="200" placeholder="Ej: Todo lo que cocino entre semana" class="w-full p-3 bg-beige-base border border-beige-border rounded-xl text-sm focus:ring-1 focus:ring-verde-ingles focus:outline-none">
+                </div>
+            <label class="flex items-center justify-between gap-4 p-4 rounded-xl border border-beige-border bg-beige-base cursor-pointer">
+                <span class="block">
+                    <span class="block text-sm font-semibold text-verde-ingles">Colección pública</span>
+                    <span class="block text-xs text-gray-500 mt-0.5">Otras personas podrán verla y guardarla. Solo se muestran las recetas públicas.</span>
+                </span>
+                <input type="checkbox" id="col-publica" checked class="sr-only peer">
+                <span class="relative w-11 h-6 shrink-0 rounded-full bg-gray-300 peer-checked:bg-verde-chip transition after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:w-5 after:h-5 after:rounded-full after:bg-white after:shadow after:transition peer-checked:after:translate-x-5"></span>
+            </label>
+            <div>
+                <span class="block text-sm font-medium text-verde-ingles mb-2">Recetas de la colección</span>
+                <div id="col-recetas" class="space-y-2 max-h-56 overflow-y-auto pr-1"></div>
+            </div>
+            <div id="col-mensaje" class="hidden text-sm text-center font-medium p-2.5 rounded-lg border text-rojo-excluir bg-red-50 border-red-200"></div>
+            <button type="button" id="btn-guardar-coleccion" onclick="guardarColeccion()" class="w-full bg-verde-ingles hover:bg-verde-hover text-white py-3 rounded-xl text-sm font-medium shadow-soft transition disabled:opacity-60">Guardar colección</button>
+        </div>
+    </div>
+
+    <!-- MODAL SEGUIDORES / SEGUIDOS -->
+    <div id="modal-personas" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/30" onclick="if(event.target===this) cerrarPersonas()">
+        <div class="bg-fondo w-full max-w-md rounded-2xl p-6 shadow-soft-lg border border-beige-border space-y-4 max-h-[85vh] flex flex-col">
+            <div class="flex justify-between items-center">
+                <h2 id="personas-titulo" class="text-lg font-semibold text-verde-ingles">Seguidores</h2>
+                <button type="button" onclick="cerrarPersonas()" title="Cerrar" class="p-2 rounded-lg text-gray-400 hover:text-verde-ingles hover:bg-beige-base transition"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+            </div>
+            <div id="personas-lista" class="flex flex-col gap-3 overflow-y-auto pr-1"></div>
+        </div>
+    </div>
+
+    <div id="toast" class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] bg-verde-ingles text-white text-sm px-5 py-3 rounded-xl shadow-soft-lg max-w-[90vw] text-center"></div>
+
     <script>
+        const HASH_INICIAL = window.location.hash;
         const SUPABASE_URL = 'https://nwkmdonyrqantliwlebi.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im53a21kb255cnFhbnRsaXdsZWJpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk5MzU0NjAsImV4cCI6MjEwNTUxMTQ2MH0.lh28WPqEKoWBUycuaVf_6tnG0LK_sVLpxP0Yd6lhlxY';
         const db = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
@@ -409,10 +608,22 @@
         window.onload = async function() {
             try {
                 if (db) {
-                    const session = (await db.auth.getSession()).data.session;
-                    if (session) {
-                        usuarioActual = session.user;
-                        mostrarAppPrincipal();
+                    if (/type=recovery/.test(HASH_INICIAL)) {
+                        modoRecuperacion = true;
+                        mostrarModoAuth('nuevaclave');
+                    } else {
+                        if (/error_code=otp_expired/.test(HASH_INICIAL)) {
+                            ponerMensaje('login-error', 'El enlace venció o ya fue usado. Pedí uno nuevo desde "¿Olvidaste tu contraseña?".', false);
+                        } else if (/[#&]error=/.test(HASH_INICIAL)) {
+                            ponerMensaje('login-error', 'No se pudo completar el ingreso. Probá de nuevo.', false);
+                        }
+                        const session = (await db.auth.getSession()).data.session;
+                        if (session) {
+                            usuarioActual = session.user;
+                            mostrarAppPrincipal();
+                        } else if (enlacePendiente) {
+                            el('login-aviso-enlace').classList.remove('hidden');
+                        }
                     }
                 }
             } catch (err) {
@@ -481,16 +692,6 @@
             }
         }
 
-        function mostrarRegistro(mostrar) {
-            document.querySelector('#pantalla-login form[onsubmit^="ejecutarLogin"]').classList.toggle('hidden', mostrar);
-            document.getElementById('form-registro').classList.toggle('hidden', !mostrar);
-            document.getElementById('login-subtitulo').innerText = mostrar
-                ? 'Creá tu cuenta con tu email'
-                : 'Inicia sesión para ver tus recetas';
-            document.getElementById('login-error').classList.add('hidden');
-            document.getElementById('reg-mensaje').classList.add('hidden');
-        }
-
         async function ejecutarRegistro(e) {
             e.preventDefault();
             const nombre = document.getElementById('reg-nombre').value.trim();
@@ -529,10 +730,11 @@
                     return;
                 }
 
+                guardarEnlacePendiente();
                 const { data, error } = await db.auth.signUp({
                     email,
                     password,
-                    options: { data: { nombre, usuario }, emailRedirectTo: window.location.origin }
+                    options: { data: { nombre, usuario }, emailRedirectTo: urlBase() }
                 });
 
                 if (error) {
@@ -643,31 +845,6 @@
                 (ok ? 'text-green-800 bg-green-50 border-green-200' : 'text-rojo-excluir bg-red-50 border-red-200');
         }
 
-        function abrirPerfil() {
-            document.getElementById('perfil-avatar-grande').innerHTML = avatarHTML(perfilActual, 'w-24 h-24', 'text-3xl');
-            document.getElementById('perfil-usuario').innerText = '@' + (perfilActual.usuario || '');
-            document.getElementById('perfil-nombre').value = perfilActual.nombre || '';
-            document.getElementById('perfil-mensaje').classList.add('hidden');
-            document.getElementById('modal-perfil').classList.remove('hidden');
-        }
-
-        function cerrarPerfil() {
-            document.getElementById('modal-perfil').classList.add('hidden');
-        }
-
-        async function guardarPerfil() {
-            const nombre = document.getElementById('perfil-nombre').value.trim();
-            if (!nombre) return mensajePerfil('El nombre no puede estar vacío.', false);
-            if (perfilActual.local) return mensajePerfil('Tu perfil todavía no está configurado en la base de datos.', false);
-
-            const { error } = await db.from('perfiles').update({ nombre }).eq('id', usuarioActual.id);
-            if (error) return mensajePerfil('No se pudo guardar: ' + error.message, false);
-
-            perfilActual.nombre = nombre;
-            pintarAvatarHeader();
-            mensajePerfil('Cambios guardados.', true);
-        }
-
         function redimensionarImagen(archivo, lado) {
             return new Promise((resolve, reject) => {
                 const url = URL.createObjectURL(archivo);
@@ -712,6 +889,8 @@
                 perfilActual.avatar_url = pub.publicUrl;
                 document.getElementById('perfil-avatar-grande').innerHTML = avatarHTML(perfilActual, 'w-24 h-24', 'text-3xl');
                 pintarAvatarHeader();
+                perfilesCache[usuarioActual.id] = perfilActual;
+                if (perfilVisto && perfilVisto.perfil.id === usuarioActual.id) { perfilVisto.perfil = perfilActual; renderPerfil(); }
                 mensajePerfil('Foto actualizada.', true);
 
                 // limpiar fotos anteriores (si falla, no importa)
@@ -726,57 +905,6 @@
             } finally {
                 textoBtn.innerText = 'Cambiar foto';
             }
-        }
-
-        async function cerrarSesion() {
-            await db.auth.signOut();
-            usuarioActual = null;
-            document.getElementById('app-principal').classList.add('hidden');
-            document.getElementById('pantalla-login').classList.remove('hidden');
-        }
-
-        async function mostrarAppPrincipal() {
-            document.getElementById('pantalla-login').classList.add('hidden');
-            document.getElementById('app-principal').classList.remove('hidden');
-
-            await cargarPerfil();
-            await cargarRecetas();
-        }
-
-        async function cargarRecetas() {
-            const { data, error } = await db.from('recetas').select('*').eq('user_id', usuarioActual.id).order('created_at', { ascending: false });
-
-            if (error) {
-                console.error("Error cargando recetas:", error);
-                return;
-            }
-
-            recetas = data.map(r => ({
-                id: r.id,
-                nombre: r.titulo,
-                descripcion: r.descripcion || '',
-                ingredientes: r.ingredientes || [],
-                tablaCantidades: r.cantidades || [],
-                procedimiento: r.procedimiento || '',
-                instagram: r.link_ig || '',
-                tiktok: r.link_tiktok || '',
-                link: r.link_otro || '',
-                publica: r.publica !== false
-            }));
-
-            renderizarFiltros();
-            filtrarRecetas();
-        }
-
-        function cambiarPestana(pestana) {
-            const activa = "px-3.5 py-2 rounded-lg text-sm font-medium transition flex items-center gap-1.5 bg-beige-card text-verde-ingles shadow-sm";
-            const inactiva = "px-3.5 py-2 rounded-lg text-sm font-medium transition flex items-center gap-1.5 text-beige-card hover:text-white";
-            const esFiltrar = pestana === 'filtrar';
-
-            document.getElementById('pestana-filtrar').classList.toggle('hidden', !esFiltrar);
-            document.getElementById('pestana-agregar').classList.toggle('hidden', esFiltrar);
-            document.getElementById('tab-btn-filtrar').className = esFiltrar ? activa : inactiva;
-            document.getElementById('tab-btn-agregar').className = esFiltrar ? inactiva : activa;
         }
 
         function obtenerTodosLosIngredientes() {
@@ -880,6 +1008,8 @@
         function limpiarFiltros() {
             ingredientesIncluidos = [];
             ingredientesExcluidos = [];
+            tipoFiltro = '';
+            pintarTipoFiltro();
             document.getElementById('input-busqueda-nombre').value = '';
             renderizarFiltros();
             filtrarRecetas();
@@ -892,6 +1022,7 @@
                 const coincideNombre = receta.nombre.toLowerCase().includes(queryNombre) || 
                                        (receta.descripcion && receta.descripcion.toLowerCase().includes(queryNombre));
                 if (!coincideNombre) return false;
+                if (tipoFiltro && receta.tipo !== tipoFiltro) return false;
 
                 const ingsReceta = receta.ingredientes.map(i => i.toLowerCase().trim());
 
@@ -911,152 +1042,8 @@
             renderizarTarjetasApiladas(resultado);
         }
 
-        function toggleExpandirTarjeta(id) {
-            estadoExpandido[id] = !estadoExpandido[id];
-            filtrarRecetas();
-        }
-
         const ICONO_MUNDO = 'M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z';
         const ICONO_CANDADO = 'M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z';
-
-        function renderizarTarjetasApiladas(lista) {
-            const contenedor = document.getElementById('contenedor-recetas-apiladas');
-            const estadoVacio = document.getElementById('estado-vacio');
-            const contador = document.getElementById('contador-resultados');
-
-            contador.innerText = `${lista.length} ${lista.length === 1 ? 'receta' : 'recetas'}`;
-            document.getElementById('card-filtros').classList.toggle('hidden', recetas.length === 0);
-
-            if (lista.length === 0) {
-                contenedor.innerHTML = '';
-                estadoVacio.classList.remove('hidden');
-                if (recetas.length === 0) {
-                    estadoVacio.innerHTML = `
-                        <div class="inline-flex p-4 bg-beige-base rounded-2xl text-mostaza mb-5">
-                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
-                        </div>
-                        <h3 class="text-lg font-semibold text-verde-ingles">Todavía no tenés recetas</h3>
-                        <p class="text-sm text-gray-500 mt-2 mb-6">Cargá la primera y empezá a armar tu recetario.</p>
-                        <button type="button" onclick="cambiarPestana('agregar')" class="bg-verde-ingles text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-verde-hover transition shadow-soft">Agregar mi primera receta</button>`;
-                } else {
-                    estadoVacio.innerHTML = `
-                        <div class="inline-flex p-4 bg-beige-base rounded-2xl text-gray-400 mb-5">
-                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                        </div>
-                        <h3 class="text-lg font-semibold text-verde-ingles">No hay recetas que coincidan</h3>
-                        <p class="text-sm text-gray-500 mt-2 mb-6">Probá quitar ingredientes excluidos o cambiar la búsqueda.</p>
-                        <button type="button" onclick="limpiarFiltros()" class="bg-verde-ingles text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-verde-hover transition shadow-soft">Limpiar filtros</button>`;
-                }
-                return;
-            }
-
-            estadoVacio.classList.add('hidden');
-
-            contenedor.innerHTML = lista.map(receta => {
-                const estaExpandida = !!estadoExpandido[receta.id];
-                const ig = urlSegura(receta.instagram);
-                const tt = urlSegura(receta.tiktok);
-                const web = urlSegura(receta.link);
-                const tieneRedes = ig || tt || web;
-
-                const filasTabla = (receta.tablaCantidades || []).map(item => `
-                    <tr class="border-b border-beige-border/60 last:border-0">
-                        <td class="py-2.5 px-4 font-medium text-gray-800">${esc(item.ingrediente)}</td>
-                        <td class="py-2.5 px-4 text-gray-600">${esc(item.cantidad || '-')}</td>
-                    </tr>
-                `).join('');
-
-                const chips = receta.ingredientes.map(ing => {
-                    const esIncluido = ingredientesIncluidos.includes(ing);
-                    const claseChip = esIncluido
-                        ? 'bg-verde-chip text-white font-medium'
-                        : 'bg-beige-base text-gray-600 border border-beige-border';
-                    return `<span class="px-3 py-1 rounded-full text-xs ${claseChip}">${esc(ing)}</span>`;
-                }).join('');
-
-                const badgeClase = receta.publica
-                    ? 'text-verde-chip bg-green-50 border-green-200 hover:bg-green-100'
-                    : 'text-gray-600 bg-beige-base border-beige-border hover:bg-beige-border/60';
-
-                return `
-                <article class="bg-white rounded-2xl p-6 shadow-soft border border-beige-border space-y-4">
-                    <div class="flex justify-between items-start gap-3">
-                        <div class="min-w-0 space-y-1">
-                            <h3 class="text-lg font-semibold text-verde-ingles leading-snug">${esc(receta.nombre)}</h3>
-                            ${receta.descripcion ? `<p class="text-sm text-gray-500">${esc(receta.descripcion)}</p>` : ''}
-                        </div>
-                        <div class="flex items-center gap-1 shrink-0">
-                            <button onclick="prepararEdicion('${receta.id}')" title="Editar" class="p-2 rounded-lg text-gray-400 hover:text-verde-ingles hover:bg-beige-base transition">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
-                            </button>
-                            <button onclick="eliminarReceta('${receta.id}')" title="Eliminar" class="p-2 rounded-lg text-gray-400 hover:text-rojo-excluir hover:bg-beige-base transition">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="flex flex-wrap gap-2">${chips}</div>
-
-                    <div class="flex items-center justify-between gap-3 pt-2">
-                        <button type="button" onclick="alternarPrivacidad('${receta.id}')" title="${receta.publica ? 'Pública: tocá para hacerla privada' : 'Privada: tocá para hacerla pública'}" class="inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full border transition ${badgeClase}">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${receta.publica ? ICONO_MUNDO : ICONO_CANDADO}"></path></svg>
-                            <span>${receta.publica ? 'Pública' : 'Privada'}</span>
-                        </button>
-                        <button onclick="toggleExpandirTarjeta('${receta.id}')" class="px-3.5 py-1.5 rounded-full text-verde-ingles hover:bg-beige-base transition border border-beige-border flex items-center gap-1.5 text-sm font-medium">
-                            <span>${estaExpandida ? 'Ver menos' : 'Ver más'}</span>
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${estaExpandida ? 'M5 15l7-7 7 7' : 'M19 9l-7 7-7-7'}"></path></svg>
-                        </button>
-                    </div>
-
-                    ${estaExpandida ? `
-                    <div class="pt-5 border-t border-beige-border space-y-5 chip-anim">
-                        <div class="space-y-2">
-                            <span class="text-sm font-semibold text-verde-ingles">Ingredientes y cantidades</span>
-                            <div class="border border-beige-border rounded-xl overflow-hidden bg-white">
-                                <table class="w-full text-left text-sm">
-                                    <thead class="bg-beige-base text-verde-ingles font-semibold border-b border-beige-border">
-                                        <tr>
-                                            <th class="py-2.5 px-4">Ingrediente</th>
-                                            <th class="py-2.5 px-4">Cantidad</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>${filasTabla}</tbody>
-                                </table>
-                            </div>
-                        </div>
-
-                        ${receta.procedimiento ? `
-                        <div class="space-y-2">
-                            <span class="text-sm font-semibold text-verde-ingles">Procedimiento</span>
-                            <p class="text-sm text-gray-700 leading-relaxed whitespace-pre-line bg-beige-base/70 p-4 rounded-xl">${esc(receta.procedimiento)}</p>
-                        </div>
-                        ` : ''}
-
-                        ${tieneRedes ? `
-                        <div class="flex flex-wrap gap-2">
-                            ${ig ? `<a href="${esc(ig)}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 px-3.5 py-2 bg-pink-50 text-pink-700 rounded-lg text-sm font-medium border border-pink-200 hover:bg-pink-100 transition">Instagram</a>` : ''}
-                            ${tt ? `<a href="${esc(tt)}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 px-3.5 py-2 bg-gray-100 text-gray-800 rounded-lg text-sm font-medium border border-gray-300 hover:bg-gray-200 transition">TikTok</a>` : ''}
-                            ${web ? `<a href="${esc(web)}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 px-3.5 py-2 bg-amber-50 text-amber-800 rounded-lg text-sm font-medium border border-amber-200 hover:bg-amber-100 transition">Enlace web</a>` : ''}
-                        </div>
-                        ` : ''}
-                    </div>
-                    ` : ''}
-                </article>
-            `}).join('');
-        }
-
-        async function alternarPrivacidad(id) {
-            const r = recetas.find(x => x.id === id);
-            if (!r) return;
-            const nueva = !r.publica;
-            const { error } = await db.from('recetas').update({ publica: nueva }).eq('id', id);
-            if (error) {
-                alert('No se pudo cambiar la privacidad: ' + error.message);
-                return;
-            }
-            r.publica = nueva;
-            filtrarRecetas();
-        }
 
         function toggleDropdownFormIngredientes() {
             const dropdown = document.getElementById('dropdown-form-ingredientes');
@@ -1182,6 +1169,7 @@
             const link_ig = document.getElementById('input-instagram').value.trim();
             const link_tiktok = document.getElementById('input-tiktok').value.trim();
             const link_otro = document.getElementById('input-link').value.trim();
+            const tipo_comida = (document.querySelector('input[name="tipo-comida"]:checked') || {}).value || null;
 
             if (ingredientesFormSeleccionados.length === 0) {
                 alert('Por favor selecciona al menos un ingrediente.');
@@ -1205,6 +1193,7 @@
                 link_ig,
                 link_tiktok,
                 link_otro,
+                tipo_comida,
                 publica: document.getElementById('input-publica').checked,
                 user_id: usuarioActual.id
             };
@@ -1224,7 +1213,7 @@
 
         function prepararEdicion(id) {
             const receta = recetas.find(r => r.id === id);
-            if (!receta) return;
+            if (!receta || receta.userId !== usuarioActual.id) return;
 
             document.getElementById('receta-id').value = receta.id;
             document.getElementById('formulario-titulo').innerText = 'Editar Receta';
@@ -1237,6 +1226,7 @@
             document.getElementById('input-tiktok').value = receta.tiktok || '';
             document.getElementById('input-link').value = receta.link || '';
             document.getElementById('input-publica').checked = receta.publica !== false;
+            document.querySelectorAll('input[name="tipo-comida"]').forEach(r => { r.checked = r.value === receta.tipo; });
 
             ingredientesFormSeleccionados = [...receta.ingredientes];
             renderizarChipsFormIngredientes();
@@ -1264,16 +1254,1366 @@
             sincronizarTablaCantidadesAuto();
         }
 
-        async function eliminarReceta(id) {
-            if (confirm("¿Seguro que deseas eliminar esta receta?")) {
-                const { error } = await db.from('recetas').delete().eq('id', id);
-                if (error) {
-                    alert("Error al eliminar la receta: " + error.message);
-                } else {
-                    await cargarRecetas();
+
+        // =====================================================
+        //  SOCIAL: perfiles, seguidores, timeline, colecciones,
+        //  recetas guardadas y enlaces para compartir
+        // =====================================================
+        const el = (id) => document.getElementById(id);
+        const PAGINA_TIMELINE = 12;
+
+        let seguidos = new Set();
+        let guardadasIds = new Set();
+        const perfilesCache = {};
+        const recetasVistas = {};
+        let misColecciones = [];
+        let coleccionesGuardadas = [];
+        let guardadasColIds = new Set();
+        let timeline = { items: [], offset: 0, fin: false, cargado: false, cargando: false };
+        let perfilVisto = null;
+        let subPerfil = 'recetas';
+        let detalleActual = null;
+        let explorarPersonas = [];
+        let listaPersonas = [];
+        let vistaActual = 'filtrar';
+        let vistaPrevia = null;
+        let editandoColeccionId = null;
+
+        // Enlace compartido que llegó en la URL (?receta=, ?coleccion= o ?perfil=)
+        let enlacePendiente = (function () {
+            const p = new URLSearchParams(window.location.search);
+            if (p.get('receta')) return { tipo: 'receta', valor: p.get('receta') };
+            if (p.get('coleccion')) return { tipo: 'coleccion', valor: p.get('coleccion') };
+            if (p.get('perfil')) return { tipo: 'perfil', valor: p.get('perfil') };
+            return null;
+        })();
+
+        // ---------- Iconos ----------
+        const ICONO_GUARDAR = 'M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z';
+        const ICONO_COMPARTIR = 'M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z';
+        const ICONO_USUARIOS = 'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z';
+        const ICONO_COLECCION = 'M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10';
+        const ICONO_LINK = 'M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1';
+        const ICONO_EXTERNO = 'M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14';
+        const ICONO_EDITAR = 'M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z';
+        const ICONO_BASURA = 'M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16';
+        const svg = (path, cls, relleno) => `<svg class="${cls || 'w-4 h-4'}" fill="${relleno ? 'currentColor' : 'none'}" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${path}"></path></svg>`;
+
+        // ---------- Utilidades ----------
+        let timerToast = null;
+        function toast(texto) {
+            const t = el('toast');
+            t.innerText = texto;
+            t.classList.remove('hidden');
+            clearTimeout(timerToast);
+            timerToast = setTimeout(() => t.classList.add('hidden'), 2800);
+        }
+
+        function cargandoHTML() {
+            return '<div class="text-center py-16 text-sm text-gray-400">Cargando...</div>';
+        }
+
+        function estadoVacioHTML(icono, titulo, texto, botonTexto, botonOnclick) {
+            return `
+                <div class="text-center py-14 px-6 bg-white rounded-2xl border border-dashed border-beige-border">
+                    <div class="inline-flex p-4 bg-beige-base rounded-2xl text-mostaza mb-5">${svg(icono, 'w-8 h-8')}</div>
+                    <h3 class="text-lg font-semibold text-verde-ingles">${esc(titulo)}</h3>
+                    <p class="text-sm text-gray-500 mt-2 ${botonTexto ? 'mb-6' : ''}">${esc(texto)}</p>
+                    ${botonTexto ? `<button type="button" onclick="${botonOnclick}" class="bg-verde-ingles text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-verde-hover transition shadow-soft">${esc(botonTexto)}</button>` : ''}
+                </div>`;
+        }
+
+        function tiempoRelativo(iso) {
+            if (!iso) return '';
+            const s = (Date.now() - new Date(iso).getTime()) / 1000;
+            if (isNaN(s)) return '';
+            if (s < 60) return 'recién';
+            const m = Math.floor(s / 60);
+            if (m < 60) return `hace ${m} min`;
+            const h = Math.floor(m / 60);
+            if (h < 24) return `hace ${h} h`;
+            const d = Math.floor(h / 24);
+            if (d < 7) return `hace ${d} d`;
+            return new Date(iso).toLocaleDateString('es-AR', { day: 'numeric', month: 'short' });
+        }
+
+        function normalizarUrl(v) {
+            v = (v || '').trim();
+            if (!v) return '';
+            if (v.startsWith('@')) v = 'https://instagram.com/' + v.slice(1);
+            else if (!/^https?:\/\//i.test(v)) v = 'https://' + v;
+            const u = urlSegura(v);
+            return u && u.length <= 200 ? u : '';
+        }
+
+        function etiquetaLink(url) {
+            try {
+                const u = new URL(url);
+                const host = u.hostname.replace(/^www\./, '');
+                if (host === 'instagram.com') {
+                    const h = u.pathname.split('/').filter(Boolean)[0];
+                    return h ? 'Instagram · @' + h : 'Instagram';
                 }
+                const texto = host + (u.pathname.length > 1 ? u.pathname.replace(/\/$/, '') : '');
+                return texto.length > 40 ? texto.slice(0, 40) + '…' : texto;
+            } catch (e) { return url; }
+        }
+
+        function mapearReceta(r) {
+            return {
+                id: String(r.id),
+                userId: r.user_id ? String(r.user_id) : null,
+                nombre: r.titulo || '',
+                descripcion: r.descripcion || '',
+                ingredientes: r.ingredientes || [],
+                tablaCantidades: r.cantidades || [],
+                procedimiento: r.procedimiento || '',
+                instagram: r.link_ig || '',
+                tiktok: r.link_tiktok || '',
+                link: r.link_otro || '',
+                publica: r.publica !== false,
+                tipo: r.tipo_comida || null,
+                creada: r.created_at || null
+            };
+        }
+
+        async function asegurarPerfiles(ids) {
+            const faltan = [...new Set(ids.filter(Boolean).map(String))].filter(id => !perfilesCache[id]);
+            if (!faltan.length) return;
+            try {
+                const { data, error } = await db.from('perfiles').select('*').in('id', faltan);
+                if (error) throw error;
+                (data || []).forEach(p => { perfilesCache[p.id] = p; });
+            } catch (err) {
+                console.warn('No se pudieron cargar perfiles:', err);
             }
         }
+
+        function buscarReceta(id) {
+            return recetas.find(r => r.id === id) || recetasVistas[id] || null;
+        }
+
+        function buscarColeccion(id) {
+            return misColecciones.find(c => c.id === id)
+                || coleccionesGuardadas.find(c => c.id === id)
+                || (perfilVisto && perfilVisto.colecciones.find(c => c.id === id))
+                || (detalleActual && detalleActual.coleccion && detalleActual.coleccion.id === id ? detalleActual.coleccion : null);
+        }
+
+        // ---------- Navegación ----------
+        const TABS = ['inicio', 'filtrar', 'colecciones', 'explorar', 'perfil'];
+        const VISTAS = ['inicio', 'filtrar', 'colecciones', 'explorar', 'perfil', 'agregar', 'detalle'];
+        const TAB_BASE = 'flex-1 flex flex-col sm:flex-row items-center justify-center gap-0.5 sm:gap-2 px-2 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition ';
+        const TAB_ACTIVA = TAB_BASE + 'bg-beige-card text-verde-ingles shadow-sm';
+        const TAB_INACTIVA = TAB_BASE + 'text-beige-card hover:text-white';
+
+        function actualizarTabs() {
+            let activa = vistaActual;
+            if (vistaActual === 'perfil' && perfilVisto && usuarioActual && perfilVisto.perfil.id !== usuarioActual.id) activa = null;
+            TABS.forEach(t => {
+                const b = el('tab-btn-' + t);
+                if (b) b.className = t === activa ? TAB_ACTIVA : TAB_INACTIVA;
+            });
+        }
+
+        function cambiarPestana(vista) {
+            if (vista !== vistaActual) vistaPrevia = vistaActual;
+            vistaActual = vista;
+            VISTAS.forEach(v => {
+                const sec = el('pestana-' + v);
+                if (sec) sec.classList.toggle('hidden', v !== vista);
+            });
+            actualizarTabs();
+
+            if (vista === 'inicio' && !timeline.cargado) cargarTimeline(true);
+            if (vista === 'inicio' && timeline.cargado) renderTimeline();
+            if (vista === 'colecciones') cargarColecciones();
+            if (vista === 'explorar') iniciarExplorar();
+            window.scrollTo({ top: 0 });
+        }
+
+        function volverVista() {
+            const destino = vistaPrevia && vistaPrevia !== vistaActual ? vistaPrevia : 'inicio';
+            cambiarPestana(destino);
+        }
+
+        function refrescarVistaActual() {
+            if (vistaActual === 'filtrar') filtrarRecetas();
+            else if (vistaActual === 'inicio') renderTimeline();
+            else if (vistaActual === 'perfil') renderPerfil();
+            else if (vistaActual === 'detalle') renderDetalle();
+            else if (vistaActual === 'explorar') renderExplorar();
+            else if (vistaActual === 'colecciones') renderMisColecciones();
+        }
+
+        // ---------- Compartir ----------
+        function urlBase() {
+            return window.location.origin + window.location.pathname;
+        }
+
+        async function copiarTexto(texto) {
+            try {
+                await navigator.clipboard.writeText(texto);
+                return true;
+            } catch (e) { /* probar alternativa */ }
+            try {
+                const ta = document.createElement('textarea');
+                ta.value = texto;
+                ta.style.position = 'fixed';
+                ta.style.opacity = '0';
+                document.body.appendChild(ta);
+                ta.select();
+                const ok = document.execCommand('copy');
+                ta.remove();
+                return ok;
+            } catch (e) { return false; }
+        }
+
+        async function compartirEnlace(url, titulo) {
+            if (navigator.share) {
+                try {
+                    await navigator.share({ title: titulo, url });
+                    return;
+                } catch (e) {
+                    if (e && e.name === 'AbortError') return;
+                }
+            }
+            toast((await copiarTexto(url)) ? 'Enlace copiado' : 'No se pudo copiar: ' + url);
+        }
+
+        function compartirReceta(id) {
+            const r = buscarReceta(id);
+            if (!r) return;
+            if (!r.publica) return toast('Es privada: hacela pública para poder compartirla.');
+            compartirEnlace(`${urlBase()}?receta=${encodeURIComponent(r.id)}`, r.nombre);
+        }
+
+        function compartirColeccion(id) {
+            const c = buscarColeccion(id);
+            if (!c) return;
+            if (c.publica === false) return toast('Es privada: hacela pública para poder compartirla.');
+            compartirEnlace(`${urlBase()}?coleccion=${encodeURIComponent(c.id)}`, c.nombre);
+        }
+
+        function compartirPerfil() {
+            if (!perfilVisto) return;
+            const p = perfilVisto.perfil;
+            compartirEnlace(`${urlBase()}?perfil=${encodeURIComponent(p.usuario)}`, p.nombre || p.usuario);
+        }
+
+        async function abrirEnlaceCompartido() {
+            if (!enlacePendiente) return false;
+            const e = enlacePendiente;
+            enlacePendiente = null;
+            try { window.history.replaceState(null, '', window.location.pathname); } catch (err) { /* ignorar */ }
+            if (e.tipo === 'receta') await abrirReceta(e.valor);
+            else if (e.tipo === 'coleccion') await abrirColeccion(e.valor);
+            else await mostrarPerfil({ usuario: e.valor });
+            return true;
+        }
+
+        // ---------- Tarjetas de receta ----------
+        function chipAutor(userId, tiempo) {
+            const p = perfilesCache[userId];
+            const nombre = p ? (p.nombre || p.usuario) : 'Usuario';
+            return `
+                <button type="button" onclick="verPerfilPorId('${esc(userId)}')" class="flex items-center gap-3 min-w-0 text-left group">
+                    ${avatarHTML(p, 'w-9 h-9', 'text-sm')}
+                    <span class="min-w-0">
+                        <span class="block text-sm font-medium text-gray-800 truncate group-hover:text-verde-ingles">${esc(nombre)}</span>
+                        <span class="block text-xs text-gray-500 truncate">${p ? '@' + esc(p.usuario) : ''}${tiempo ? ' · ' + esc(tiempo) : ''}</span>
+                    </span>
+                </button>`;
+        }
+
+        function etiquetaVerMas(abierta) {
+            return `<span>${abierta ? 'Ver menos' : 'Ver más'}</span>${svg(abierta ? 'M5 15l7-7 7 7' : 'M19 9l-7 7-7-7')}`;
+        }
+
+        function toggleDetalle(ctx, id) {
+            const clave = ctx + ':' + id;
+            estadoExpandido[clave] = !estadoExpandido[clave];
+            const det = el('det-' + ctx + '-' + id);
+            const btn = el('btn-det-' + ctx + '-' + id);
+            if (det) det.classList.toggle('hidden', !estadoExpandido[clave]);
+            if (btn) btn.innerHTML = etiquetaVerMas(estadoExpandido[clave]);
+        }
+
+        function botonGuardar(r) {
+            const g = guardadasIds.has(r.id);
+            const clase = g
+                ? 'text-mostaza bg-amber-50 border-amber-200 hover:bg-amber-100'
+                : 'text-gray-600 bg-white border-beige-border hover:bg-beige-base';
+            return `
+                <button type="button" onclick="alternarGuardada('${esc(r.id)}')" title="${g ? 'Quitar de guardadas' : 'Guardar en mi recetario'}" class="inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full border transition ${clase}">
+                    ${svg(ICONO_GUARDAR, 'w-3.5 h-3.5', g)}
+                    <span>${g ? 'Guardada' : 'Guardar'}</span>
+                </button>`;
+        }
+
+        function tarjetaReceta(r, ctx) {
+            const propia = r.userId === usuarioActual.id;
+            const clave = ctx + ':' + r.id;
+            const abierta = !!estadoExpandido[clave];
+            const idAttr = esc(r.id);
+            const ig = urlSegura(r.instagram);
+            const tt = urlSegura(r.tiktok);
+            const web = urlSegura(r.link);
+
+            const filasTabla = (r.tablaCantidades || []).map(item => `
+                <tr class="border-b border-beige-border/60 last:border-0">
+                    <td class="py-2.5 px-4 font-medium text-gray-800">${esc(item.ingrediente)}</td>
+                    <td class="py-2.5 px-4 text-gray-600">${esc(item.cantidad || '-')}</td>
+                </tr>`).join('');
+
+            const chipTipo = r.tipo && TIPOS_COMIDA[r.tipo]
+                ? `<span class="px-3 py-1 rounded-full text-xs font-medium bg-amber-50 text-amber-800 border border-amber-200">${esc(TIPOS_COMIDA[r.tipo])}</span>`
+                : '';
+            const chips = chipTipo + r.ingredientes.map(ing => {
+                const esIncluido = ingredientesIncluidos.includes(ing);
+                const claseChip = esIncluido
+                    ? 'bg-verde-chip text-white font-medium'
+                    : 'bg-beige-base text-gray-600 border border-beige-border';
+                return `<span class="px-3 py-1 rounded-full text-xs ${claseChip}">${esc(ing)}</span>`;
+            }).join('');
+
+            const pill = (href, texto, clase) => `
+                <a href="${esc(href)}" target="_blank" rel="noopener noreferrer nofollow" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition ${clase}">
+                    ${svg(ICONO_EXTERNO, 'w-3.5 h-3.5')}<span>${texto}</span>
+                </a>`;
+            const enlaces = [
+                ig ? pill(enlaceSalida(r, 'ig', ig), 'Instagram', 'bg-pink-50 text-pink-700 border-pink-200 hover:bg-pink-100') : '',
+                tt ? pill(enlaceSalida(r, 'tt', tt), 'TikTok', 'bg-gray-100 text-gray-800 border-gray-300 hover:bg-gray-200') : '',
+                web ? pill(enlaceSalida(r, 'web', web), 'Enlace web', 'bg-amber-50 text-amber-800 border-amber-200 hover:bg-amber-100') : ''
+            ].join('');
+
+            const badgeClase = r.publica
+                ? 'text-verde-chip bg-green-50 border-green-200 hover:bg-green-100'
+                : 'text-gray-600 bg-beige-base border-beige-border hover:bg-beige-border/60';
+
+            const izquierda = propia ? `
+                <button type="button" onclick="alternarPrivacidad('${idAttr}')" title="${r.publica ? 'Pública: tocá para hacerla privada' : 'Privada: tocá para hacerla pública'}" class="inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full border transition ${badgeClase}">
+                    ${svg(r.publica ? ICONO_MUNDO : ICONO_CANDADO, 'w-3.5 h-3.5')}
+                    <span>${r.publica ? 'Pública' : 'Privada'}</span>
+                </button>` : botonGuardar(r);
+
+            const accionesPropias = propia ? `
+                <div class="flex items-center gap-1 shrink-0">
+                    <button onclick="prepararEdicion('${idAttr}')" title="Editar" class="p-2 rounded-lg text-gray-400 hover:text-verde-ingles hover:bg-beige-base transition">${svg(ICONO_EDITAR)}</button>
+                    <button onclick="eliminarReceta('${idAttr}')" title="Eliminar" class="p-2 rounded-lg text-gray-400 hover:text-rojo-excluir hover:bg-beige-base transition">${svg(ICONO_BASURA)}</button>
+                </div>` : '';
+
+            return `
+            <article class="bg-white rounded-2xl p-6 shadow-soft border border-beige-border space-y-4">
+                ${propia ? '' : `<div class="pb-1">${chipAutor(r.userId, ctx === 'inicio' ? tiempoRelativo(r.creada) : '')}</div>`}
+
+                <div class="flex justify-between items-start gap-3">
+                    <div class="min-w-0 space-y-1">
+                        <h3 class="text-lg font-semibold text-verde-ingles leading-snug">${esc(r.nombre)}</h3>
+                        ${r.descripcion ? `<p class="text-sm text-gray-500">${esc(r.descripcion)}</p>` : ''}
+                    </div>
+                    ${accionesPropias}
+                </div>
+
+                <div class="flex flex-wrap gap-2">${chips}</div>
+
+                ${enlaces ? `<div class="flex flex-wrap gap-2">${enlaces}</div>` : ''}
+
+                <div class="flex items-center justify-between gap-3 pt-2">
+                    <div class="flex items-center gap-2">
+                        ${izquierda}
+                        <button type="button" onclick="compartirReceta('${idAttr}')" title="Compartir" class="p-2 rounded-full text-gray-400 hover:text-verde-ingles hover:bg-beige-base transition">${svg(ICONO_COMPARTIR)}</button>
+                    </div>
+                    <button id="btn-det-${ctx}-${idAttr}" onclick="toggleDetalle('${ctx}', '${idAttr}')" class="px-3.5 py-1.5 rounded-full text-verde-ingles hover:bg-beige-base transition border border-beige-border flex items-center gap-1.5 text-sm font-medium">${etiquetaVerMas(abierta)}</button>
+                </div>
+
+                <div id="det-${ctx}-${idAttr}" class="${abierta ? '' : 'hidden'} pt-5 border-t border-beige-border space-y-5">
+                    <div class="space-y-2">
+                        <span class="text-sm font-semibold text-verde-ingles">Ingredientes y cantidades</span>
+                        <div class="border border-beige-border rounded-xl overflow-hidden bg-white">
+                            <table class="w-full text-left text-sm">
+                                <thead class="bg-beige-base text-verde-ingles font-semibold border-b border-beige-border">
+                                    <tr><th class="py-2.5 px-4">Ingrediente</th><th class="py-2.5 px-4">Cantidad</th></tr>
+                                </thead>
+                                <tbody>${filasTabla}</tbody>
+                            </table>
+                        </div>
+                    </div>
+                    ${r.procedimiento ? `
+                    <div class="space-y-2">
+                        <span class="text-sm font-semibold text-verde-ingles">Procedimiento</span>
+                        <p class="text-sm text-gray-700 leading-relaxed whitespace-pre-line bg-beige-base/70 p-4 rounded-xl">${esc(r.procedimiento)}</p>
+                    </div>` : ''}
+                </div>
+            </article>`;
+        }
+
+        function listaTarjetas(lista, ctx) {
+            return lista.map(r => tarjetaReceta(r, ctx)).join('');
+        }
+
+        // ---------- Guardar recetas de otras personas ----------
+        async function alternarGuardada(id) {
+            const r = buscarReceta(id);
+            if (!r) return;
+            const yaGuardada = guardadasIds.has(id);
+            const res = yaGuardada
+                ? await db.from('recetas_guardadas').delete().eq('user_id', usuarioActual.id).eq('receta_id', id)
+                : await db.from('recetas_guardadas').insert({ user_id: usuarioActual.id, receta_id: id });
+            if (res.error) {
+                toast('No se pudo guardar: ' + res.error.message);
+                return;
+            }
+            toast(yaGuardada ? 'Quitada de tus guardadas' : 'Guardada en tu recetario');
+            await cargarRecetas();
+            refrescarVistaActual();
+        }
+
+        // ---------- Seguir ----------
+        async function cargarSeguidos() {
+            seguidos = new Set();
+            try {
+                const { data, error } = await db.from('seguidores').select('seguido_id').eq('seguidor_id', usuarioActual.id);
+                if (error) throw error;
+                (data || []).forEach(x => seguidos.add(String(x.seguido_id)));
+            } catch (err) {
+                console.warn('No se pudieron cargar los seguidos:', err);
+            }
+        }
+
+        function botonSeguir(id) {
+            const sig = seguidos.has(id);
+            const clase = sig
+                ? 'bg-white text-verde-ingles border border-verde-ingles/40 hover:bg-red-50 hover:text-rojo-excluir hover:border-rojo-excluir/40'
+                : 'bg-verde-ingles text-white border border-verde-ingles hover:bg-verde-hover';
+            return `<button type="button" onclick="event.stopPropagation(); alternarSeguir('${esc(id)}')" class="px-4 py-2 rounded-xl text-sm font-medium transition shrink-0 ${clase}">${sig ? 'Siguiendo' : 'Seguir'}</button>`;
+        }
+
+        async function alternarSeguir(id) {
+            const yo = usuarioActual.id;
+            if (id === yo) return;
+            const siguiendo = seguidos.has(id);
+            const res = siguiendo
+                ? await db.from('seguidores').delete().eq('seguidor_id', yo).eq('seguido_id', id)
+                : await db.from('seguidores').insert({ seguidor_id: yo, seguido_id: id });
+            if (res.error) {
+                toast('No se pudo actualizar: ' + res.error.message);
+                return;
+            }
+            if (siguiendo) seguidos.delete(id); else seguidos.add(id);
+            timeline.cargado = false;
+            if (perfilVisto) {
+                if (perfilVisto.perfil.id === id) perfilVisto.nSeguidores += siguiendo ? -1 : 1;
+                if (perfilVisto.perfil.id === yo) perfilVisto.nSeguidos += siguiendo ? -1 : 1;
+            }
+            if (vistaActual !== 'inicio') refrescarVistaActual();
+            if (!el('modal-personas').classList.contains('hidden')) renderListaPersonas();
+        }
+
+        function filaPersona(p) {
+            const yo = p.id === usuarioActual.id;
+            return `
+                <div onclick="verPerfilPorId('${esc(p.id)}')" class="flex items-center gap-4 bg-white rounded-2xl p-4 border border-beige-border shadow-soft cursor-pointer hover:border-verde-chip transition">
+                    ${avatarHTML(p, 'w-12 h-12', 'text-lg')}
+                    <div class="min-w-0 flex-1">
+                        <div class="text-sm font-semibold text-gray-800 truncate">${esc(p.nombre || p.usuario)}</div>
+                        <div class="text-xs text-gray-500 truncate">@${esc(p.usuario)}</div>
+                        ${p.bio ? `<div class="text-xs text-gray-500 mt-1 truncate">${esc(p.bio)}</div>` : ''}
+                    </div>
+                    ${yo ? '' : botonSeguir(p.id)}
+                </div>`;
+        }
+
+        // ---------- Timeline ----------
+        async function cargarTimeline(reiniciar) {
+            if (timeline.cargando) return;
+            if (reiniciar) timeline = { items: [], offset: 0, fin: false, cargado: false, cargando: false };
+            if (seguidos.size === 0) {
+                timeline.cargado = true;
+                renderTimeline();
+                return;
+            }
+            timeline.cargando = true;
+            if (reiniciar) renderTimeline();
+            try {
+                const { data, error } = await db.from('recetas').select('*')
+                    .in('user_id', [...seguidos])
+                    .eq('publica', true)
+                    .order('created_at', { ascending: false })
+                    .range(timeline.offset, timeline.offset + PAGINA_TIMELINE - 1);
+                if (error) throw error;
+                await asegurarPerfiles(data.map(r => r.user_id));
+                const nuevas = data.map(mapearReceta);
+                nuevas.forEach(r => { recetasVistas[r.id] = r; });
+                timeline.items.push(...nuevas);
+                timeline.offset += data.length;
+                timeline.fin = data.length < PAGINA_TIMELINE;
+            } catch (err) {
+                console.error('Error en la timeline:', err);
+                toast('No se pudieron cargar las novedades.');
+            } finally {
+                timeline.cargado = true;
+                timeline.cargando = false;
+                renderTimeline();
+            }
+        }
+
+        function renderTimeline() {
+            const cont = el('timeline-lista');
+            if (seguidos.size === 0) {
+                cont.innerHTML = estadoVacioHTML(ICONO_USUARIOS, 'Todavía no seguís a nadie', 'Seguí a otras personas para ver acá sus recetas nuevas.', 'Buscar personas', "cambiarPestana('explorar')");
+                return;
+            }
+            if (!timeline.cargado) { cont.innerHTML = cargandoHTML(); return; }
+            if (timeline.items.length === 0) {
+                cont.innerHTML = estadoVacioHTML(ICONO_USUARIOS, 'Todavía no hay novedades', 'Las personas que seguís aún no publicaron recetas públicas.', '', '');
+                return;
+            }
+            cont.innerHTML = listaTarjetas(timeline.items, 'inicio') + (timeline.fin ? '' : `
+                <div class="text-center pt-2">
+                    <button type="button" onclick="cargarTimeline(false)" class="px-5 py-2.5 rounded-xl text-sm font-medium text-verde-ingles border border-beige-border bg-white hover:bg-beige-base transition">Ver más recetas</button>
+                </div>`);
+        }
+
+        // ---------- Explorar personas ----------
+        let timerBusqueda = null;
+
+        async function iniciarExplorar() {
+            if (el('input-buscar-personas').value.trim()) return;
+            el('explorar-titulo').innerText = 'Personas nuevas';
+            try {
+                const { data, error } = await db.from('perfiles').select('*')
+                    .neq('id', usuarioActual.id)
+                    .order('created_at', { ascending: false })
+                    .limit(12);
+                if (error) throw error;
+                explorarPersonas = data || [];
+                explorarPersonas.forEach(p => { perfilesCache[p.id] = p; });
+            } catch (err) {
+                console.error('Error al cargar personas:', err);
+                explorarPersonas = [];
+            }
+            renderExplorar();
+        }
+
+        function buscarPersonasDebounce() {
+            clearTimeout(timerBusqueda);
+            timerBusqueda = setTimeout(buscarPersonas, 350);
+        }
+
+        async function buscarPersonas() {
+            const crudo = el('input-buscar-personas').value.trim();
+            if (!crudo) return iniciarExplorar();
+            const q = crudo.replace(/[\\%_]/g, m => '\\' + m);
+            el('explorar-titulo').innerText = 'Resultados';
+            try {
+                const [porUsuario, porNombre] = await Promise.all([
+                    db.from('perfiles').select('*').ilike('usuario', `%${q}%`).limit(20),
+                    db.from('perfiles').select('*').ilike('nombre', `%${q}%`).limit(20)
+                ]);
+                if (el('input-buscar-personas').value.trim() !== crudo) return;
+                const mapa = new Map();
+                [...(porUsuario.data || []), ...(porNombre.data || [])].forEach(p => mapa.set(p.id, p));
+                const minus = crudo.toLowerCase();
+                explorarPersonas = [...mapa.values()]
+                    .filter(p => p.id !== usuarioActual.id)
+                    .sort((a, b) => (b.usuario.startsWith(minus) ? 1 : 0) - (a.usuario.startsWith(minus) ? 1 : 0));
+                explorarPersonas.forEach(p => { perfilesCache[p.id] = p; });
+            } catch (err) {
+                console.error('Error en la búsqueda:', err);
+                explorarPersonas = [];
+            }
+            renderExplorar();
+        }
+
+        function renderExplorar() {
+            const cont = el('explorar-lista');
+            if (!explorarPersonas.length) {
+                cont.innerHTML = '<div class="text-center py-12 text-sm text-gray-500 bg-white rounded-2xl border border-dashed border-beige-border">No encontramos a nadie.</div>';
+                return;
+            }
+            cont.innerHTML = explorarPersonas.map(filaPersona).join('');
+        }
+
+        // ---------- Seguidores / seguidos (ventana) ----------
+        async function abrirListaPersonas(tipo, id) {
+            el('personas-titulo').innerText = tipo === 'seguidores' ? 'Seguidores' : 'Siguiendo';
+            el('personas-lista').innerHTML = cargandoHTML();
+            el('modal-personas').classList.remove('hidden');
+            const col = tipo === 'seguidores' ? 'seguido_id' : 'seguidor_id';
+            const otra = tipo === 'seguidores' ? 'seguidor_id' : 'seguido_id';
+            try {
+                const { data, error } = await db.from('seguidores').select(otra).eq(col, id).order('created_at', { ascending: false }).limit(200);
+                if (error) throw error;
+                const ids = (data || []).map(x => String(x[otra]));
+                await asegurarPerfiles(ids);
+                listaPersonas = ids.map(i => perfilesCache[i]).filter(Boolean);
+            } catch (err) {
+                console.error('Error al cargar la lista:', err);
+                listaPersonas = [];
+            }
+            renderListaPersonas();
+        }
+
+        function renderListaPersonas() {
+            el('personas-lista').innerHTML = listaPersonas.length
+                ? listaPersonas.map(filaPersona).join('')
+                : '<div class="text-center py-10 text-sm text-gray-500">Todavía no hay nadie acá.</div>';
+        }
+
+        function cerrarPersonas() {
+            el('modal-personas').classList.add('hidden');
+        }
+
+        // ---------- Perfiles ----------
+        async function verPerfilPorId(id) {
+            cerrarPersonas();
+            await mostrarPerfil({ id });
+        }
+
+        function verPerfilPropio() {
+            return mostrarPerfil({ id: usuarioActual.id });
+        }
+
+        async function mostrarPerfil({ id, usuario }) {
+            perfilVisto = null;
+            cambiarPestana('perfil');
+            el('perfil-contenido').innerHTML = cargandoHTML();
+            try {
+                let q = db.from('perfiles').select('*');
+                q = id ? q.eq('id', id) : q.eq('usuario', String(usuario).toLowerCase());
+                const { data: p, error } = await q.maybeSingle();
+                if (error) throw error;
+                if (!p) {
+                    el('perfil-contenido').innerHTML = `<button onclick="volverVista()" class="mb-4 text-sm text-gray-500 hover:text-verde-ingles">← Volver</button>` +
+                        estadoVacioHTML(ICONO_USUARIOS, 'Este perfil no existe', 'Puede que el usuario haya cambiado o ya no esté.', '', '');
+                    return;
+                }
+                perfilesCache[p.id] = p;
+
+                const [recRes, colRes, segRes, sigRes] = await Promise.all([
+                    db.from('recetas').select('*').eq('user_id', p.id).eq('publica', true).order('created_at', { ascending: false }),
+                    db.from('colecciones').select('*').eq('user_id', p.id).eq('publica', true).order('created_at', { ascending: false }),
+                    db.from('seguidores').select('*', { count: 'exact', head: true }).eq('seguido_id', p.id),
+                    db.from('seguidores').select('*', { count: 'exact', head: true }).eq('seguidor_id', p.id)
+                ]);
+
+                const recs = (recRes.data || []).map(mapearReceta);
+                recs.forEach(r => { recetasVistas[r.id] = r; });
+                const cols = colRes.data || [];
+                let items = [];
+                if (cols.length) {
+                    const ir = await db.from('coleccion_recetas').select('coleccion_id, receta_id').in('coleccion_id', cols.map(c => c.id));
+                    items = ir.data || [];
+                }
+                const publicas = new Set(recs.map(r => r.id));
+                const colecciones = cols.map(c => ({
+                    ...c,
+                    cantidad: items.filter(i => i.coleccion_id === c.id && publicas.has(String(i.receta_id))).length
+                }));
+
+                perfilVisto = { perfil: p, recetas: recs, colecciones, nSeguidores: segRes.count || 0, nSeguidos: sigRes.count || 0 };
+                subPerfil = 'recetas';
+                actualizarTabs();
+                renderPerfil();
+            } catch (err) {
+                console.error('Error al cargar el perfil:', err);
+                el('perfil-contenido').innerHTML = estadoVacioHTML(ICONO_USUARIOS, 'No se pudo cargar el perfil', 'Probá de nuevo en un momento.', '', '');
+            }
+        }
+
+        function cambiarSubPerfil(sub) {
+            subPerfil = sub;
+            renderPerfil();
+        }
+
+        function botonGuardarColeccion(c) {
+            const g = guardadasColIds.has(c.id);
+            const clase = g
+                ? 'text-mostaza bg-amber-50 border-amber-200 hover:bg-amber-100'
+                : 'text-gray-600 bg-white border-beige-border hover:bg-beige-base';
+            return `
+                <button type="button" onclick="event.stopPropagation(); alternarColeccionGuardada('${esc(c.id)}')" title="${g ? 'Quitar de guardadas' : 'Guardar esta colección'}" class="inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full border transition ${clase}">
+                    ${svg(ICONO_GUARDAR, 'w-3.5 h-3.5', g)}
+                    <span>${g ? 'Guardada' : 'Guardar'}</span>
+                </button>`;
+        }
+
+        function tarjetaColeccion(c, propia, conAutor) {
+            const cantidad = propia ? c.recetaIds.length : c.cantidad;
+            const idAttr = esc(c.id);
+            return `
+                <article onclick="abrirColeccion('${idAttr}')" class="bg-white rounded-2xl p-6 shadow-soft border border-beige-border cursor-pointer hover:border-verde-chip transition flex flex-col gap-4">
+                    ${conAutor ? `<div onclick="event.stopPropagation()">${chipAutor(c.user_id, '')}</div>` : ''}
+                    <div class="flex justify-between items-start gap-3">
+                        <div class="min-w-0 space-y-1">
+                            <h3 class="text-lg font-semibold text-verde-ingles leading-snug">${esc(c.nombre)}</h3>
+                            ${c.descripcion ? `<p class="text-sm text-gray-500">${esc(c.descripcion)}</p>` : ''}
+                        </div>
+                        <div class="text-mostaza shrink-0">${svg(ICONO_COLECCION, 'w-6 h-6')}</div>
+                    </div>
+                    <div class="flex items-center justify-between gap-2 mt-auto">
+                        <div class="flex items-center gap-2 text-sm text-gray-500">
+                            <span>${cantidad} ${cantidad === 1 ? 'receta' : 'recetas'}</span>
+                            ${propia ? `<span class="inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full border ${c.publica ? 'text-verde-chip bg-green-50 border-green-200' : 'text-gray-600 bg-beige-base border-beige-border'}">${svg(c.publica ? ICONO_MUNDO : ICONO_CANDADO, 'w-3 h-3')}${c.publica ? 'Pública' : 'Privada'}</span>` : ''}
+                        </div>
+                        <div class="flex items-center gap-1" onclick="event.stopPropagation()">
+                            ${propia ? '' : botonGuardarColeccion(c)}
+                            <button type="button" onclick="compartirColeccion('${idAttr}')" title="Compartir" class="p-2 rounded-lg text-gray-400 hover:text-verde-ingles hover:bg-beige-base transition">${svg(ICONO_COMPARTIR)}</button>
+                            ${propia ? `
+                            <button type="button" onclick="abrirEditorColeccion('${idAttr}')" title="Editar" class="p-2 rounded-lg text-gray-400 hover:text-verde-ingles hover:bg-beige-base transition">${svg(ICONO_EDITAR)}</button>
+                            <button type="button" onclick="eliminarColeccion('${idAttr}')" title="Eliminar" class="p-2 rounded-lg text-gray-400 hover:text-rojo-excluir hover:bg-beige-base transition">${svg(ICONO_BASURA)}</button>` : ''}
+                        </div>
+                    </div>
+                </article>`;
+        }
+
+        function renderPerfil() {
+            const pv = perfilVisto;
+            if (!pv) return;
+            const p = pv.perfil;
+            const yo = p.id === usuarioActual.id;
+            const linkSeguro = urlSegura(p.link);
+            const tabBase = 'px-4 py-2.5 rounded-xl text-sm font-medium transition border ';
+            const tabOn = tabBase + 'bg-verde-ingles text-white border-verde-ingles';
+            const tabOff = tabBase + 'bg-white text-gray-600 border-beige-border hover:bg-beige-base';
+
+            let contenido;
+            if (subPerfil === 'recetas') {
+                contenido = pv.recetas.length
+                    ? `<div class="flex flex-col gap-5">${listaTarjetas(pv.recetas, 'perfil')}</div>`
+                    : estadoVacioHTML(ICONO_COLECCION, 'Todavía no hay recetas públicas', yo ? 'Las recetas nuevas son públicas por defecto.' : 'Cuando publique alguna, la vas a ver acá.', '', '');
+            } else {
+                contenido = pv.colecciones.length
+                    ? `<div class="grid grid-cols-1 sm:grid-cols-2 gap-5">${pv.colecciones.map(c => tarjetaColeccion(c, c.user_id === usuarioActual.id, false)).join('')}</div>`
+                    : estadoVacioHTML(ICONO_COLECCION, 'Todavía no hay colecciones públicas', yo ? 'Creá una desde la pestaña Colecciones.' : 'Cuando publique alguna, la vas a ver acá.', '', '');
+            }
+
+            el('perfil-contenido').innerHTML = `
+                ${yo ? '' : `<button type="button" onclick="volverVista()" class="mb-4 inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-verde-ingles">${svg('M15 19l-7-7 7-7')}<span>Volver</span></button>`}
+                <div class="space-y-6">
+                    <div class="bg-white rounded-2xl p-6 sm:p-8 shadow-soft border border-beige-border space-y-5">
+                        <div class="flex flex-col sm:flex-row sm:items-center gap-5">
+                            <div class="shrink-0">${avatarHTML(p, 'w-24 h-24', 'text-3xl')}</div>
+                            <div class="min-w-0 flex-1 space-y-1">
+                                <h2 class="text-xl font-semibold text-verde-ingles truncate">${esc(p.nombre || p.usuario)}</h2>
+                                <div class="text-sm text-gray-500">@${esc(p.usuario)}</div>
+                                <div class="flex gap-5 pt-2 text-sm">
+                                    <button type="button" onclick="abrirListaPersonas('seguidores', '${esc(p.id)}')" class="hover:text-verde-ingles transition"><span class="font-semibold text-gray-800">${pv.nSeguidores}</span> <span class="text-gray-500">${pv.nSeguidores === 1 ? 'seguidor' : 'seguidores'}</span></button>
+                                    <button type="button" onclick="abrirListaPersonas('seguidos', '${esc(p.id)}')" class="hover:text-verde-ingles transition"><span class="font-semibold text-gray-800">${pv.nSeguidos}</span> <span class="text-gray-500">siguiendo</span></button>
+                                </div>
+                            </div>
+                            <div class="flex gap-2 shrink-0">
+                                ${yo
+                                    ? `<button type="button" onclick="abrirEditorPerfil()" class="px-4 py-2 rounded-xl text-sm font-medium border border-beige-border bg-white text-verde-ingles hover:bg-beige-base transition">Editar perfil</button>`
+                                    : botonSeguir(p.id)}
+                                <button type="button" onclick="compartirPerfil()" title="Compartir perfil" class="p-2.5 rounded-xl border border-beige-border text-gray-500 hover:text-verde-ingles hover:bg-beige-base transition">${svg(ICONO_COMPARTIR)}</button>
+                            </div>
+                        </div>
+                        ${p.bio ? `<p class="text-sm text-gray-700 leading-relaxed whitespace-pre-line">${esc(p.bio)}</p>` : (yo ? '<p class="text-sm text-gray-400">Todavía no escribiste una bio. Podés agregarla desde Editar perfil.</p>' : '')}
+                        ${linkSeguro ? `<a href="${esc(linkSeguro)}" target="_blank" rel="noopener noreferrer nofollow" class="inline-flex items-center gap-2 text-sm font-medium text-verde-ingles underline underline-offset-4 hover:text-verde-hover">${svg(ICONO_LINK)}<span>${esc(etiquetaLink(linkSeguro))}</span></a>` : ''}
+                        ${yo ? '<p class="text-xs text-gray-400">Así ven tu perfil las demás personas: solo tus recetas y colecciones públicas.</p>' : ''}
+                    </div>
+
+                    <div class="flex gap-2">
+                        <button type="button" onclick="cambiarSubPerfil('recetas')" class="${subPerfil === 'recetas' ? tabOn : tabOff}">Recetas (${pv.recetas.length})</button>
+                        <button type="button" onclick="cambiarSubPerfil('colecciones')" class="${subPerfil === 'colecciones' ? tabOn : tabOff}">Colecciones (${pv.colecciones.length})</button>
+                    </div>
+
+                    ${contenido}
+                </div>`;
+        }
+
+        // ---------- Editar perfil ----------
+        function abrirEditorPerfil() {
+            el('perfil-avatar-grande').innerHTML = avatarHTML(perfilActual, 'w-24 h-24', 'text-3xl');
+            el('perfil-usuario').innerText = '@' + (perfilActual.usuario || '');
+            el('perfil-nombre').value = perfilActual.nombre || '';
+            el('perfil-bio').value = perfilActual.bio || '';
+            el('perfil-link').value = perfilActual.link || '';
+            el('perfil-mensaje').classList.add('hidden');
+            el('modal-perfil').classList.remove('hidden');
+        }
+
+        function cerrarEditorPerfil() {
+            el('modal-perfil').classList.add('hidden');
+        }
+
+        async function guardarPerfil() {
+            const nombre = el('perfil-nombre').value.trim();
+            const bio = el('perfil-bio').value.trim();
+            const linkCrudo = el('perfil-link').value.trim();
+            if (!nombre) return mensajePerfil('El nombre no puede estar vacío.', false);
+            let link = '';
+            if (linkCrudo) {
+                link = normalizarUrl(linkCrudo);
+                if (!link) return mensajePerfil('El enlace no es válido. Ejemplo: https://instagram.com/tu_usuario', false);
+            }
+            if (perfilActual.local) return mensajePerfil('Tu perfil todavía no está configurado en la base de datos.', false);
+
+            const { error } = await db.from('perfiles').update({ nombre, bio: bio || null, link: link || null }).eq('id', usuarioActual.id);
+            if (error) return mensajePerfil('No se pudo guardar: ' + error.message, false);
+
+            Object.assign(perfilActual, { nombre, bio: bio || null, link: link || null });
+            perfilesCache[usuarioActual.id] = perfilActual;
+            pintarAvatarHeader();
+            if (perfilVisto && perfilVisto.perfil.id === usuarioActual.id) {
+                perfilVisto.perfil = perfilActual;
+                renderPerfil();
+            }
+            el('perfil-link').value = link;
+            mensajePerfil('Cambios guardados.', true);
+        }
+
+        // ---------- Colecciones ----------
+        async function cargarMisColecciones() {
+            try {
+                const { data, error } = await db.from('colecciones').select('*').eq('user_id', usuarioActual.id).order('created_at', { ascending: false });
+                if (error) throw error;
+                const cols = data || [];
+                let items = [];
+                if (cols.length) {
+                    const ir = await db.from('coleccion_recetas').select('coleccion_id, receta_id').in('coleccion_id', cols.map(c => c.id));
+                    items = ir.data || [];
+                }
+                misColecciones = cols.map(c => ({
+                    ...c,
+                    recetaIds: items.filter(i => i.coleccion_id === c.id).map(i => String(i.receta_id))
+                }));
+            } catch (err) {
+                console.warn('No se pudieron cargar las colecciones:', err);
+                misColecciones = [];
+            }
+        }
+
+        async function cargarColeccionesGuardadas() {
+            guardadasColIds = new Set();
+            coleccionesGuardadas = [];
+            try {
+                const { data, error } = await db.from('colecciones_guardadas').select('coleccion_id').eq('user_id', usuarioActual.id);
+                if (error) throw error;
+                const ids = (data || []).map(x => String(x.coleccion_id));
+                if (!ids.length) return;
+                const { data: cols } = await db.from('colecciones').select('*').in('id', ids);
+                const lista = cols || [];
+                if (!lista.length) return;
+                const ir = await db.from('coleccion_recetas').select('coleccion_id, receta_id').in('coleccion_id', lista.map(c => c.id));
+                const items = ir.data || [];
+                const todos = [...new Set(items.map(i => String(i.receta_id)))];
+                let visibles = new Set();
+                if (todos.length) {
+                    const rr = await db.from('recetas').select('id').in('id', todos);
+                    visibles = new Set((rr.data || []).map(r => String(r.id)));
+                }
+                coleccionesGuardadas = lista.map(c => ({
+                    ...c,
+                    cantidad: items.filter(i => i.coleccion_id === c.id && visibles.has(String(i.receta_id))).length
+                }));
+                coleccionesGuardadas.forEach(c => guardadasColIds.add(c.id));
+                await asegurarPerfiles(lista.map(c => c.user_id));
+            } catch (err) {
+                console.warn('No se pudieron cargar las colecciones guardadas:', err);
+            }
+        }
+
+        async function cargarColecciones() {
+            await Promise.all([cargarMisColecciones(), cargarColeccionesGuardadas()]);
+            renderMisColecciones();
+        }
+
+        async function alternarColeccionGuardada(id) {
+            const yaGuardada = guardadasColIds.has(id);
+            const res = yaGuardada
+                ? await db.from('colecciones_guardadas').delete().eq('user_id', usuarioActual.id).eq('coleccion_id', id)
+                : await db.from('colecciones_guardadas').insert({ user_id: usuarioActual.id, coleccion_id: id });
+            if (res.error) {
+                toast('No se pudo guardar: ' + res.error.message);
+                return;
+            }
+            toast(yaGuardada ? 'Colección quitada de tus guardadas' : 'Colección guardada');
+            await cargarColeccionesGuardadas();
+            refrescarVistaActual();
+        }
+
+        function renderMisColecciones() {
+            const cont = el('colecciones-lista');
+            if (!misColecciones.length) {
+                cont.className = '';
+                cont.innerHTML = estadoVacioHTML(ICONO_COLECCION, 'Todavía no tenés colecciones', 'Agrupá tus recetas en colecciones y compartilas con un enlace.', 'Crear mi primera colección', 'abrirEditorColeccion()');
+            } else {
+                cont.className = 'grid grid-cols-1 sm:grid-cols-2 gap-5';
+                cont.innerHTML = misColecciones.map(c => tarjetaColeccion(c, true, false)).join('');
+            }
+            el('bloque-col-guardadas').classList.toggle('hidden', coleccionesGuardadas.length === 0);
+            el('colecciones-guardadas-lista').innerHTML = coleccionesGuardadas.map(c => tarjetaColeccion(c, false, true)).join('');
+        }
+
+        function abrirEditorColeccion(id) {
+            editandoColeccionId = id || null;
+            const c = id ? misColecciones.find(x => x.id === id) : null;
+            el('col-titulo-modal').innerText = c ? 'Editar colección' : 'Nueva colección';
+            el('col-nombre').value = c ? c.nombre : '';
+            el('col-descripcion').value = c ? (c.descripcion || '') : '';
+            el('col-publica').checked = c ? c.publica !== false : true;
+
+            const propias = recetas.filter(r => r.userId === usuarioActual.id);
+            const marcadas = new Set(c ? c.recetaIds : []);
+            el('col-recetas').innerHTML = propias.length
+                ? propias.map(r => `
+                    <label class="flex items-center gap-3 p-3 rounded-xl border border-beige-border hover:bg-beige-base cursor-pointer">
+                        <input type="checkbox" value="${esc(r.id)}" ${marcadas.has(r.id) ? 'checked' : ''} class="w-4 h-4 accent-[#2d6a4f]">
+                        <span class="text-sm text-gray-800 flex-1 min-w-0 truncate">${esc(r.nombre)}</span>
+                        ${r.publica ? '' : '<span class="text-xs text-gray-400 shrink-0">privada</span>'}
+                    </label>`).join('')
+                : '<p class="text-sm text-gray-500 text-center py-4">Primero cargá alguna receta propia para agregarla.</p>';
+
+            el('col-mensaje').classList.add('hidden');
+            el('modal-coleccion').classList.remove('hidden');
+        }
+
+        function cerrarEditorColeccion() {
+            el('modal-coleccion').classList.add('hidden');
+        }
+
+        function mensajeColeccion(texto) {
+            const m = el('col-mensaje');
+            m.innerText = texto;
+            m.classList.remove('hidden');
+        }
+
+        async function guardarColeccion() {
+            const nombre = el('col-nombre').value.trim();
+            const descripcion = el('col-descripcion').value.trim();
+            const publica = el('col-publica').checked;
+            if (!nombre) return mensajeColeccion('Ponele un nombre a la colección.');
+
+            const previa = editandoColeccionId ? misColecciones.find(x => x.id === editandoColeccionId) : null;
+            const payload = { nombre, descripcion: descripcion || null, publica };
+            let id = editandoColeccionId;
+
+            const btn = el('btn-guardar-coleccion');
+            btn.disabled = true;
+            try {
+                if (id) {
+                    const { error } = await db.from('colecciones').update(payload).eq('id', id);
+                    if (error) throw error;
+                } else {
+                    const { data, error } = await db.from('colecciones').insert({ ...payload, user_id: usuarioActual.id }).select().single();
+                    if (error) throw error;
+                    id = data.id;
+                }
+
+                const marcadas = [...document.querySelectorAll('#col-recetas input:checked')].map(i => i.value);
+                const anteriores = new Set(previa ? previa.recetaIds : []);
+                const agregar = marcadas.filter(x => !anteriores.has(x));
+                const quitar = [...anteriores].filter(x => !marcadas.includes(x));
+
+                if (quitar.length) {
+                    const { error } = await db.from('coleccion_recetas').delete().eq('coleccion_id', id).in('receta_id', quitar);
+                    if (error) throw error;
+                }
+                if (agregar.length) {
+                    const { error } = await db.from('coleccion_recetas').insert(agregar.map(rid => ({ coleccion_id: id, receta_id: rid })));
+                    if (error) throw error;
+                }
+
+                cerrarEditorColeccion();
+                toast('Colección guardada');
+                await cargarColecciones();
+                if (vistaActual === 'detalle' && detalleActual && detalleActual.coleccion && detalleActual.coleccion.id === id) {
+                    await abrirColeccion(id);
+                }
+            } catch (err) {
+                console.error('Error al guardar la colección:', err);
+                mensajeColeccion('No se pudo guardar: ' + (err.message || 'error desconocido'));
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        async function eliminarColeccion(id) {
+            if (!confirm('¿Seguro que querés eliminar esta colección? Las recetas no se borran.')) return;
+            const { error } = await db.from('colecciones').delete().eq('id', id);
+            if (error) return toast('No se pudo eliminar: ' + error.message);
+            toast('Colección eliminada');
+            await cargarColecciones();
+            if (vistaActual === 'detalle') cambiarPestana('colecciones');
+        }
+
+        // ---------- Detalle (receta o colección abierta por enlace o desde un perfil) ----------
+        async function abrirReceta(id) {
+            detalleActual = null;
+            cambiarPestana('detalle');
+            el('detalle-contenido').innerHTML = cargandoHTML();
+            try {
+                const { data, error } = await db.from('recetas').select('*').eq('id', id).maybeSingle();
+                if (error || !data) {
+                    detalleActual = { error: 'Esta receta no existe o es privada.' };
+                } else {
+                    const r = mapearReceta(data);
+                    recetasVistas[r.id] = r;
+                    await asegurarPerfiles([r.userId]);
+                    estadoExpandido['detalle:' + r.id] = true;
+                    detalleActual = { tipo: 'receta', recetas: [r] };
+                }
+            } catch (err) {
+                console.error(err);
+                detalleActual = { error: 'No se pudo abrir la receta.' };
+            }
+            renderDetalle();
+        }
+
+        async function abrirColeccion(id) {
+            detalleActual = null;
+            cambiarPestana('detalle');
+            el('detalle-contenido').innerHTML = cargandoHTML();
+            try {
+                const { data: c, error } = await db.from('colecciones').select('*').eq('id', id).maybeSingle();
+                if (error || !c) {
+                    detalleActual = { error: 'Esta colección no existe o es privada.' };
+                } else {
+                    const ir = await db.from('coleccion_recetas').select('receta_id').eq('coleccion_id', id);
+                    const ids = (ir.data || []).map(i => String(i.receta_id));
+                    let rs = [];
+                    if (ids.length) {
+                        const rr = await db.from('recetas').select('*').in('id', ids).order('created_at', { ascending: false });
+                        rs = (rr.data || []).map(mapearReceta);
+                    }
+                    rs.forEach(r => { recetasVistas[r.id] = r; });
+                    await asegurarPerfiles([c.user_id, ...rs.map(r => r.userId)]);
+                    detalleActual = { tipo: 'coleccion', coleccion: c, recetas: rs };
+                }
+            } catch (err) {
+                console.error(err);
+                detalleActual = { error: 'No se pudo abrir la colección.' };
+            }
+            renderDetalle();
+        }
+
+        function renderDetalle() {
+            const d = detalleActual;
+            if (!d) return;
+            const volver = `<button type="button" onclick="volverVista()" class="mb-4 inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-verde-ingles">${svg('M15 19l-7-7 7-7')}<span>Volver</span></button>`;
+            if (d.error) {
+                el('detalle-contenido').innerHTML = volver + estadoVacioHTML(ICONO_COLECCION, 'No disponible', d.error, '', '');
+                return;
+            }
+
+            let cabecera = '';
+            if (d.tipo === 'coleccion') {
+                const c = d.coleccion;
+                const propia = c.user_id === usuarioActual.id;
+                const idAttr = esc(c.id);
+                cabecera = `
+                    <div class="bg-white rounded-2xl p-6 sm:p-8 shadow-soft border border-beige-border space-y-5">
+                        <div class="flex justify-between items-start gap-3">
+                            <div class="min-w-0 space-y-1">
+                                <div class="text-xs font-semibold uppercase tracking-wide text-mostaza">Colección</div>
+                                <h2 class="text-xl font-semibold text-verde-ingles">${esc(c.nombre)}</h2>
+                                ${c.descripcion ? `<p class="text-sm text-gray-500">${esc(c.descripcion)}</p>` : ''}
+                            </div>
+                            <div class="flex items-center gap-1 shrink-0">
+                                ${propia ? '' : botonGuardarColeccion(c)}
+                                <button type="button" onclick="compartirColeccion('${idAttr}')" title="Compartir" class="p-2 rounded-lg text-gray-400 hover:text-verde-ingles hover:bg-beige-base transition">${svg(ICONO_COMPARTIR)}</button>
+                                ${propia ? `<button type="button" onclick="abrirEditorColeccion('${idAttr}')" title="Editar" class="p-2 rounded-lg text-gray-400 hover:text-verde-ingles hover:bg-beige-base transition">${svg(ICONO_EDITAR)}</button>` : ''}
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between gap-3">
+                            ${chipAutor(c.user_id, '')}
+                            <span class="text-sm text-gray-500">${d.recetas.length} ${d.recetas.length === 1 ? 'receta' : 'recetas'}</span>
+                        </div>
+                    </div>`;
+            }
+
+            const lista = d.recetas.length
+                ? `<div class="flex flex-col gap-5">${listaTarjetas(d.recetas, 'detalle')}</div>`
+                : estadoVacioHTML(ICONO_COLECCION, 'Sin recetas para mostrar', 'Esta colección todavía no tiene recetas visibles.', '', '');
+
+            el('detalle-contenido').innerHTML = volver + `<div class="space-y-6">${cabecera}${lista}</div>`;
+        }
+
+        // =====================================================
+        //  Tipo de comida, redirección de enlaces y funciones
+        //  que reemplazan a las versiones anteriores
+        // =====================================================
+        const TIPOS_COMIDA = {
+            almuerzo_cena: 'Almuerzo / cena',
+            desayuno_merienda: 'Desayuno / merienda',
+            postre: 'Postre'
+        };
+        let tipoFiltro = '';
+
+        const CLASE_TIPO_BASE = 'px-4 py-2 rounded-xl text-sm font-medium transition border ';
+        function pintarTipoFiltro() {
+            document.querySelectorAll('[data-tipo-filtro]').forEach(b => {
+                const on = b.dataset.tipoFiltro === tipoFiltro;
+                b.className = CLASE_TIPO_BASE + (on
+                    ? 'bg-verde-ingles text-white border-verde-ingles'
+                    : 'bg-white text-gray-600 border-beige-border hover:bg-beige-base');
+            });
+        }
+
+        function setTipoFiltro(tipo) {
+            tipoFiltro = tipo;
+            pintarTipoFiltro();
+            filtrarRecetas();
+        }
+
+        // Los enlaces a Instagram / TikTok / web de las recetas públicas pasan por /go
+        // (ver worker.js). Si preferís enlaces directos, poné false.
+        const REDIRECCION_ACTIVA = true;
+        function enlaceSalida(r, tipo, urlDirecta) {
+            if (REDIRECCION_ACTIVA && r.publica) {
+                return `${window.location.origin}/go?r=${encodeURIComponent(r.id)}&t=${tipo}`;
+            }
+            return urlDirecta;
+        }
+
+        // ---------- Recetas propias + guardadas ----------
+        async function cargarRecetas() {
+            const yo = usuarioActual.id;
+            const [propiasRes, guardadasRes] = await Promise.all([
+                db.from('recetas').select('*').eq('user_id', yo).order('created_at', { ascending: false }),
+                db.from('recetas_guardadas').select('receta_id').eq('user_id', yo)
+            ]);
+
+            if (propiasRes.error) {
+                console.error('Error cargando recetas:', propiasRes.error);
+                return;
+            }
+
+            const propias = propiasRes.data.map(mapearReceta);
+            let guardadas = [];
+            guardadasIds = new Set();
+
+            if (!guardadasRes.error && guardadasRes.data && guardadasRes.data.length) {
+                const ids = guardadasRes.data.map(g => String(g.receta_id));
+                const { data } = await db.from('recetas').select('*').in('id', ids);
+                guardadas = (data || []).map(mapearReceta);
+                guardadas.forEach(r => { guardadasIds.add(r.id); recetasVistas[r.id] = r; });
+                await asegurarPerfiles(guardadas.map(r => r.userId));
+            }
+
+            recetas = [...propias, ...guardadas].sort((a, b) => new Date(b.creada || 0) - new Date(a.creada || 0));
+            perfilesCache[yo] = perfilActual;
+            renderizarFiltros();
+            filtrarRecetas();
+        }
+
+        function renderizarTarjetasApiladas(lista) {
+            const contenedor = document.getElementById('contenedor-recetas-apiladas');
+            const estadoVacio = document.getElementById('estado-vacio');
+            const contador = document.getElementById('contador-resultados');
+
+            contador.innerText = `${lista.length} ${lista.length === 1 ? 'receta' : 'recetas'}`;
+            document.getElementById('card-filtros').classList.toggle('hidden', recetas.length === 0);
+
+            if (lista.length === 0) {
+                contenedor.innerHTML = '';
+                estadoVacio.classList.remove('hidden');
+                estadoVacio.innerHTML = recetas.length === 0
+                    ? estadoVacioHTML('M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253', 'Todavía no tenés recetas', 'Cargá la primera o guardá recetas de otras personas desde Explorar.', 'Agregar mi primera receta', "cambiarPestana('agregar')")
+                    : estadoVacioHTML('M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z', 'No hay recetas que coincidan', 'Probá quitar filtros o cambiar la búsqueda.', 'Limpiar filtros', 'limpiarFiltros()');
+                // el contenedor ya trae su propio borde punteado; evitamos duplicarlo
+                estadoVacio.className = '';
+                return;
+            }
+
+            estadoVacio.classList.add('hidden');
+            contenedor.innerHTML = listaTarjetas(lista, 'lista');
+        }
+
+        async function alternarPrivacidad(id) {
+            const r = buscarReceta(id);
+            if (!r || r.userId !== usuarioActual.id) return;
+            const nueva = !r.publica;
+            const { error } = await db.from('recetas').update({ publica: nueva }).eq('id', id);
+            if (error) {
+                alert('No se pudo cambiar la privacidad: ' + error.message);
+                return;
+            }
+            [recetas.find(x => x.id === id), recetasVistas[id]].forEach(x => { if (x) x.publica = nueva; });
+            if (perfilVisto && perfilVisto.perfil.id === usuarioActual.id) {
+                perfilVisto.recetas = perfilVisto.recetas.filter(x => x.publica);
+            }
+            refrescarVistaActual();
+        }
+
+        async function eliminarReceta(id) {
+            if (!confirm('¿Seguro que deseas eliminar esta receta?')) return;
+            const { error } = await db.from('recetas').delete().eq('id', id);
+            if (error) {
+                alert('Error al eliminar la receta: ' + error.message);
+                return;
+            }
+            delete recetasVistas[id];
+            if (perfilVisto) perfilVisto.recetas = perfilVisto.recetas.filter(x => x.id !== id);
+            if (detalleActual && detalleActual.recetas) detalleActual.recetas = detalleActual.recetas.filter(x => x.id !== id);
+            timeline.items = timeline.items.filter(x => x.id !== id);
+            await cargarRecetas();
+            refrescarVistaActual();
+        }
+
+        // ---------- Autenticación: Google y recuperar contraseña ----------
+        let appIniciada = false;
+        let modoRecuperacion = false;
+        const CLAVE_ENLACE = 'recetario_enlace_pendiente';
+
+        function guardarEnlacePendiente() {
+            try {
+                if (enlacePendiente) localStorage.setItem(CLAVE_ENLACE, JSON.stringify({ e: enlacePendiente, t: Date.now() }));
+            } catch (e) { /* ignorar */ }
+        }
+
+        function recuperarEnlacePendiente() {
+            try {
+                const raw = localStorage.getItem(CLAVE_ENLACE);
+                if (!raw) return;
+                localStorage.removeItem(CLAVE_ENLACE);
+                const g = JSON.parse(raw);
+                if (!enlacePendiente && g && g.e && Date.now() - g.t < 24 * 3600 * 1000) enlacePendiente = g.e;
+            } catch (e) { /* ignorar */ }
+        }
+
+        function mostrarModoAuth(modo) {
+            const mapa = { login: 'form-login', registro: 'form-registro', olvide: 'form-olvide', nuevaclave: 'form-nueva-clave' };
+            Object.keys(mapa).forEach(m => el(mapa[m]).classList.toggle('hidden', m !== modo));
+            el('bloque-google').classList.toggle('hidden', !(modo === 'login' || modo === 'registro'));
+            const subs = {
+                login: 'Inicia sesión para ver tus recetas',
+                registro: 'Creá tu cuenta con tu email',
+                olvide: 'Recuperá tu contraseña',
+                nuevaclave: 'Elegí tu nueva contraseña'
+            };
+            el('login-subtitulo').innerText = subs[modo];
+            ['login-error', 'reg-mensaje', 'olvide-mensaje', 'clave-mensaje', 'google-mensaje'].forEach(id => el(id).classList.add('hidden'));
+        }
+
+        function mostrarRegistro(mostrar) {
+            mostrarModoAuth(mostrar ? 'registro' : 'login');
+        }
+
+        function ponerMensaje(id, texto, ok) {
+            const m = el(id);
+            m.innerText = texto;
+            m.className = 'text-sm text-center font-medium p-2.5 rounded-lg border ' +
+                (ok ? 'text-green-800 bg-green-50 border-green-200' : 'text-rojo-excluir bg-red-50 border-red-200');
+        }
+
+        async function ingresarConGoogle() {
+            if (!db) return ponerMensaje('google-mensaje', 'No se pudo cargar Supabase. Recargá la página.', false);
+            guardarEnlacePendiente();
+            const { error } = await db.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: urlBase() } });
+            if (error) ponerMensaje('google-mensaje', 'No se pudo iniciar con Google: ' + error.message, false);
+        }
+
+        async function enviarRecuperacion(e) {
+            e.preventDefault();
+            const email = el('olvide-email').value.trim().toLowerCase();
+            const btn = el('btn-olvide');
+            if (email.endsWith('@recetario.local')) {
+                return ponerMensaje('olvide-mensaje', 'Esa cuenta es de las primeras y no tiene un email real. Pedile a quien administra la app que te cambie la contraseña.', false);
+            }
+            btn.disabled = true;
+            try {
+                const { error } = await db.auth.resetPasswordForEmail(email, { redirectTo: urlBase() });
+                if (error && /rate|seconds|limit/i.test(error.message)) {
+                    ponerMensaje('olvide-mensaje', 'Esperá un momento antes de pedir otro correo.', false);
+                } else if (error) {
+                    ponerMensaje('olvide-mensaje', 'No se pudo enviar el correo: ' + error.message, false);
+                } else {
+                    ponerMensaje('olvide-mensaje', 'Listo. Si ese email tiene una cuenta, te enviamos un enlace para crear una contraseña nueva. Revisá también el correo no deseado.', true);
+                }
+            } catch (err) {
+                ponerMensaje('olvide-mensaje', 'No se pudo conectar con el servidor.', false);
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        async function guardarNuevaClave(e) {
+            e.preventDefault();
+            const a = el('clave-nueva').value;
+            const b = el('clave-repetir').value;
+            if (a.length < 6) return ponerMensaje('clave-mensaje', 'La contraseña debe tener al menos 6 caracteres.', false);
+            if (a !== b) return ponerMensaje('clave-mensaje', 'Las contraseñas no coinciden.', false);
+            const btn = el('btn-nueva-clave');
+            btn.disabled = true;
+            try {
+                const { data, error } = await db.auth.updateUser({ password: a });
+                if (error) {
+                    ponerMensaje('clave-mensaje', 'No se pudo cambiar la contraseña: ' + error.message, false);
+                    return;
+                }
+                ponerMensaje('clave-mensaje', 'Contraseña actualizada. Entrando...', true);
+                modoRecuperacion = false;
+                usuarioActual = data.user;
+                setTimeout(() => mostrarAppPrincipal(), 900);
+            } catch (err) {
+                ponerMensaje('clave-mensaje', 'No se pudo conectar con el servidor.', false);
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        if (db) {
+            db.auth.onAuthStateChange((evento, sesion) => {
+                if (evento === 'PASSWORD_RECOVERY') {
+                    modoRecuperacion = true;
+                    appIniciada = false;
+                    el('app-principal').classList.add('hidden');
+                    el('pantalla-login').classList.remove('hidden');
+                    mostrarModoAuth('nuevaclave');
+                } else if (evento === 'SIGNED_IN' && sesion && !appIniciada && !modoRecuperacion) {
+                    usuarioActual = sesion.user;
+                    setTimeout(() => mostrarAppPrincipal(), 0);
+                }
+            });
+        }
+
+        // ---------- Inicio y cierre de sesión ----------
+        async function mostrarAppPrincipal() {
+            if (appIniciada) return;
+            appIniciada = true;
+            document.getElementById('pantalla-login').classList.add('hidden');
+            document.getElementById('app-principal').classList.remove('hidden');
+
+            recuperarEnlacePendiente();
+            pintarTipoFiltro();
+            await cargarPerfil();
+            await Promise.all([cargarSeguidos(), cargarRecetas(), cargarMisColecciones(), cargarColeccionesGuardadas()]);
+            renderMisColecciones();
+
+            const abrio = await abrirEnlaceCompartido();
+            if (!abrio) cambiarPestana(seguidos.size > 0 ? 'inicio' : 'filtrar');
+        }
+
+        async function cerrarSesion() {
+            try { await db.auth.signOut(); } catch (e) { /* ignorar */ }
+            usuarioActual = null;
+            perfilActual = null;
+            appIniciada = false;
+            recetas = [];
+            seguidos = new Set();
+            guardadasIds = new Set();
+            guardadasColIds = new Set();
+            misColecciones = [];
+            coleccionesGuardadas = [];
+            timeline = { items: [], offset: 0, fin: false, cargado: false, cargando: false };
+            perfilVisto = null;
+            detalleActual = null;
+            explorarPersonas = [];
+            estadoExpandido = {};
+            Object.keys(perfilesCache).forEach(k => delete perfilesCache[k]);
+            Object.keys(recetasVistas).forEach(k => delete recetasVistas[k]);
+            vistaActual = 'filtrar';
+            vistaPrevia = null;
+            ['modal-perfil', 'modal-coleccion', 'modal-personas'].forEach(id => el(id).classList.add('hidden'));
+            document.getElementById('app-principal').classList.add('hidden');
+            document.getElementById('pantalla-login').classList.remove('hidden');
+            mostrarModoAuth('login');
+        }
+
     </script>
 </body>
 </html>
