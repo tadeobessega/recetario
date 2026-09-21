@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mi Recetario Personal</title>
+    <!-- Tipografía: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Supabase JS Client -->
@@ -14,7 +18,7 @@
             theme: {
                 extend: {
                     fontFamily: {
-                        sans: ['"Helvetica Neue"', 'Helvetica', 'Arial', 'sans-serif'],
+                        sans: ['Inter', 'ui-sans-serif', 'system-ui', '-apple-system', '"Segoe UI"', 'Roboto', 'Arial', 'sans-serif'],
                     },
                     colors: {
                         'beige-base': '#f5f2eb',
@@ -40,7 +44,9 @@
         body {
             background-color: #f5f2eb;
             color: #2b2d42;
-            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+            letter-spacing: 0.01em;
+            line-height: 1.6;
         }
         ::-webkit-scrollbar {
             width: 6px;
@@ -73,8 +79,8 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
                     </svg>
                 </div>
-                <h1 class="text-xl font-bold text-verde-ingles tracking-tight">Mi Recetario</h1>
-                <p class="text-xs text-gray-500">Inicia sesión para ver tus recetas</p>
+                <h1 class="text-xl font-bold text-verde-ingles">Mi Recetario</h1>
+                <p id="login-subtitulo" class="text-xs text-gray-500">Inicia sesión para ver tus recetas</p>
             </div>
 
             <form onsubmit="ejecutarLogin(event)" class="space-y-4">
@@ -92,6 +98,29 @@
                 <button type="submit" id="btn-login-submit" class="w-full bg-verde-ingles hover:bg-verde-hover text-white py-2.5 rounded-xl text-xs sm:text-sm font-medium shadow-soft transition flex items-center justify-center gap-2">
                     <span>Ingresar</span>
                 </button>
+                <p class="text-center text-xs text-gray-500">¿No tenés cuenta? <button type="button" onclick="mostrarRegistro(true)" class="text-verde-ingles font-medium underline">Registrate</button></p>
+            </form>
+
+            <form id="form-registro" onsubmit="ejecutarRegistro(event)" class="hidden space-y-4">
+                <div>
+                    <label class="block text-xs font-medium text-verde-ingles mb-1">Nombre</label>
+                    <input type="text" id="reg-nombre" required placeholder="Tu nombre" class="w-full p-2.5 bg-beige-base border border-beige-border rounded-xl text-xs sm:text-sm focus:ring-1 focus:ring-verde-ingles focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-verde-ingles mb-1">Email</label>
+                    <input type="email" id="reg-email" required placeholder="tu@email.com" class="w-full p-2.5 bg-beige-base border border-beige-border rounded-xl text-xs sm:text-sm focus:ring-1 focus:ring-verde-ingles focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-verde-ingles mb-1">Contraseña</label>
+                    <input type="password" id="reg-password" required minlength="6" placeholder="Mínimo 6 caracteres" class="w-full p-2.5 bg-beige-base border border-beige-border rounded-xl text-xs sm:text-sm focus:ring-1 focus:ring-verde-ingles focus:outline-none">
+                </div>
+
+                <div id="reg-mensaje" class="hidden text-xs text-center font-medium p-2 rounded-lg border"></div>
+
+                <button type="submit" id="btn-registro-submit" class="w-full bg-verde-ingles hover:bg-verde-hover text-white py-2.5 rounded-xl text-xs sm:text-sm font-medium shadow-soft transition flex items-center justify-center gap-2">
+                    <span>Crear cuenta</span>
+                </button>
+                <p class="text-center text-xs text-gray-500">¿Ya tenés cuenta? <button type="button" onclick="mostrarRegistro(false)" class="text-verde-ingles font-medium underline">Ingresá</button></p>
             </form>
         </div>
     </div>
@@ -107,7 +136,7 @@
                         </svg>
                     </div>
                     <div>
-                        <h1 class="text-base sm:text-lg font-bold text-white tracking-tight">Mi Recetario</h1>
+                        <h1 class="text-base sm:text-lg font-bold text-white">Mi Recetario</h1>
                         <p class="text-[10px] text-green-200" id="user-display-name"></p>
                     </div>
                 </div>
@@ -389,6 +418,80 @@
             }
         }
 
+        function mostrarRegistro(mostrar) {
+            document.querySelector('#pantalla-login form[onsubmit^="ejecutarLogin"]').classList.toggle('hidden', mostrar);
+            document.getElementById('form-registro').classList.toggle('hidden', !mostrar);
+            document.getElementById('login-subtitulo').innerText = mostrar
+                ? 'Creá tu cuenta con tu email'
+                : 'Inicia sesión para ver tus recetas';
+            document.getElementById('login-error').classList.add('hidden');
+            document.getElementById('reg-mensaje').classList.add('hidden');
+        }
+
+        async function ejecutarRegistro(e) {
+            e.preventDefault();
+            const nombre = document.getElementById('reg-nombre').value.trim();
+            const email = document.getElementById('reg-email').value.trim().toLowerCase();
+            const password = document.getElementById('reg-password').value;
+            const msg = document.getElementById('reg-mensaje');
+            const btn = document.getElementById('btn-registro-submit');
+
+            const mostrarMensaje = (texto, ok) => {
+                msg.innerText = texto;
+                msg.className = 'text-xs text-center font-medium p-2 rounded-lg border ' +
+                    (ok ? 'text-green-800 bg-green-50 border-green-200' : 'text-rojo-excluir bg-red-50 border-red-200');
+                btn.disabled = false;
+                btn.innerText = 'Crear cuenta';
+            };
+
+            msg.classList.add('hidden');
+            btn.disabled = true;
+            btn.innerText = 'Creando cuenta...';
+
+            if (!db) {
+                mostrarMensaje('No se pudo cargar Supabase. Desactivá el bloqueador de anuncios y recargá.', false);
+                return;
+            }
+
+            try {
+                const { data, error } = await db.auth.signUp({
+                    email,
+                    password,
+                    options: { data: { nombre }, emailRedirectTo: window.location.origin }
+                });
+
+                if (error) {
+                    console.error('Error de registro:', error);
+                    if (/already registered/i.test(error.message)) {
+                        mostrarMensaje('Ese email ya está registrado. Ingresá con tu email y contraseña.', false);
+                    } else if (/password/i.test(error.message)) {
+                        mostrarMensaje('La contraseña debe tener al menos 6 caracteres.', false);
+                    } else {
+                        mostrarMensaje('Error: ' + error.message, false);
+                    }
+                    return;
+                }
+
+                // Supabase devuelve un usuario sin identidades cuando el email ya existe
+                if (data.user && data.user.identities && data.user.identities.length === 0) {
+                    mostrarMensaje('Ese email ya está registrado. Ingresá con tu email y contraseña.', false);
+                    return;
+                }
+
+                if (data.session) {
+                    usuarioActual = data.user;
+                    btn.disabled = false;
+                    btn.innerText = 'Crear cuenta';
+                    mostrarAppPrincipal();
+                } else {
+                    mostrarMensaje('¡Cuenta creada! Te enviamos un mail para confirmarla. Después de confirmar, ingresá con tu email.', true);
+                }
+            } catch (err) {
+                console.error('Error de conexión:', err);
+                mostrarMensaje('No se pudo conectar con la base de datos.', false);
+            }
+        }
+
         async function cerrarSesion() {
             await db.auth.signOut();
             usuarioActual = null;
@@ -407,7 +510,7 @@
         }
 
         async function cargarRecetas() {
-            const { data, error } = await db.from('recetas').select('*').order('created_at', { ascending: false });
+            const { data, error } = await db.from('recetas').select('*').eq('user_id', usuarioActual.id).order('created_at', { ascending: false });
 
             if (error) {
                 console.error("Error cargando recetas:", error);
@@ -615,7 +718,7 @@
                 return `
                 <article class="bg-beige-card rounded-2xl p-4 shadow-soft border border-beige-border transition space-y-3">
                     <div class="flex justify-between items-center gap-2">
-                        <h3 class="text-base font-bold text-verde-ingles tracking-tight">${receta.nombre}</h3>
+                        <h3 class="text-base font-bold text-verde-ingles">${receta.nombre}</h3>
                         <div class="flex items-center gap-1">
                             <button onclick="prepararEdicion('${receta.id}')" title="Editar" class="p-1.5 rounded-lg text-gray-500 hover:text-verde-ingles hover:bg-beige-base transition">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
