@@ -21,9 +21,10 @@
                         sans: ['Inter', 'ui-sans-serif', 'system-ui', '-apple-system', '"Segoe UI"', 'Roboto', 'Arial', 'sans-serif'],
                     },
                     colors: {
-                        'beige-base': '#f5f2eb',
+                        'fondo': '#fcfbf8',
+                        'beige-base': '#f7f5ef',
                         'beige-card': '#ffffff',
-                        'beige-border': '#e2dccf',
+                        'beige-border': '#ebe7dc',
                         'verde-ingles': '#1b4332',
                         'verde-hover': '#2d5a27',
                         'verde-chip': '#2d6a4f',
@@ -33,27 +34,29 @@
                         'rojo-hover': '#a93226'
                     },
                     boxShadow: {
-                        'soft': '0 4px 20px rgba(0, 0, 0, 0.04)',
-                        'soft-lg': '0 10px 30px rgba(0, 0, 0, 0.06)'
+                        'soft': '0 1px 2px rgba(27, 67, 50, 0.04), 0 6px 20px rgba(27, 67, 50, 0.05)',
+                        'soft-lg': '0 12px 40px rgba(27, 67, 50, 0.10)'
                     }
                 }
             }
         }
     </script>
     <style>
+        *, *::before, *::after, ::placeholder { font-style: normal !important; }
+        em, i, cite, address, dfn, var { font-style: normal !important; }
         body {
-            background-color: #f5f2eb;
+            background-color: #fcfbf8;
             color: #2b2d42;
             font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
-            letter-spacing: 0.01em;
-            line-height: 1.6;
+            letter-spacing: 0.02em;
+            line-height: 1.65;
         }
         ::-webkit-scrollbar {
             width: 6px;
             height: 6px;
         }
         ::-webkit-scrollbar-track {
-            background: #f5f2eb;
+            background: #fcfbf8;
         }
         ::-webkit-scrollbar-thumb {
             background: #c68b59;
@@ -68,7 +71,7 @@
         }
     </style>
 </head>
-<body class="min-h-screen flex flex-col font-sans antialiased bg-beige-base text-gray-800">
+<body class="min-h-screen flex flex-col font-sans antialiased bg-fondo text-gray-800">
 
     <!-- PANTALLA DE LOGIN -->
     <div id="pantalla-login" class="min-h-screen flex items-center justify-center p-4">
@@ -79,48 +82,53 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
                     </svg>
                 </div>
-                <h1 class="text-xl font-bold text-verde-ingles">Mi Recetario</h1>
-                <p id="login-subtitulo" class="text-xs text-gray-500">Inicia sesión para ver tus recetas</p>
+                <h1 class="text-xl font-semibold text-verde-ingles">Mi Recetario</h1>
+                <p id="login-subtitulo" class="text-sm text-gray-500">Inicia sesión para ver tus recetas</p>
             </div>
 
-            <form onsubmit="ejecutarLogin(event)" class="space-y-4">
+            <form onsubmit="ejecutarLogin(event)" class="space-y-5">
                 <div>
-                    <label class="block text-xs font-medium text-verde-ingles mb-1">Usuario</label>
-                    <input type="text" id="login-usuario" required placeholder="Usuario" class="w-full p-2.5 bg-beige-base border border-beige-border rounded-xl text-xs sm:text-sm focus:ring-1 focus:ring-verde-ingles focus:outline-none">
+                    <label class="block text-sm font-medium text-verde-ingles mb-2">Usuario</label>
+                    <input type="text" id="login-usuario" required placeholder="Usuario" class="w-full p-3 bg-beige-base border border-beige-border rounded-xl text-sm focus:ring-1 focus:ring-verde-ingles focus:outline-none">
                 </div>
                 <div>
-                    <label class="block text-xs font-medium text-verde-ingles mb-1">Contraseña</label>
-                    <input type="password" id="login-password" required placeholder="••••••••" class="w-full p-2.5 bg-beige-base border border-beige-border rounded-xl text-xs sm:text-sm focus:ring-1 focus:ring-verde-ingles focus:outline-none">
+                    <label class="block text-sm font-medium text-verde-ingles mb-2">Contraseña</label>
+                    <input type="password" id="login-password" required placeholder="••••••••" class="w-full p-3 bg-beige-base border border-beige-border rounded-xl text-sm focus:ring-1 focus:ring-verde-ingles focus:outline-none">
                 </div>
 
-                <div id="login-error" class="hidden text-xs text-rojo-excluir text-center font-medium bg-red-50 p-2 rounded-lg border border-red-200"></div>
+                <div id="login-error" class="hidden text-sm text-rojo-excluir text-center font-medium bg-red-50 p-2 rounded-lg border border-red-200"></div>
 
-                <button type="submit" id="btn-login-submit" class="w-full bg-verde-ingles hover:bg-verde-hover text-white py-2.5 rounded-xl text-xs sm:text-sm font-medium shadow-soft transition flex items-center justify-center gap-2">
+                <button type="submit" id="btn-login-submit" class="w-full bg-verde-ingles hover:bg-verde-hover text-white py-2.5 rounded-xl text-sm font-medium shadow-soft transition flex items-center justify-center gap-2">
                     <span>Ingresar</span>
                 </button>
-                <p class="text-center text-xs text-gray-500">¿No tenés cuenta? <button type="button" onclick="mostrarRegistro(true)" class="text-verde-ingles font-medium underline">Registrate</button></p>
+                <p class="text-center text-sm text-gray-500">¿No tenés cuenta? <button type="button" onclick="mostrarRegistro(true)" class="text-verde-ingles font-medium underline">Registrate</button></p>
             </form>
 
             <form id="form-registro" onsubmit="ejecutarRegistro(event)" class="hidden space-y-4">
                 <div>
-                    <label class="block text-xs font-medium text-verde-ingles mb-1">Nombre</label>
-                    <input type="text" id="reg-nombre" required placeholder="Tu nombre" class="w-full p-2.5 bg-beige-base border border-beige-border rounded-xl text-xs sm:text-sm focus:ring-1 focus:ring-verde-ingles focus:outline-none">
+                    <label class="block text-sm font-medium text-verde-ingles mb-2">Nombre</label>
+                    <input type="text" id="reg-nombre" required placeholder="Tu nombre" class="w-full p-3 bg-beige-base border border-beige-border rounded-xl text-sm focus:ring-1 focus:ring-verde-ingles focus:outline-none">
                 </div>
                 <div>
-                    <label class="block text-xs font-medium text-verde-ingles mb-1">Email</label>
-                    <input type="email" id="reg-email" required placeholder="tu@email.com" class="w-full p-2.5 bg-beige-base border border-beige-border rounded-xl text-xs sm:text-sm focus:ring-1 focus:ring-verde-ingles focus:outline-none">
+                    <label class="block text-sm font-medium text-verde-ingles mb-2">Nombre de usuario</label>
+                    <input type="text" id="reg-usuario" required maxlength="20" autocapitalize="none" autocomplete="off" placeholder="tu_usuario" oninput="verificarUsuarioLive()" class="w-full p-3 bg-beige-base border border-beige-border rounded-xl text-sm focus:ring-1 focus:ring-verde-ingles focus:outline-none">
+                    <p id="reg-usuario-hint" class="text-xs text-gray-500 mt-2">3 a 20 caracteres: letras minúsculas, números y _</p>
                 </div>
                 <div>
-                    <label class="block text-xs font-medium text-verde-ingles mb-1">Contraseña</label>
-                    <input type="password" id="reg-password" required minlength="6" placeholder="Mínimo 6 caracteres" class="w-full p-2.5 bg-beige-base border border-beige-border rounded-xl text-xs sm:text-sm focus:ring-1 focus:ring-verde-ingles focus:outline-none">
+                    <label class="block text-sm font-medium text-verde-ingles mb-2">Email</label>
+                    <input type="email" id="reg-email" required placeholder="tu@email.com" class="w-full p-3 bg-beige-base border border-beige-border rounded-xl text-sm focus:ring-1 focus:ring-verde-ingles focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-verde-ingles mb-2">Contraseña</label>
+                    <input type="password" id="reg-password" required minlength="6" placeholder="Mínimo 6 caracteres" class="w-full p-3 bg-beige-base border border-beige-border rounded-xl text-sm focus:ring-1 focus:ring-verde-ingles focus:outline-none">
                 </div>
 
-                <div id="reg-mensaje" class="hidden text-xs text-center font-medium p-2 rounded-lg border"></div>
+                <div id="reg-mensaje" class="hidden text-sm text-center font-medium p-2 rounded-lg border"></div>
 
-                <button type="submit" id="btn-registro-submit" class="w-full bg-verde-ingles hover:bg-verde-hover text-white py-2.5 rounded-xl text-xs sm:text-sm font-medium shadow-soft transition flex items-center justify-center gap-2">
+                <button type="submit" id="btn-registro-submit" class="w-full bg-verde-ingles hover:bg-verde-hover text-white py-2.5 rounded-xl text-sm font-medium shadow-soft transition flex items-center justify-center gap-2">
                     <span>Crear cuenta</span>
                 </button>
-                <p class="text-center text-xs text-gray-500">¿Ya tenés cuenta? <button type="button" onclick="mostrarRegistro(false)" class="text-verde-ingles font-medium underline">Ingresá</button></p>
+                <p class="text-center text-sm text-gray-500">¿Ya tenés cuenta? <button type="button" onclick="mostrarRegistro(false)" class="text-verde-ingles font-medium underline">Ingresá</button></p>
             </form>
         </div>
     </div>
@@ -128,30 +136,29 @@
     <!-- APP PRINCIPAL -->
     <div id="app-principal" class="hidden min-h-screen flex flex-col">
         <header class="bg-verde-ingles text-beige-card shadow-soft sticky top-0 z-30">
-            <div class="max-w-4xl mx-auto px-4 sm:px-6 py-3 flex flex-row justify-between items-center gap-3">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 py-3.5 flex flex-row justify-between items-center gap-3">
                 <div class="flex items-center gap-2.5">
                     <div class="p-2 bg-verde-hover/60 rounded-xl">
                         <svg class="w-5 h-5 text-mostaza" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
                         </svg>
                     </div>
-                    <div>
-                        <h1 class="text-base sm:text-lg font-bold text-white">Mi Recetario</h1>
-                        <p class="text-[10px] text-green-200" id="user-display-name"></p>
-                    </div>
+                    <h1 class="text-lg font-semibold text-white">Mi Recetario</h1>
                 </div>
 
-                <div class="flex items-center gap-2">
+                <div class="flex items-center gap-2 sm:gap-3">
                     <nav class="flex bg-verde-hover/50 p-1 rounded-xl">
-                        <button id="tab-btn-filtrar" onclick="cambiarPestana('filtrar')" class="px-3 py-1.5 rounded-lg text-xs font-medium transition flex items-center gap-1.5 bg-beige-card text-verde-ingles shadow-sm">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                            <span>Filtrar Recetas</span>
+                        <button id="tab-btn-filtrar" onclick="cambiarPestana('filtrar')" class="px-3.5 py-2 rounded-lg text-sm font-medium transition flex items-center gap-1.5 bg-beige-card text-verde-ingles shadow-sm">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                            <span class="hidden sm:inline">Recetas</span>
                         </button>
-                        <button id="tab-btn-agregar" onclick="cambiarPestana('agregar')" class="px-3 py-1.5 rounded-lg text-xs font-medium transition flex items-center gap-1.5 text-beige-card hover:text-white">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-                            <span>Agregar Receta</span>
+                        <button id="tab-btn-agregar" onclick="cambiarPestana('agregar')" class="px-3.5 py-2 rounded-lg text-sm font-medium transition flex items-center gap-1.5 text-beige-card hover:text-white">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                            <span class="hidden sm:inline">Agregar</span>
                         </button>
                     </nav>
+
+                    <button id="btn-avatar-header" onclick="abrirPerfil()" title="Mi perfil" class="rounded-full ring-2 ring-white/20 hover:ring-white/70 transition"></button>
 
                     <button onclick="cerrarSesion()" title="Cerrar Sesión" class="p-2 text-green-200 hover:text-white hover:bg-verde-hover/60 rounded-xl transition">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
@@ -160,39 +167,39 @@
             </div>
         </header>
 
-        <main class="flex-grow max-w-4xl w-full mx-auto px-4 sm:px-6 py-6">
+        <main class="flex-grow max-w-4xl w-full mx-auto px-4 sm:px-6 py-10">
 
             <!-- PESTAÑA FILTRAR RECETAS -->
-            <section id="pestana-filtrar" class="space-y-5">
-                <div class="bg-beige-card rounded-2xl p-4 sm:p-5 shadow-soft border border-beige-border space-y-4">
+            <section id="pestana-filtrar" class="space-y-6">
+                <div id="card-filtros" class="bg-beige-card rounded-2xl p-5 sm:p-7 shadow-soft border border-beige-border space-y-5">
                     <div class="flex items-center justify-between pb-2 border-b border-beige-border/80">
-                        <div class="flex items-center gap-2 text-verde-ingles font-semibold text-xs sm:text-sm">
+                        <div class="flex items-center gap-2 text-verde-ingles font-semibold text-sm">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
                             <span>Filtros de Búsqueda</span>
                         </div>
-                        <span id="contador-resultados" class="text-xs text-gray-500 bg-beige-base px-2.5 py-1 rounded-full border border-beige-border font-medium">
+                        <span id="contador-resultados" class="text-sm text-gray-500 bg-beige-base px-2.5 py-1 rounded-full border border-beige-border font-medium">
                             0 recetas
                         </span>
                     </div>
 
                     <div class="relative">
                         <svg class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                        <input type="text" id="input-busqueda-nombre" placeholder="Buscar por nombre o contenido..." oninput="filtrarRecetas()" class="w-full pl-9 pr-4 py-2 bg-beige-base border border-beige-border rounded-xl focus:outline-none focus:ring-1 focus:ring-verde-ingles text-xs sm:text-sm">
+                        <input type="text" id="input-busqueda-nombre" placeholder="Buscar por nombre o contenido..." oninput="filtrarRecetas()" class="w-full pl-10 pr-4 py-3 bg-beige-base border border-beige-border rounded-xl focus:outline-none focus:ring-1 focus:ring-verde-ingles text-sm">
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div class="space-y-1.5">
-                            <label class="text-xs font-semibold text-verde-ingles flex items-center gap-1.5">
+                            <label class="text-sm font-semibold text-verde-ingles flex items-center gap-1.5">
                                 <span class="w-2 h-2 rounded-full bg-verde-chip"></span>
                                 Ingredientes que tengo
                             </label>
                             <div class="relative">
-                                <button type="button" onclick="toggleDropdown('dropdown-incluir')" class="w-full bg-beige-base border border-beige-border rounded-xl p-2 text-left flex justify-between items-center text-xs shadow-sm hover:border-verde-ingles focus:outline-none">
+                                <button type="button" onclick="toggleDropdown('dropdown-incluir')" class="w-full bg-beige-base border border-beige-border rounded-xl p-3 text-left flex justify-between items-center text-sm shadow-sm hover:border-verde-ingles focus:outline-none">
                                     <span class="text-gray-500 truncate" id="label-dropdown-incluir">Seleccionar ingrediente...</span>
                                     <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                                 </button>
                                 <div id="dropdown-incluir" class="hidden absolute left-0 right-0 top-full mt-1 bg-white border border-beige-border rounded-xl shadow-soft-lg z-30 max-h-56 flex flex-col p-2 space-y-1.5">
-                                    <input type="text" id="search-incluir" placeholder="Buscar..." oninput="filtrarOpcionesDropdown('incluir')" class="w-full p-1.5 text-xs bg-beige-base border border-beige-border rounded-lg focus:outline-none focus:ring-1 focus:ring-verde-ingles">
+                                    <input type="text" id="search-incluir" placeholder="Buscar..." oninput="filtrarOpcionesDropdown('incluir')" class="w-full p-2.5 text-sm bg-beige-base border border-beige-border rounded-lg focus:outline-none focus:ring-1 focus:ring-verde-ingles">
                                     <div id="lista-opciones-incluir" class="overflow-y-auto space-y-0.5 flex-grow"></div>
                                 </div>
                             </div>
@@ -200,17 +207,17 @@
                         </div>
 
                         <div class="space-y-1.5">
-                            <label class="text-xs font-semibold text-rojo-excluir flex items-center gap-1.5">
+                            <label class="text-sm font-semibold text-rojo-excluir flex items-center gap-1.5">
                                 <span class="w-2 h-2 rounded-full bg-rojo-excluir"></span>
                                 Ingredientes que no tengo
                             </label>
                             <div class="relative">
-                                <button type="button" onclick="toggleDropdown('dropdown-excluir')" class="w-full bg-beige-base border border-beige-border rounded-xl p-2 text-left flex justify-between items-center text-xs shadow-sm hover:border-rojo-excluir focus:outline-none">
+                                <button type="button" onclick="toggleDropdown('dropdown-excluir')" class="w-full bg-beige-base border border-beige-border rounded-xl p-3 text-left flex justify-between items-center text-sm shadow-sm hover:border-rojo-excluir focus:outline-none">
                                     <span class="text-gray-500 truncate" id="label-dropdown-excluir">Seleccionar ingrediente...</span>
                                     <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                                 </button>
                                 <div id="dropdown-excluir" class="hidden absolute left-0 right-0 top-full mt-1 bg-white border border-beige-border rounded-xl shadow-soft-lg z-30 max-h-56 flex flex-col p-2 space-y-1.5">
-                                    <input type="text" id="search-excluir" placeholder="Buscar..." oninput="filtrarOpcionesDropdown('excluir')" class="w-full p-1.5 text-xs bg-beige-base border border-beige-border rounded-lg focus:outline-none focus:ring-1 focus:ring-rojo-excluir">
+                                    <input type="text" id="search-excluir" placeholder="Buscar..." oninput="filtrarOpcionesDropdown('excluir')" class="w-full p-2.5 text-sm bg-beige-base border border-beige-border rounded-lg focus:outline-none focus:ring-1 focus:ring-rojo-excluir">
                                     <div id="lista-opciones-excluir" class="overflow-y-auto space-y-0.5 flex-grow"></div>
                                 </div>
                             </div>
@@ -219,58 +226,51 @@
                     </div>
 
                     <div class="flex justify-end pt-1">
-                        <button type="button" onclick="limpiarFiltros()" class="text-xs text-gray-500 hover:text-verde-ingles font-medium flex items-center gap-1 transition">
+                        <button type="button" onclick="limpiarFiltros()" class="text-sm text-gray-500 hover:text-verde-ingles font-medium flex items-center gap-1 transition">
                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
                             <span>Resetear filtros</span>
                         </button>
                     </div>
                 </div>
 
-                <div id="contenedor-recetas-apiladas" class="flex flex-col gap-3"></div>
+                <div id="contenedor-recetas-apiladas" class="flex flex-col gap-5"></div>
 
-                <div id="estado-vacio" class="hidden text-center py-10 px-4 space-y-2 bg-beige-card/60 rounded-2xl border border-dashed border-beige-border">
-                    <svg class="w-8 h-8 mx-auto text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                    <h3 class="text-sm font-semibold text-verde-ingles">No hay recetas que coincidan</h3>
-                    <p class="text-xs text-gray-500">Intenta quitar ingredientes excluidos o cambiar la búsqueda.</p>
-                    <button type="button" onclick="limpiarFiltros()" class="mt-2 bg-verde-ingles text-white px-3.5 py-1.5 rounded-xl text-xs font-medium hover:bg-verde-hover transition">
-                        Limpiar Filtros
-                    </button>
-                </div>
+                <div id="estado-vacio" class="hidden text-center py-16 px-6 bg-white rounded-2xl border border-dashed border-beige-border"></div>
             </section>
 
             <!-- PESTAÑA AGREGAR RECETA -->
             <section id="pestana-agregar" class="hidden">
-                <div class="bg-beige-card rounded-2xl p-5 sm:p-7 shadow-soft border border-beige-border space-y-5">
+                <div class="bg-beige-card rounded-2xl p-6 sm:p-9 shadow-soft border border-beige-border space-y-6">
                     <div class="flex justify-between items-center border-b border-beige-border pb-3">
-                        <h2 id="formulario-titulo" class="text-base font-bold text-verde-ingles">Agregar Receta</h2>
-                        <button id="btn-cancelar-edicion" type="button" onclick="cancelarEdicion()" class="hidden text-xs text-gray-500 hover:text-rojo-excluir underline">
+                        <h2 id="formulario-titulo" class="text-base font-semibold text-verde-ingles">Agregar Receta</h2>
+                        <button id="btn-cancelar-edicion" type="button" onclick="cancelarEdicion()" class="hidden text-sm text-gray-500 hover:text-rojo-excluir underline">
                             Cancelar edición
                         </button>
                     </div>
 
-                    <form id="form-receta" onsubmit="guardarReceta(event)" class="space-y-4">
+                    <form id="form-receta" onsubmit="guardarReceta(event)" class="space-y-6">
                         <input type="hidden" id="receta-id">
 
                         <div>
-                            <label class="block text-xs font-semibold text-verde-ingles mb-1">Nombre de la receta *</label>
-                            <input type="text" id="input-nombre" required placeholder="Ej: Milanesas con Puré" class="w-full p-2 bg-beige-base border border-beige-border rounded-xl text-xs sm:text-sm focus:ring-1 focus:ring-verde-ingles focus:outline-none">
+                            <label class="block text-sm font-semibold text-verde-ingles mb-2">Nombre de la receta *</label>
+                            <input type="text" id="input-nombre" required placeholder="Ej: Milanesas con Puré" class="w-full p-3 bg-beige-base border border-beige-border rounded-xl text-sm focus:ring-1 focus:ring-verde-ingles focus:outline-none">
                         </div>
 
                         <div>
-                            <label class="block text-xs font-semibold text-verde-ingles mb-1">Breve descripción (opcional)</label>
-                            <input type="text" id="input-descripcion" placeholder="Ej: Plato clásico crocante con puré cremoso" class="w-full p-2 bg-beige-base border border-beige-border rounded-xl text-xs sm:text-sm focus:ring-1 focus:ring-verde-ingles focus:outline-none">
+                            <label class="block text-sm font-semibold text-verde-ingles mb-2">Breve descripción (opcional)</label>
+                            <input type="text" id="input-descripcion" placeholder="Ej: Plato clásico crocante con puré cremoso" class="w-full p-3 bg-beige-base border border-beige-border rounded-xl text-sm focus:ring-1 focus:ring-verde-ingles focus:outline-none">
                         </div>
 
                         <div class="space-y-1.5">
-                            <label class="block text-xs font-semibold text-verde-ingles">Ingredientes de la receta *</label>
+                            <label class="block text-sm font-semibold text-verde-ingles">Ingredientes de la receta *</label>
                             <div class="relative">
-                                <button type="button" onclick="toggleDropdownFormIngredientes()" class="w-full bg-beige-base border border-beige-border rounded-xl p-2 text-left flex justify-between items-center text-xs shadow-sm hover:border-verde-ingles focus:outline-none">
+                                <button type="button" onclick="toggleDropdownFormIngredientes()" class="w-full bg-beige-base border border-beige-border rounded-xl p-3 text-left flex justify-between items-center text-sm shadow-sm hover:border-verde-ingles focus:outline-none">
                                     <span class="text-gray-500" id="label-dropdown-form-ing">Buscar o agregar ingrediente...</span>
                                     <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                                 </button>
 
                                 <div id="dropdown-form-ingredientes" class="hidden absolute left-0 right-0 top-full mt-1 bg-white border border-beige-border rounded-xl shadow-soft-lg z-30 max-h-56 flex flex-col p-2 space-y-1.5">
-                                    <input type="text" id="input-buscar-ingrediente-form" placeholder="Escribe un ingrediente..." oninput="filtrarDropdownFormIngredientes()" class="w-full p-1.5 text-xs bg-beige-base border border-beige-border rounded-lg focus:outline-none focus:ring-1 focus:ring-verde-ingles">
+                                    <input type="text" id="input-buscar-ingrediente-form" placeholder="Escribe un ingrediente..." oninput="filtrarDropdownFormIngredientes()" class="w-full p-2.5 text-sm bg-beige-base border border-beige-border rounded-lg focus:outline-none focus:ring-1 focus:ring-verde-ingles">
                                     <div id="lista-opciones-form-ingredientes" class="overflow-y-auto space-y-0.5 flex-grow"></div>
                                 </div>
                             </div>
@@ -278,9 +278,9 @@
                         </div>
 
                         <div class="space-y-1.5 pt-2">
-                            <label class="block text-xs font-semibold text-verde-ingles">Cantidades por ingrediente</label>
+                            <label class="block text-sm font-semibold text-verde-ingles">Cantidades por ingrediente</label>
                             <div class="border border-beige-border rounded-xl overflow-hidden bg-beige-base">
-                                <table class="w-full text-left text-xs">
+                                <table class="w-full text-left text-sm">
                                     <thead class="bg-beige-border/50 text-verde-ingles font-semibold">
                                         <tr>
                                             <th class="py-2 px-3 w-1/2">Ingrediente</th>
@@ -297,30 +297,39 @@
                         </div>
 
                         <div>
-                            <label class="block text-xs font-semibold text-verde-ingles mb-1">Procedimiento (opcional)</label>
-                            <textarea id="input-procedimiento" rows="3" placeholder="Paso a paso para la preparación..." class="w-full p-2 bg-beige-base border border-beige-border rounded-xl text-xs focus:ring-1 focus:ring-verde-ingles focus:outline-none"></textarea>
+                            <label class="block text-sm font-semibold text-verde-ingles mb-2">Procedimiento (opcional)</label>
+                            <textarea id="input-procedimiento" rows="3" placeholder="Paso a paso para la preparación..." class="w-full p-3 bg-beige-base border border-beige-border rounded-xl text-sm focus:ring-1 focus:ring-verde-ingles focus:outline-none"></textarea>
                         </div>
 
                         <div class="border-t border-beige-border pt-3 space-y-2">
-                            <label class="block text-xs font-semibold text-verde-ingles">Enlaces de referencia (opcional)</label>
+                            <label class="block text-sm font-semibold text-verde-ingles">Enlaces de referencia (opcional)</label>
                             <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
                                 <div class="flex items-center gap-2 bg-beige-base p-2 rounded-xl border border-beige-border">
                                     <svg class="w-4 h-4 text-pink-600 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
-                                    <input type="url" id="input-instagram" placeholder="Link Instagram" class="w-full text-xs bg-transparent focus:outline-none">
+                                    <input type="url" id="input-instagram" placeholder="Link Instagram" class="w-full text-sm bg-transparent focus:outline-none">
                                 </div>
                                 <div class="flex items-center gap-2 bg-beige-base p-2 rounded-xl border border-beige-border">
                                     <svg class="w-4 h-4 text-black flex-shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-5.2 1.74 2.89 2.89 0 012.31-4.64 2.93 2.93 0 01.88.13V9.4a6.84 6.84 0 00-1-.05A6.33 6.33 0 003 15.68 6.34 6.34 0 009.34 22a6.34 6.34 0 006.33-6.33V10a8.16 8.16 0 003.92 1V7.58a4.83 4.83 0 01-3-.89z"/></svg>
-                                    <input type="url" id="input-tiktok" placeholder="Link TikTok" class="w-full text-xs bg-transparent focus:outline-none">
+                                    <input type="url" id="input-tiktok" placeholder="Link TikTok" class="w-full text-sm bg-transparent focus:outline-none">
                                 </div>
                                 <div class="flex items-center gap-2 bg-beige-base p-2 rounded-xl border border-beige-border">
                                     <svg class="w-4 h-4 text-amber-800 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg>
-                                    <input type="url" id="input-link" placeholder="Otro enlace" class="w-full text-xs bg-transparent focus:outline-none">
+                                    <input type="url" id="input-link" placeholder="Otro enlace" class="w-full text-sm bg-transparent focus:outline-none">
                                 </div>
                             </div>
                         </div>
 
+                        <label class="flex items-center justify-between gap-4 p-4 rounded-xl border border-beige-border bg-beige-base cursor-pointer">
+                            <span class="block">
+                                <span class="block text-sm font-semibold text-verde-ingles">Receta pública</span>
+                                <span class="block text-xs text-gray-500 mt-0.5">Otras personas podrán verla en tu perfil. Si la desactivás, solo la ves vos.</span>
+                            </span>
+                            <input type="checkbox" id="input-publica" checked class="sr-only peer">
+                            <span class="relative w-11 h-6 shrink-0 rounded-full bg-gray-300 peer-checked:bg-verde-chip transition after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:w-5 after:h-5 after:rounded-full after:bg-white after:shadow after:transition peer-checked:after:translate-x-5"></span>
+                        </label>
+
                         <div class="flex justify-end pt-2 border-t border-beige-border">
-                            <button type="submit" class="bg-verde-ingles hover:bg-verde-hover text-white px-5 py-2.5 rounded-xl text-xs sm:text-sm font-medium shadow-soft transition flex items-center gap-1.5">
+                            <button type="submit" class="bg-verde-ingles hover:bg-verde-hover text-white px-5 py-2.5 rounded-xl text-sm font-medium shadow-soft transition flex items-center gap-1.5">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path></svg>
                                 <span>Guardar Receta</span>
                             </button>
@@ -331,11 +340,65 @@
         </main>
     </div>
 
+
+    <!-- MODAL PERFIL -->
+    <div id="modal-perfil" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/30" onclick="if(event.target===this) cerrarPerfil()">
+        <div class="bg-white w-full max-w-sm rounded-2xl p-7 shadow-soft-lg border border-beige-border space-y-6">
+            <div class="flex justify-between items-center">
+                <h2 class="text-lg font-semibold text-verde-ingles">Mi perfil</h2>
+                <button type="button" onclick="cerrarPerfil()" title="Cerrar" class="p-2 rounded-lg text-gray-400 hover:text-verde-ingles hover:bg-beige-base transition">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+
+            <div class="flex flex-col items-center gap-3">
+                <div id="perfil-avatar-grande"></div>
+                <label class="cursor-pointer text-sm font-medium text-verde-ingles underline underline-offset-4 hover:text-verde-hover">
+                    <span id="perfil-foto-texto">Cambiar foto</span>
+                    <input type="file" id="input-avatar" accept="image/*" class="hidden" onchange="cambiarAvatar(this)">
+                </label>
+            </div>
+
+            <div class="space-y-5">
+                <div>
+                    <span class="block text-sm font-medium text-verde-ingles mb-2">Usuario</span>
+                    <div id="perfil-usuario" class="text-sm text-gray-600 px-1"></div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-verde-ingles mb-2">Nombre</label>
+                    <input type="text" id="perfil-nombre" maxlength="40" class="w-full p-3 bg-beige-base border border-beige-border rounded-xl text-sm focus:ring-1 focus:ring-verde-ingles focus:outline-none">
+                </div>
+            </div>
+
+            <div id="perfil-mensaje" class="hidden text-sm text-center font-medium p-2.5 rounded-lg border"></div>
+
+            <button type="button" onclick="guardarPerfil()" class="w-full bg-verde-ingles hover:bg-verde-hover text-white py-3 rounded-xl text-sm font-medium shadow-soft transition">Guardar cambios</button>
+        </div>
+    </div>
+
     <script>
         const SUPABASE_URL = 'https://nwkmdonyrqantliwlebi.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im53a21kb255cnFhbnRsaXdsZWJpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk5MzU0NjAsImV4cCI6MjEwNTUxMTQ2MH0.lh28WPqEKoWBUycuaVf_6tnG0LK_sVLpxP0Yd6lhlxY';
         const db = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
 
+
+        // ---------- Utilidades ----------
+        const esc = (v) => String(v ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+        function urlSegura(u) {
+            try {
+                const x = new URL(u);
+                return (x.protocol === 'http:' || x.protocol === 'https:') ? x.href : '';
+            } catch (e) { return ''; }
+        }
+        const PREFIJO_AVATAR = SUPABASE_URL + '/storage/v1/object/public/avatares/';
+        function avatarHTML(perfil, tam, texto) {
+            tam = tam || 'w-9 h-9'; texto = texto || 'text-sm';
+            const url = perfil && perfil.avatar_url && perfil.avatar_url.startsWith(PREFIJO_AVATAR) ? perfil.avatar_url : '';
+            if (url) return `<img src="${esc(url)}" alt="" class="${tam} rounded-full object-cover bg-beige-base block">`;
+            const inicial = esc(((perfil && (perfil.nombre || perfil.usuario)) || '?').trim().charAt(0).toUpperCase());
+            return `<div class="${tam} rounded-full bg-mostaza text-white ${texto} font-semibold flex items-center justify-center">${inicial}</div>`;
+        }
+        let perfilActual = null;
         let usuarioActual = null;
         let recetas = [];
         let ingredientesIncluidos = [];
@@ -401,7 +464,7 @@
                     console.error('Error de login:', error);
                     const detalle = error.message || 'desconocido';
                     if (/invalid login credentials/i.test(detalle)) {
-                        mostrarError("Usuario o contraseña incorrectos.");
+                        mostrarError(usuario.includes('@') ? "Email o contraseña incorrectos." : "Usuario o contraseña incorrectos. Si te registraste con tu email, ingresá con tu email.");
                     } else {
                         mostrarError("Error de Supabase: " + detalle);
                     }
@@ -431,6 +494,7 @@
         async function ejecutarRegistro(e) {
             e.preventDefault();
             const nombre = document.getElementById('reg-nombre').value.trim();
+            const usuario = document.getElementById('reg-usuario').value.trim().toLowerCase();
             const email = document.getElementById('reg-email').value.trim().toLowerCase();
             const password = document.getElementById('reg-password').value;
             const msg = document.getElementById('reg-mensaje');
@@ -438,7 +502,7 @@
 
             const mostrarMensaje = (texto, ok) => {
                 msg.innerText = texto;
-                msg.className = 'text-xs text-center font-medium p-2 rounded-lg border ' +
+                msg.className = 'text-sm text-center font-medium p-2 rounded-lg border ' +
                     (ok ? 'text-green-800 bg-green-50 border-green-200' : 'text-rojo-excluir bg-red-50 border-red-200');
                 btn.disabled = false;
                 btn.innerText = 'Crear cuenta';
@@ -453,17 +517,30 @@
                 return;
             }
 
+            if (!REGEX_USUARIO.test(usuario)) {
+                mostrarMensaje('El usuario debe tener de 3 a 20 caracteres: letras minúsculas, números y _.', false);
+                return;
+            }
+
             try {
+                const disponible = await usuarioDisponible(usuario);
+                if (disponible === false) {
+                    mostrarMensaje('Ese nombre de usuario ya está en uso. Elegí otro.', false);
+                    return;
+                }
+
                 const { data, error } = await db.auth.signUp({
                     email,
                     password,
-                    options: { data: { nombre }, emailRedirectTo: window.location.origin }
+                    options: { data: { nombre, usuario }, emailRedirectTo: window.location.origin }
                 });
 
                 if (error) {
                     console.error('Error de registro:', error);
                     if (/already registered/i.test(error.message)) {
                         mostrarMensaje('Ese email ya está registrado. Ingresá con tu email y contraseña.', false);
+                    } else if (/database error saving new user/i.test(error.message)) {
+                        mostrarMensaje('No se pudo crear la cuenta. Puede que ese nombre de usuario ya esté en uso.', false);
                     } else if (/password/i.test(error.message)) {
                         mostrarMensaje('La contraseña debe tener al menos 6 caracteres.', false);
                     } else {
@@ -492,6 +569,165 @@
             }
         }
 
+        const REGEX_USUARIO = /^[a-z0-9_]{3,20}$/;
+        let timerUsuario = null;
+
+        async function usuarioDisponible(usuario) {
+            try {
+                const { data, error } = await db.rpc('usuario_disponible', { p_usuario: usuario });
+                if (error) throw error;
+                return data === true;
+            } catch (err) {
+                console.warn('No se pudo verificar el usuario:', err);
+                return null;
+            }
+        }
+
+        function verificarUsuarioLive() {
+            const input = document.getElementById('reg-usuario');
+            const hint = document.getElementById('reg-usuario-hint');
+            input.value = input.value.toLowerCase().replace(/[^a-z0-9_]/g, '');
+            const v = input.value;
+            clearTimeout(timerUsuario);
+
+            const poner = (texto, clase) => { hint.innerText = texto; hint.className = 'text-xs mt-2 ' + clase; };
+
+            if (!v) return poner('3 a 20 caracteres: letras minúsculas, números y _', 'text-gray-500');
+            if (!REGEX_USUARIO.test(v)) return poner('Mínimo 3 caracteres.', 'text-gray-500');
+
+            poner('Verificando...', 'text-gray-500');
+            timerUsuario = setTimeout(async () => {
+                const disp = await usuarioDisponible(v);
+                if (input.value !== v) return;
+                if (disp === true) poner('Disponible', 'text-green-700 font-medium');
+                else if (disp === false) poner('Ese usuario ya está en uso', 'text-rojo-excluir font-medium');
+                else poner('3 a 20 caracteres: letras minúsculas, números y _', 'text-gray-500');
+            }, 400);
+        }
+
+        // ---------- Perfil ----------
+        async function cargarPerfil() {
+            perfilActual = null;
+            const emailBase = (usuarioActual.email || 'usuario').split('@')[0];
+            const nombreBase = (usuarioActual.user_metadata && usuarioActual.user_metadata.nombre) || emailBase;
+            try {
+                let { data, error } = await db.from('perfiles').select('*').eq('id', usuarioActual.id).maybeSingle();
+                if (error) throw error;
+
+                if (!data) {
+                    let base = emailBase.toLowerCase().replace(/[^a-z0-9_]/g, '');
+                    if (base.length < 3) base = 'user' + Math.floor(1000 + Math.random() * 9000);
+                    for (let i = 0; i < 4 && !data; i++) {
+                        const candidato = i === 0 ? base : base.slice(0, 15) + Math.floor(1000 + Math.random() * 9000);
+                        const ins = await db.from('perfiles').insert({ id: usuarioActual.id, usuario: candidato, nombre: nombreBase }).select().maybeSingle();
+                        if (!ins.error) data = ins.data;
+                    }
+                }
+                perfilActual = data;
+            } catch (err) {
+                console.warn('No se pudo cargar el perfil:', err);
+            }
+            if (!perfilActual) perfilActual = { usuario: emailBase, nombre: nombreBase, avatar_url: null, local: true };
+            pintarAvatarHeader();
+        }
+
+        function pintarAvatarHeader() {
+            const btn = document.getElementById('btn-avatar-header');
+            if (btn) btn.innerHTML = avatarHTML(perfilActual, 'w-9 h-9', 'text-sm');
+        }
+
+        function mensajePerfil(texto, ok) {
+            const el = document.getElementById('perfil-mensaje');
+            el.innerText = texto;
+            el.className = 'text-sm text-center font-medium p-2.5 rounded-lg border ' +
+                (ok ? 'text-green-800 bg-green-50 border-green-200' : 'text-rojo-excluir bg-red-50 border-red-200');
+        }
+
+        function abrirPerfil() {
+            document.getElementById('perfil-avatar-grande').innerHTML = avatarHTML(perfilActual, 'w-24 h-24', 'text-3xl');
+            document.getElementById('perfil-usuario').innerText = '@' + (perfilActual.usuario || '');
+            document.getElementById('perfil-nombre').value = perfilActual.nombre || '';
+            document.getElementById('perfil-mensaje').classList.add('hidden');
+            document.getElementById('modal-perfil').classList.remove('hidden');
+        }
+
+        function cerrarPerfil() {
+            document.getElementById('modal-perfil').classList.add('hidden');
+        }
+
+        async function guardarPerfil() {
+            const nombre = document.getElementById('perfil-nombre').value.trim();
+            if (!nombre) return mensajePerfil('El nombre no puede estar vacío.', false);
+            if (perfilActual.local) return mensajePerfil('Tu perfil todavía no está configurado en la base de datos.', false);
+
+            const { error } = await db.from('perfiles').update({ nombre }).eq('id', usuarioActual.id);
+            if (error) return mensajePerfil('No se pudo guardar: ' + error.message, false);
+
+            perfilActual.nombre = nombre;
+            pintarAvatarHeader();
+            mensajePerfil('Cambios guardados.', true);
+        }
+
+        function redimensionarImagen(archivo, lado) {
+            return new Promise((resolve, reject) => {
+                const url = URL.createObjectURL(archivo);
+                const img = new Image();
+                img.onload = () => {
+                    const min = Math.min(img.width, img.height);
+                    const sx = (img.width - min) / 2;
+                    const sy = (img.height - min) / 2;
+                    const canvas = document.createElement('canvas');
+                    canvas.width = lado; canvas.height = lado;
+                    canvas.getContext('2d').drawImage(img, sx, sy, min, min, 0, 0, lado, lado);
+                    URL.revokeObjectURL(url);
+                    canvas.toBlob(b => b ? resolve(b) : reject(new Error('No se pudo procesar la imagen')), 'image/jpeg', 0.88);
+                };
+                img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('No se pudo leer la imagen')); };
+                img.src = url;
+            });
+        }
+
+        async function cambiarAvatar(input) {
+            const archivo = input.files && input.files[0];
+            input.value = '';
+            if (!archivo) return;
+            if (!archivo.type.startsWith('image/')) return mensajePerfil('Elegí un archivo de imagen.', false);
+            if (archivo.size > 15 * 1024 * 1024) return mensajePerfil('La imagen es muy pesada (máximo 15 MB).', false);
+            if (perfilActual.local) return mensajePerfil('Tu perfil todavía no está configurado en la base de datos.', false);
+
+            const textoBtn = document.getElementById('perfil-foto-texto');
+            textoBtn.innerText = 'Subiendo...';
+            try {
+                const blob = await redimensionarImagen(archivo, 384);
+                const nombreArchivo = `avatar-${Date.now()}.jpg`;
+                const ruta = `${usuarioActual.id}/${nombreArchivo}`;
+
+                const { error: errSubida } = await db.storage.from('avatares').upload(ruta, blob, { contentType: 'image/jpeg', cacheControl: '3600' });
+                if (errSubida) throw errSubida;
+
+                const { data: pub } = db.storage.from('avatares').getPublicUrl(ruta);
+                const { error: errPerfil } = await db.from('perfiles').update({ avatar_url: pub.publicUrl }).eq('id', usuarioActual.id);
+                if (errPerfil) throw errPerfil;
+
+                perfilActual.avatar_url = pub.publicUrl;
+                document.getElementById('perfil-avatar-grande').innerHTML = avatarHTML(perfilActual, 'w-24 h-24', 'text-3xl');
+                pintarAvatarHeader();
+                mensajePerfil('Foto actualizada.', true);
+
+                // limpiar fotos anteriores (si falla, no importa)
+                try {
+                    const { data: viejas } = await db.storage.from('avatares').list(usuarioActual.id);
+                    const borrar = (viejas || []).filter(f => f.name !== nombreArchivo).map(f => `${usuarioActual.id}/${f.name}`);
+                    if (borrar.length) await db.storage.from('avatares').remove(borrar);
+                } catch (e) { /* ignorar */ }
+            } catch (err) {
+                console.error('Error al subir la foto:', err);
+                mensajePerfil('No se pudo subir la foto: ' + (err.message || 'error desconocido'), false);
+            } finally {
+                textoBtn.innerText = 'Cambiar foto';
+            }
+        }
+
         async function cerrarSesion() {
             await db.auth.signOut();
             usuarioActual = null;
@@ -503,9 +739,7 @@
             document.getElementById('pantalla-login').classList.add('hidden');
             document.getElementById('app-principal').classList.remove('hidden');
 
-            const nombre = usuarioActual.user_metadata?.nombre || usuarioActual.email.split('@')[0];
-            document.getElementById('user-display-name').innerText = `Recetario de ${nombre}`;
-
+            await cargarPerfil();
             await cargarRecetas();
         }
 
@@ -526,7 +760,8 @@
                 procedimiento: r.procedimiento || '',
                 instagram: r.link_ig || '',
                 tiktok: r.link_tiktok || '',
-                link: r.link_otro || ''
+                link: r.link_otro || '',
+                publica: r.publica !== false
             }));
 
             renderizarFiltros();
@@ -534,22 +769,14 @@
         }
 
         function cambiarPestana(pestana) {
-            const btnFiltrar = document.getElementById('tab-btn-filtrar');
-            const btnAgregar = document.getElementById('tab-btn-agregar');
-            const secFiltrar = document.getElementById('pestana-filtrar');
-            const secAgregar = document.getElementById('pestana-agregar');
+            const activa = "px-3.5 py-2 rounded-lg text-sm font-medium transition flex items-center gap-1.5 bg-beige-card text-verde-ingles shadow-sm";
+            const inactiva = "px-3.5 py-2 rounded-lg text-sm font-medium transition flex items-center gap-1.5 text-beige-card hover:text-white";
+            const esFiltrar = pestana === 'filtrar';
 
-            if (pestana === 'filtrar') {
-                secFiltrar.classList.remove('hidden');
-                secAgregar.classList.add('hidden');
-                btnFiltrar.className = "px-3 py-1.5 rounded-lg text-xs font-medium transition flex items-center gap-1.5 bg-beige-card text-verde-ingles shadow-sm";
-                btnAgregar.className = "px-3 py-1.5 rounded-lg text-xs font-medium transition flex items-center gap-1.5 text-beige-card hover:text-white";
-            } else {
-                secFiltrar.classList.add('hidden');
-                secAgregar.classList.remove('hidden');
-                btnAgregar.className = "px-3 py-1.5 rounded-lg text-xs font-medium transition flex items-center gap-1.5 bg-beige-card text-verde-ingles shadow-sm";
-                btnFiltrar.className = "px-3 py-1.5 rounded-lg text-xs font-medium transition flex items-center gap-1.5 text-beige-card hover:text-white";
-            }
+            document.getElementById('pestana-filtrar').classList.toggle('hidden', !esFiltrar);
+            document.getElementById('pestana-agregar').classList.toggle('hidden', esFiltrar);
+            document.getElementById('tab-btn-filtrar').className = esFiltrar ? activa : inactiva;
+            document.getElementById('tab-btn-agregar').className = esFiltrar ? inactiva : activa;
         }
 
         function obtenerTodosLosIngredientes() {
@@ -586,15 +813,15 @@
             const disponibles = lista.filter(i => !seleccionados.includes(i) && !opuesto.includes(i));
 
             if (disponibles.length === 0) {
-                contenedor.innerHTML = `<div class="text-xs text-gray-400 p-2 text-center">Sin opciones disponibles</div>`;
+                contenedor.innerHTML = `<div class="text-sm text-gray-400 p-2 text-center">Sin opciones disponibles</div>`;
                 return;
             }
 
             disponibles.forEach(ing => {
                 const btn = document.createElement('button');
                 btn.type = 'button';
-                btn.className = 'w-full text-left px-2 py-1 text-xs rounded-md hover:bg-beige-base flex items-center justify-between text-gray-700 transition';
-                btn.innerHTML = `<span>${ing}</span> <svg class="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>`;
+                btn.className = 'w-full text-left px-2 py-1 text-sm rounded-md hover:bg-beige-base flex items-center justify-between text-gray-700 transition';
+                btn.innerHTML = `<span>${esc(ing)}</span> <svg class="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>`;
                 btn.onclick = () => seleccionarIngrediente(tipo, ing);
                 contenedor.appendChild(btn);
             });
@@ -631,9 +858,9 @@
         function renderizarChips() {
             const containerInc = document.getElementById('container-chips-incluir');
             containerInc.innerHTML = ingredientesIncluidos.map(ing => `
-                <span class="chip-anim inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-verde-chip text-white shadow-sm">
-                    ${ing}
-                    <button type="button" onclick="removerIngrediente('incluir', '${ing}')" class="hover:text-green-200 transition">
+                <span class="chip-anim inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-sm font-medium bg-verde-chip text-white shadow-sm">
+                    ${esc(ing)}
+                    <button type="button" data-ing="${esc(ing)}" onclick="removerIngrediente('incluir', this.dataset.ing)" class="hover:text-green-200 transition">
                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                     </button>
                 </span>
@@ -641,9 +868,9 @@
 
             const containerExc = document.getElementById('container-chips-excluir');
             containerExc.innerHTML = ingredientesExcluidos.map(ing => `
-                <span class="chip-anim inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-rojo-excluir text-white shadow-sm">
-                    ${ing}
-                    <button type="button" onclick="removerIngrediente('excluir', '${ing}')" class="hover:text-red-200 transition">
+                <span class="chip-anim inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-sm font-medium bg-rojo-excluir text-white shadow-sm">
+                    ${esc(ing)}
+                    <button type="button" data-ing="${esc(ing)}" onclick="removerIngrediente('excluir', this.dataset.ing)" class="hover:text-red-200 transition">
                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                     </button>
                 </span>
@@ -689,117 +916,146 @@
             filtrarRecetas();
         }
 
+        const ICONO_MUNDO = 'M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z';
+        const ICONO_CANDADO = 'M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z';
+
         function renderizarTarjetasApiladas(lista) {
             const contenedor = document.getElementById('contenedor-recetas-apiladas');
             const estadoVacio = document.getElementById('estado-vacio');
             const contador = document.getElementById('contador-resultados');
 
             contador.innerText = `${lista.length} ${lista.length === 1 ? 'receta' : 'recetas'}`;
+            document.getElementById('card-filtros').classList.toggle('hidden', recetas.length === 0);
 
             if (lista.length === 0) {
                 contenedor.innerHTML = '';
                 estadoVacio.classList.remove('hidden');
+                if (recetas.length === 0) {
+                    estadoVacio.innerHTML = `
+                        <div class="inline-flex p-4 bg-beige-base rounded-2xl text-mostaza mb-5">
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+                        </div>
+                        <h3 class="text-lg font-semibold text-verde-ingles">Todavía no tenés recetas</h3>
+                        <p class="text-sm text-gray-500 mt-2 mb-6">Cargá la primera y empezá a armar tu recetario.</p>
+                        <button type="button" onclick="cambiarPestana('agregar')" class="bg-verde-ingles text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-verde-hover transition shadow-soft">Agregar mi primera receta</button>`;
+                } else {
+                    estadoVacio.innerHTML = `
+                        <div class="inline-flex p-4 bg-beige-base rounded-2xl text-gray-400 mb-5">
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                        </div>
+                        <h3 class="text-lg font-semibold text-verde-ingles">No hay recetas que coincidan</h3>
+                        <p class="text-sm text-gray-500 mt-2 mb-6">Probá quitar ingredientes excluidos o cambiar la búsqueda.</p>
+                        <button type="button" onclick="limpiarFiltros()" class="bg-verde-ingles text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-verde-hover transition shadow-soft">Limpiar filtros</button>`;
+                }
                 return;
             }
 
             estadoVacio.classList.add('hidden');
-            
+
             contenedor.innerHTML = lista.map(receta => {
                 const estaExpandida = !!estadoExpandido[receta.id];
-                const tieneRedes = receta.instagram || receta.tiktok || receta.link;
+                const ig = urlSegura(receta.instagram);
+                const tt = urlSegura(receta.tiktok);
+                const web = urlSegura(receta.link);
+                const tieneRedes = ig || tt || web;
 
                 const filasTabla = (receta.tablaCantidades || []).map(item => `
-                    <tr class="border-b border-beige-border/50 last:border-0 hover:bg-beige-base/40 transition">
-                        <td class="py-1.5 px-3 font-medium text-gray-800">${item.ingrediente}</td>
-                        <td class="py-1.5 px-3 text-gray-600 text-xs">${item.cantidad || '-'}</td>
+                    <tr class="border-b border-beige-border/60 last:border-0">
+                        <td class="py-2.5 px-4 font-medium text-gray-800">${esc(item.ingrediente)}</td>
+                        <td class="py-2.5 px-4 text-gray-600">${esc(item.cantidad || '-')}</td>
                     </tr>
                 `).join('');
 
+                const chips = receta.ingredientes.map(ing => {
+                    const esIncluido = ingredientesIncluidos.includes(ing);
+                    const claseChip = esIncluido
+                        ? 'bg-verde-chip text-white font-medium'
+                        : 'bg-beige-base text-gray-600 border border-beige-border';
+                    return `<span class="px-3 py-1 rounded-full text-xs ${claseChip}">${esc(ing)}</span>`;
+                }).join('');
+
+                const badgeClase = receta.publica
+                    ? 'text-verde-chip bg-green-50 border-green-200 hover:bg-green-100'
+                    : 'text-gray-600 bg-beige-base border-beige-border hover:bg-beige-border/60';
+
                 return `
-                <article class="bg-beige-card rounded-2xl p-4 shadow-soft border border-beige-border transition space-y-3">
-                    <div class="flex justify-between items-center gap-2">
-                        <h3 class="text-base font-bold text-verde-ingles">${receta.nombre}</h3>
-                        <div class="flex items-center gap-1">
-                            <button onclick="prepararEdicion('${receta.id}')" title="Editar" class="p-1.5 rounded-lg text-gray-500 hover:text-verde-ingles hover:bg-beige-base transition">
+                <article class="bg-white rounded-2xl p-6 shadow-soft border border-beige-border space-y-4">
+                    <div class="flex justify-between items-start gap-3">
+                        <div class="min-w-0 space-y-1">
+                            <h3 class="text-lg font-semibold text-verde-ingles leading-snug">${esc(receta.nombre)}</h3>
+                            ${receta.descripcion ? `<p class="text-sm text-gray-500">${esc(receta.descripcion)}</p>` : ''}
+                        </div>
+                        <div class="flex items-center gap-1 shrink-0">
+                            <button onclick="prepararEdicion('${receta.id}')" title="Editar" class="p-2 rounded-lg text-gray-400 hover:text-verde-ingles hover:bg-beige-base transition">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
                             </button>
-                            <button onclick="eliminarReceta('${receta.id}')" title="Eliminar" class="p-1.5 rounded-lg text-gray-500 hover:text-rojo-excluir hover:bg-beige-base transition">
+                            <button onclick="eliminarReceta('${receta.id}')" title="Eliminar" class="p-2 rounded-lg text-gray-400 hover:text-rojo-excluir hover:bg-beige-base transition">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                            </button>
-                            <button onclick="toggleExpandirTarjeta('${receta.id}')" class="p-1.5 rounded-lg bg-beige-base text-verde-ingles hover:bg-verde-ingles hover:text-white transition border border-beige-border flex items-center gap-1 text-xs font-semibold">
-                                <span>${estaExpandida ? 'Menos' : 'Ver más'}</span>
-                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${estaExpandida ? 'M5 15l7-7 7 7' : 'M19 9l-7 7-7-7'}"></path></svg>
                             </button>
                         </div>
                     </div>
 
-                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 text-xs">
-                        <div class="text-gray-600 max-w-sm">
-                            ${receta.descripcion || ''}
-                        </div>
-                        <div class="flex flex-wrap gap-1 justify-start sm:justify-end">
-                            ${receta.ingredientes.map(ing => {
-                                const esIncluido = ingredientesIncluidos.includes(ing);
-                                const claseChip = esIncluido 
-                                    ? 'bg-verde-chip text-white font-medium' 
-                                    : 'bg-beige-base text-gray-600 border border-beige-border';
-                                return `<span class="px-2 py-0.5 rounded-md text-[11px] ${claseChip}">${ing}</span>`;
-                            }).join('')}
-                        </div>
+                    <div class="flex flex-wrap gap-2">${chips}</div>
+
+                    <div class="flex items-center justify-between gap-3 pt-2">
+                        <button type="button" onclick="alternarPrivacidad('${receta.id}')" title="${receta.publica ? 'Pública: tocá para hacerla privada' : 'Privada: tocá para hacerla pública'}" class="inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full border transition ${badgeClase}">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${receta.publica ? ICONO_MUNDO : ICONO_CANDADO}"></path></svg>
+                            <span>${receta.publica ? 'Pública' : 'Privada'}</span>
+                        </button>
+                        <button onclick="toggleExpandirTarjeta('${receta.id}')" class="px-3.5 py-1.5 rounded-full text-verde-ingles hover:bg-beige-base transition border border-beige-border flex items-center gap-1.5 text-sm font-medium">
+                            <span>${estaExpandida ? 'Ver menos' : 'Ver más'}</span>
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${estaExpandida ? 'M5 15l7-7 7 7' : 'M19 9l-7 7-7-7'}"></path></svg>
+                        </button>
                     </div>
 
                     ${estaExpandida ? `
-                    <div class="pt-3 border-t border-beige-border space-y-3 chip-anim">
-                        <div class="space-y-1">
-                            <span class="text-xs font-semibold text-verde-ingles">Ingredientes y Cantidades:</span>
+                    <div class="pt-5 border-t border-beige-border space-y-5 chip-anim">
+                        <div class="space-y-2">
+                            <span class="text-sm font-semibold text-verde-ingles">Ingredientes y cantidades</span>
                             <div class="border border-beige-border rounded-xl overflow-hidden bg-white">
-                                <table class="w-full text-left text-xs">
+                                <table class="w-full text-left text-sm">
                                     <thead class="bg-beige-base text-verde-ingles font-semibold border-b border-beige-border">
                                         <tr>
-                                            <th class="py-1.5 px-3">Ingrediente</th>
-                                            <th class="py-1.5 px-3">Cantidad</th>
+                                            <th class="py-2.5 px-4">Ingrediente</th>
+                                            <th class="py-2.5 px-4">Cantidad</th>
                                         </tr>
                                     </thead>
-                                    <tbody>
-                                        ${filasTabla}
-                                    </tbody>
+                                    <tbody>${filasTabla}</tbody>
                                 </table>
                             </div>
                         </div>
 
                         ${receta.procedimiento ? `
-                        <div class="space-y-1 bg-beige-base/60 p-3 rounded-xl border border-beige-border">
-                            <span class="text-xs font-semibold text-verde-ingles">Procedimiento:</span>
-                            <p class="text-xs text-gray-700 leading-relaxed whitespace-pre-line">${receta.procedimiento}</p>
+                        <div class="space-y-2">
+                            <span class="text-sm font-semibold text-verde-ingles">Procedimiento</span>
+                            <p class="text-sm text-gray-700 leading-relaxed whitespace-pre-line bg-beige-base/70 p-4 rounded-xl">${esc(receta.procedimiento)}</p>
                         </div>
                         ` : ''}
 
                         ${tieneRedes ? `
-                        <div class="pt-1 flex flex-wrap gap-2">
-                            ${receta.instagram ? `
-                                <a href="${receta.instagram}" target="_blank" class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-pink-50 text-pink-700 rounded-lg text-xs font-medium border border-pink-200 hover:bg-pink-100 transition">
-                                    <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
-                                    <span>Instagram</span>
-                                </a>
-                            ` : ''}
-                            ${receta.tiktok ? `
-                                <a href="${receta.tiktok}" target="_blank" class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-gray-100 text-gray-800 rounded-lg text-xs font-medium border border-gray-300 hover:bg-gray-200 transition">
-                                    <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-5.2 1.74 2.89 2.89 0 012.31-4.64 2.93 2.93 0 01.88.13V9.4a6.84 6.84 0 00-1-.05A6.33 6.33 0 003 15.68 6.34 6.34 0 009.34 22a6.34 6.34 0 006.33-6.33V10a8.16 8.16 0 003.92 1V7.58a4.83 4.83 0 01-3-.89z"/></svg>
-                                    <span>TikTok</span>
-                                </a>
-                            ` : ''}
-                            ${receta.link ? `
-                                <a href="${receta.link}" target="_blank" class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-amber-50 text-amber-800 rounded-lg text-xs font-medium border border-amber-200 hover:bg-amber-100 transition">
-                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg>
-                                    <span>Enlace Web</span>
-                                </a>
-                            ` : ''}
+                        <div class="flex flex-wrap gap-2">
+                            ${ig ? `<a href="${esc(ig)}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 px-3.5 py-2 bg-pink-50 text-pink-700 rounded-lg text-sm font-medium border border-pink-200 hover:bg-pink-100 transition">Instagram</a>` : ''}
+                            ${tt ? `<a href="${esc(tt)}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 px-3.5 py-2 bg-gray-100 text-gray-800 rounded-lg text-sm font-medium border border-gray-300 hover:bg-gray-200 transition">TikTok</a>` : ''}
+                            ${web ? `<a href="${esc(web)}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 px-3.5 py-2 bg-amber-50 text-amber-800 rounded-lg text-sm font-medium border border-amber-200 hover:bg-amber-100 transition">Enlace web</a>` : ''}
                         </div>
                         ` : ''}
                     </div>
                     ` : ''}
                 </article>
             `}).join('');
+        }
+
+        async function alternarPrivacidad(id) {
+            const r = recetas.find(x => x.id === id);
+            if (!r) return;
+            const nueva = !r.publica;
+            const { error } = await db.from('recetas').update({ publica: nueva }).eq('id', id);
+            if (error) {
+                alert('No se pudo cambiar la privacidad: ' + error.message);
+                return;
+            }
+            r.publica = nueva;
+            filtrarRecetas();
         }
 
         function toggleDropdownFormIngredientes() {
@@ -829,8 +1085,8 @@
             disponibles.forEach(ing => {
                 const btn = document.createElement('button');
                 btn.type = 'button';
-                btn.className = 'w-full text-left px-2 py-1 text-xs rounded-md hover:bg-beige-base flex items-center justify-between text-gray-700 transition';
-                btn.innerHTML = `<span>${ing}</span> <svg class="w-3.5 h-3.5 text-verde-ingles" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>`;
+                btn.className = 'w-full text-left px-2 py-1 text-sm rounded-md hover:bg-beige-base flex items-center justify-between text-gray-700 transition';
+                btn.innerHTML = `<span>${esc(ing)}</span> <svg class="w-3.5 h-3.5 text-verde-ingles" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>`;
                 btn.onclick = () => agregarIngredienteForm(ing);
                 contenedor.appendChild(btn);
             });
@@ -841,14 +1097,14 @@
             if (query.length > 0 && !existeExacto) {
                 const btnNuevo = document.createElement('button');
                 btnNuevo.type = 'button';
-                btnNuevo.className = 'w-full text-left px-2 py-1.5 text-xs rounded-md bg-verde-ingles/10 text-verde-ingles hover:bg-verde-ingles hover:text-white flex items-center justify-between font-medium transition mt-1 border border-verde-ingles/20';
-                btnNuevo.innerHTML = `<span>Agregar "${query}" como nuevo ingrediente</span> <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
+                btnNuevo.className = 'w-full text-left px-2 py-1.5 text-sm rounded-md bg-verde-ingles/10 text-verde-ingles hover:bg-verde-ingles hover:text-white flex items-center justify-between font-medium transition mt-1 border border-verde-ingles/20';
+                btnNuevo.innerHTML = `<span>Agregar "${esc(query)}" como nuevo ingrediente</span> <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
                 btnNuevo.onclick = () => agregarIngredienteForm(query);
                 contenedor.appendChild(btnNuevo);
             }
 
             if (disponibles.length === 0 && query.length === 0) {
-                contenedor.innerHTML = `<div class="text-xs text-gray-400 p-2 text-center">Escribe para buscar o agregar ingrediente</div>`;
+                contenedor.innerHTML = `<div class="text-sm text-gray-400 p-2 text-center">Escribe para buscar o agregar ingrediente</div>`;
             }
         }
 
@@ -872,9 +1128,9 @@
         function renderizarChipsFormIngredientes() {
             const container = document.getElementById('container-chips-form-ingredientes');
             container.innerHTML = ingredientesFormSeleccionados.map(ing => `
-                <span class="chip-anim inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-verde-ingles text-white shadow-sm">
-                    ${ing}
-                    <button type="button" onclick="removerIngredienteForm('${ing}')" class="hover:text-green-200 transition">
+                <span class="chip-anim inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-sm font-medium bg-verde-ingles text-white shadow-sm">
+                    ${esc(ing)}
+                    <button type="button" data-ing="${esc(ing)}" onclick="removerIngredienteForm(this.dataset.ing)" class="hover:text-green-200 transition">
                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                     </button>
                 </span>
@@ -908,9 +1164,9 @@
                 tr.setAttribute('data-ingrediente', ing);
                 tr.className = "hover:bg-beige-card/50 transition border-b border-beige-border last:border-0";
                 tr.innerHTML = `
-                    <td class="p-2 font-medium text-gray-800 text-xs">${ing}</td>
+                    <td class="p-2 font-medium text-gray-800 text-sm">${esc(ing)}</td>
                     <td class="p-2">
-                        <input type="text" value="${cantidadPrevia}" placeholder="Ej: 200 g, 1 cda, a gusto" class="w-full p-1.5 text-xs bg-white border border-beige-border rounded-lg focus:ring-1 focus:ring-verde-ingles focus:outline-none">
+                        <input type="text" value="${esc(cantidadPrevia)}" placeholder="Ej: 200 g, 1 cda, a gusto" class="w-full p-1.5 text-sm bg-white border border-beige-border rounded-lg focus:ring-1 focus:ring-verde-ingles focus:outline-none">
                     </td>
                 `;
                 tbody.appendChild(tr);
@@ -949,6 +1205,7 @@
                 link_ig,
                 link_tiktok,
                 link_otro,
+                publica: document.getElementById('input-publica').checked,
                 user_id: usuarioActual.id
             };
 
@@ -979,6 +1236,7 @@
             document.getElementById('input-instagram').value = receta.instagram || '';
             document.getElementById('input-tiktok').value = receta.tiktok || '';
             document.getElementById('input-link').value = receta.link || '';
+            document.getElementById('input-publica').checked = receta.publica !== false;
 
             ingredientesFormSeleccionados = [...receta.ingredientes];
             renderizarChipsFormIngredientes();
@@ -986,7 +1244,7 @@
             sincronizarTablaCantidadesAuto();
             if (receta.tablaCantidades) {
                 receta.tablaCantidades.forEach(item => {
-                    const fila = document.querySelector(`#tabla-body-cantidades tr[data-ingrediente="${item.ingrediente}"]`);
+                    const fila = document.querySelector(`#tabla-body-cantidades tr[data-ingrediente="${CSS.escape(item.ingrediente)}"]`);
                     if (fila) {
                         fila.querySelector('input').value = item.cantidad || '';
                     }
