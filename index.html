@@ -21,8 +21,8 @@
                         sans: ['Inter', 'ui-sans-serif', 'system-ui', '-apple-system', '"Segoe UI"', 'Roboto', 'Arial', 'sans-serif'],
                     },
                     colors: {
-                        'fondo': '#fcfbf8',
-                        'beige-base': '#f7f5ef',
+                        'fondo': '#fffdf9',
+                        'beige-base': '#f8f6f0',
                         'beige-card': '#ffffff',
                         'beige-border': '#ebe7dc',
                         'verde-ingles': '#1b4332',
@@ -45,7 +45,7 @@
         *, *::before, *::after, ::placeholder { font-style: normal !important; }
         em, i, cite, address, dfn, var { font-style: normal !important; }
         body {
-            background-color: #fcfbf8;
+            background-color: #fffdf9;
             color: #2b2d42;
             font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
             letter-spacing: 0.02em;
@@ -56,7 +56,7 @@
             height: 6px;
         }
         ::-webkit-scrollbar-track {
-            background: #fcfbf8;
+            background: #fffdf9;
         }
         ::-webkit-scrollbar-thumb {
             background: #c68b59;
@@ -195,11 +195,11 @@
                         <span class="hidden sm:inline">Agregar receta</span>
                     </button>
                     <button onclick="abrirNotificaciones()" title="Notificaciones" class="relative p-2 text-green-200 hover:text-white hover:bg-verde-hover/60 rounded-xl transition">
-                        <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
                         <span id="badge-notificaciones" class="hidden absolute -top-0.5 -right-0.5 min-w-[16px] h-4 px-1 rounded-full bg-mostaza text-white text-[10px] font-semibold flex items-center justify-center">0</span>
                     </button>
                     <button onclick="abrirMensajes()" title="Mensajes" class="relative p-2 text-green-200 hover:text-white hover:bg-verde-hover/60 rounded-xl transition">
-                        <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
                         <span id="badge-mensajes" class="hidden absolute -top-0.5 -right-0.5 min-w-[16px] h-4 px-1 rounded-full bg-mostaza text-white text-[10px] font-semibold flex items-center justify-center">0</span>
                     </button>
                     <button id="btn-avatar-header" onclick="verPerfilPropio()" title="Mi perfil" class="rounded-full ring-2 ring-white/20 hover:ring-white/70 transition"></button>
@@ -1801,6 +1801,7 @@
 
         function bloqueResenas(r) {
             const id = r.id;
+            const propia = r.userId === usuarioActual.id;
             const c = resenasCache[id] || { promedio: 0, cantidad: 0, mia: null, lista: [] };
             const mia = c.mia;
             if (estadoResenaForm[id] === undefined) estadoResenaForm[id] = mia ? mia.puntaje : 0;
@@ -1821,10 +1822,9 @@
                 </div>`;
             }).join('');
 
-            return `
-            <div class="space-y-3">
-                <span class="text-sm font-semibold text-verde-ingles">Calificación y reseñas</span>
-                <div class="bg-beige-base/70 p-4 rounded-xl space-y-3">
+            const formulario = propia
+                ? `<p class="text-xs text-gray-400 bg-beige-base/70 p-3 rounded-xl">No podés calificar tu propia receta. Vas a ver acá lo que opinen las demás personas.</p>`
+                : `<div class="bg-beige-base/70 p-4 rounded-xl space-y-3">
                     <div class="flex items-center gap-3">
                         ${estrellasInputHTML(id, valorActual)}
                         <span id="valor-resena-${esc(id)}" class="text-sm font-semibold text-verde-ingles">${valorActual.toFixed(1)}</span>
@@ -1834,10 +1834,13 @@
                         ${mia ? `<button type="button" onclick="eliminarResena('${esc(id)}')" class="text-xs text-rojo-excluir hover:underline">Borrar mi reseña</button>` : ''}
                         <button type="button" onclick="guardarResena('${esc(id)}')" class="px-4 py-2 rounded-xl text-sm font-medium bg-verde-ingles hover:bg-verde-hover text-white transition">${mia ? 'Actualizar reseña' : 'Publicar reseña'}</button>
                     </div>
-                </div>
-                <div id="lista-resenas-${esc(id)}">
-                    ${listaHTML || '<p class="text-sm text-gray-400">Todavía no hay otras reseñas.</p>'}
-                </div>
+                </div>`;
+
+            return `
+            <div class="space-y-3">
+                <span class="text-sm font-semibold text-verde-ingles">Calificación y reseñas</span>
+                ${formulario}
+                <div id="lista-resenas-${esc(id)}">${listaHTML || (propia ? '<p class="text-sm text-gray-400">Todavía no hay reseñas.</p>' : '<p class="text-sm text-gray-400">Todavía no hay otras reseñas.</p>')}</div>
             </div>`;
         }
 
@@ -1906,8 +1909,12 @@
                     ${botonGuardar(r)}
                 </div>`;
 
+            const claseArticulo = opts.anidada
+                ? 'bg-beige-base/50 p-5 space-y-4'
+                : 'bg-white rounded-2xl p-6 shadow-soft border border-beige-border space-y-4';
+
             return `
-            <article class="bg-white rounded-2xl p-6 shadow-soft border border-beige-border space-y-4">
+            <article class="${claseArticulo}">
                 ${(propia || opts.ocultarAutor) ? '' : `<div class="pb-1">${chipAutor(r.userId, ctx === 'inicio' ? tiempoRelativo(r.creada) : '')}</div>`}
 
                 <div class="flex justify-between items-start gap-3">
@@ -1918,7 +1925,6 @@
                     ${arribaDerecha}
                 </div>
 
-                ${chipsMeta ? `<div class="flex flex-wrap gap-2">${chipsMeta}</div>` : ''}
                 <div class="flex flex-wrap gap-2">${chipsIngredientes}</div>
 
                 ${enlaces ? `<div class="flex flex-wrap gap-2">${enlaces}</div>` : ''}
@@ -1932,6 +1938,7 @@
                 </div>
 
                 <div id="det-${ctx}-${idAttr}" class="${abierta ? '' : 'hidden'} pt-5 border-t border-beige-border space-y-5">
+                    ${chipsMeta ? `<div class="flex flex-wrap gap-2">${chipsMeta}</div>` : ''}
                     <div class="space-y-2">
                         <span class="text-sm font-semibold text-verde-ingles">Ingredientes y cantidades</span>
                         <div class="border border-beige-border rounded-xl overflow-hidden bg-white">
@@ -1967,22 +1974,19 @@
             const r = p.receta;
             if (!r) return '';
             const esRepost = p.userId !== r.userId;
-            const cabecera = `<div class="pb-1 flex items-start justify-between gap-2">
-                <div class="min-w-0">${chipAutor(p.userId, tiempoRelativo(p.creada))}</div>
-            </div>`;
-            const nota = esRepost
-                ? `<button type="button" onclick="verPerfilPorId('${esc(r.userId)}')" class="text-xs text-gray-500 hover:text-verde-ingles">Compartió una receta de <span class="font-medium">${esc((perfilesCache[r.userId] || {}).nombre || (perfilesCache[r.userId] || {}).usuario || 'otra persona')}</span></button>`
-                : '';
             const caption = p.descripcion ? `<p class="text-sm text-gray-700 whitespace-pre-line">${esc(p.descripcion)}</p>` : '';
+            const notaRepost = esRepost
+                ? `<div class="flex items-center gap-1.5 text-xs text-gray-500">${svg(ICONO_COMPARTIR, 'w-3 h-3')}<span>Compartió esta receta</span></div>`
+                : '';
             return `
-            <div class="space-y-2">
-                <div class="bg-white rounded-2xl px-6 pt-5 pb-0 shadow-soft border border-beige-border border-b-0 rounded-b-none space-y-2">
-                    ${cabecera}
-                    ${nota}
-                    ${caption}
+            <article class="bg-white rounded-2xl p-5 shadow-soft border border-beige-border space-y-3">
+                <div>${chipAutor(p.userId, tiempoRelativo(p.creada))}</div>
+                ${caption}
+                ${notaRepost}
+                <div class="border border-beige-border rounded-xl overflow-hidden">
+                    ${tarjetaReceta(r, ctx, { ocultarAutor: !esRepost, anidada: true })}
                 </div>
-                ${tarjetaReceta(r, ctx, { ocultarAutor: true }).replace('<article class="bg-white rounded-2xl p-6 shadow-soft border border-beige-border space-y-4">', '<article class="bg-white rounded-2xl px-6 pb-6 pt-2 shadow-soft border border-beige-border border-t-0 rounded-t-none space-y-4">')}
-            </div>`;
+            </article>`;
         }
 
         function listaTarjetas(lista, ctx) {
