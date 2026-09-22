@@ -1739,6 +1739,9 @@
                 </button>`;
         }
 
+        const PATH_ESTRELLA = 'M10 15.27L16.18 19l-1.64-7.03L20 7.24l-7.19-.61L10 0 7.19 6.63 0 7.24l5.46 4.73L3.82 19z';
+        const estadoResenaForm = {}; // recetaId -> puntaje seleccionado (sin guardar todavía)
+
         function estrellasHTML(promedio, size) {
             const pct = Math.max(0, Math.min(100, (promedio / 5) * 100));
             const s = size || 'text-sm';
@@ -1754,15 +1757,54 @@
             return `${estrellasHTML(c.promedio)}<span class="text-xs text-gray-500 ml-1.5 align-middle">${c.promedio.toFixed(1)} · ${c.cantidad} ${c.cantidad === 1 ? 'reseña' : 'reseñas'}</span>`;
         }
 
-        function actualizarPreviaEstrellas(id, valor) {
+        function resumenResenasCompacto(id) {
+            const c = resenasCache[id];
+            if (!c || !c.cantidad) return '';
+            return `<span class="inline-flex items-center gap-1 text-xs font-medium text-gray-600 shrink-0" title="${c.promedio.toFixed(1)} de 5 · ${c.cantidad} ${c.cantidad === 1 ? 'reseña' : 'reseñas'}">
+                ${svg(PATH_ESTRELLA, 'w-3.5 h-3.5 text-mostaza', true)}${c.promedio.toFixed(1)}
+            </span>`;
+        }
+
+        function pctEstrella(valor, i) {
+            if (valor >= i) return 100;
+            if (valor >= i - 0.5) return 50;
+            return 0;
+        }
+
+        function estrellasInputHTML(id, valor) {
+            let botones = '';
+            for (let i = 1; i <= 5; i++) {
+                botones += `
+                <span class="relative inline-block w-7 h-7" data-estrella="${i}">
+                    <svg class="absolute inset-0 w-7 h-7 text-gray-300" fill="currentColor" viewBox="0 0 20 20"><path d="${PATH_ESTRELLA}"></path></svg>
+                    <span class="absolute inset-0 overflow-hidden" style="width:${pctEstrella(valor, i)}%">
+                        <svg class="w-7 h-7 text-mostaza" fill="currentColor" viewBox="0 0 20 20"><path d="${PATH_ESTRELLA}"></path></svg>
+                    </span>
+                    <button type="button" onclick="setEstrellaInput('${esc(id)}', ${i - 0.5})" title="${i - 0.5} de 5" class="absolute left-0 top-0 w-1/2 h-full"></button>
+                    <button type="button" onclick="setEstrellaInput('${esc(id)}', ${i})" title="${i} de 5" class="absolute right-0 top-0 w-1/2 h-full"></button>
+                </span>`;
+            }
+            return `<div class="flex items-center gap-0.5" id="estrellas-input-${esc(id)}">${botones}</div>`;
+        }
+
+        function setEstrellaInput(id, valor) {
+            estadoResenaForm[id] = valor;
+            const cont = el('estrellas-input-' + id);
+            if (!cont) return;
+            cont.querySelectorAll('[data-estrella]').forEach(span => {
+                const i = parseInt(span.dataset.estrella, 10);
+                span.querySelector('span.absolute.overflow-hidden').style.width = pctEstrella(valor, i) + '%';
+            });
             const lbl = el('valor-resena-' + id);
-            if (lbl) lbl.innerText = parseFloat(valor).toFixed(1);
+            if (lbl) lbl.innerText = valor.toFixed(1);
         }
 
         function bloqueResenas(r) {
             const id = r.id;
             const c = resenasCache[id] || { promedio: 0, cantidad: 0, mia: null, lista: [] };
             const mia = c.mia;
+            if (estadoResenaForm[id] === undefined) estadoResenaForm[id] = mia ? mia.puntaje : 0;
+            const valorActual = estadoResenaForm[id];
             const listaHTML = (c.lista || []).filter(res => res.userId !== usuarioActual.id).map(res => {
                 const p = perfilesCache[res.userId];
                 return `
@@ -1784,8 +1826,8 @@
                 <span class="text-sm font-semibold text-verde-ingles">Calificación y reseñas</span>
                 <div class="bg-beige-base/70 p-4 rounded-xl space-y-3">
                     <div class="flex items-center gap-3">
-                        <input type="range" min="0" max="5" step="0.5" value="${mia ? mia.puntaje : 0}" oninput="actualizarPreviaEstrellas('${esc(id)}', this.value)" id="rango-resena-${esc(id)}" class="flex-1 accent-[#c68b59]">
-                        <span id="valor-resena-${esc(id)}" class="text-sm font-semibold text-verde-ingles w-9 text-right">${mia ? mia.puntaje.toFixed(1) : '0.0'}</span>
+                        ${estrellasInputHTML(id, valorActual)}
+                        <span id="valor-resena-${esc(id)}" class="text-sm font-semibold text-verde-ingles">${valorActual.toFixed(1)}</span>
                     </div>
                     <textarea id="texto-resena-${esc(id)}" rows="2" maxlength="1000" placeholder="Escribí una reseña (opcional)..." class="w-full p-2.5 bg-white border border-beige-border rounded-lg text-sm focus:ring-1 focus:ring-verde-ingles focus:outline-none">${esc(mia ? (mia.texto || '') : '')}</textarea>
                     <div class="flex justify-end gap-3 items-center">
@@ -1821,7 +1863,8 @@
             const chipPorciones = r.porciones
                 ? `<span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium bg-beige-base text-gray-600 border border-beige-border">${svg(ICONO_USUARIOS, 'w-3 h-3')}Rinde ${esc(r.porciones)} ${r.porciones === 1 ? 'porción' : 'porciones'}</span>`
                 : '';
-            const chips = chipTipo + chipPorciones + r.ingredientes.map(ing => {
+            const chipsMeta = chipTipo + chipPorciones;
+            const chipsIngredientes = r.ingredientes.map(ing => {
                 const esIncluido = ingredientesIncluidos.includes(ing);
                 const claseChip = esIncluido
                     ? 'bg-verde-chip text-white font-medium'
@@ -1843,20 +1886,25 @@
                 ? 'text-verde-chip bg-green-50 border-green-200 hover:bg-green-100'
                 : 'text-gray-600 bg-beige-base border-beige-border hover:bg-beige-border/60';
 
-            const izquierda = propia ? `
+            const togglePrivacidad = `
                 <button type="button" onclick="alternarPrivacidad('${idAttr}')" title="${r.publica ? 'Pública: tocá para hacerla privada' : 'Privada: tocá para hacerla pública'}" class="inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full border transition ${badgeClase}">
                     ${svg(r.publica ? ICONO_MUNDO : ICONO_CANDADO, 'w-3.5 h-3.5')}
                     <span>${r.publica ? 'Pública' : 'Privada'}</span>
-                </button>` : botonGuardar(r);
+                </button>`;
 
             const botonColeccion = `<button type="button" onclick="abrirAgregarAColeccion('${idAttr}')" title="Agregar a colección" class="p-2 rounded-lg text-gray-400 hover:text-verde-ingles hover:bg-beige-base transition">${svg(ICONO_COLECCION)}</button>`;
 
-            const accionesPropias = propia ? `
-                <div class="flex items-center gap-1 shrink-0">
+            const arribaDerecha = propia ? `
+                <div class="flex items-center gap-1.5 shrink-0">
+                    ${resumenResenasCompacto(r.id)}
                     ${botonColeccion}
                     <button onclick="prepararEdicion('${idAttr}')" title="Editar" class="p-2 rounded-lg text-gray-400 hover:text-verde-ingles hover:bg-beige-base transition">${svg(ICONO_EDITAR)}</button>
                     <button onclick="eliminarReceta('${idAttr}')" title="Eliminar" class="p-2 rounded-lg text-gray-400 hover:text-rojo-excluir hover:bg-beige-base transition">${svg(ICONO_BASURA)}</button>
-                </div>` : '';
+                </div>` : `
+                <div class="flex items-center gap-2 shrink-0">
+                    ${resumenResenasCompacto(r.id)}
+                    ${botonGuardar(r)}
+                </div>`;
 
             return `
             <article class="bg-white rounded-2xl p-6 shadow-soft border border-beige-border space-y-4">
@@ -1866,19 +1914,18 @@
                     <div class="min-w-0 space-y-1">
                         <h3 class="text-lg font-semibold text-verde-ingles leading-snug">${esc(r.nombre)}</h3>
                         ${r.descripcion ? `<p class="text-sm text-gray-500">${esc(r.descripcion)}</p>` : ''}
-                        <div class="pt-0.5">${resumenResenas(r.id)}</div>
                     </div>
-                    ${accionesPropias}
+                    ${arribaDerecha}
                 </div>
 
-                <div class="flex flex-wrap gap-2">${chips}</div>
+                ${chipsMeta ? `<div class="flex flex-wrap gap-2">${chipsMeta}</div>` : ''}
+                <div class="flex flex-wrap gap-2">${chipsIngredientes}</div>
 
                 ${enlaces ? `<div class="flex flex-wrap gap-2">${enlaces}</div>` : ''}
 
                 <div class="flex items-center justify-between gap-3 pt-2">
                     <div class="flex items-center gap-2">
-                        ${izquierda}
-                        ${propia ? '' : botonColeccion}
+                        ${propia ? togglePrivacidad : botonColeccion}
                         <button type="button" onclick="compartirReceta('${idAttr}')" title="Compartir" class="p-2 rounded-full text-gray-400 hover:text-verde-ingles hover:bg-beige-base transition">${svg(ICONO_COMPARTIR)}</button>
                     </div>
                     <button id="btn-det-${ctx}-${idAttr}" onclick="toggleDetalle('${ctx}', '${idAttr}')" class="px-3.5 py-1.5 rounded-full text-verde-ingles hover:bg-beige-base transition border border-beige-border flex items-center gap-1.5 text-sm font-medium">${etiquetaVerMas(abierta)}</button>
@@ -1974,10 +2021,9 @@
         }
 
         async function guardarResena(id) {
-            const inputRango = el('rango-resena-' + id);
             const inputTexto = el('texto-resena-' + id);
-            if (!inputRango) return;
-            const puntaje = Math.round(parseFloat(inputRango.value) * 2) / 2;
+            if (!inputTexto) return;
+            const puntaje = estadoResenaForm[id] !== undefined ? estadoResenaForm[id] : 0;
             const texto = inputTexto.value.trim();
             try {
                 const { error } = await db.from('resenas').upsert(
@@ -1985,6 +2031,7 @@
                     { onConflict: 'receta_id,user_id' }
                 );
                 if (error) throw error;
+                delete estadoResenaForm[id];
                 await cargarResenasPara([id], true);
                 toast('Reseña guardada');
                 refrescarVistaActual();
@@ -1995,6 +2042,7 @@
 
         async function eliminarResena(id) {
             if (!confirm('¿Borrar tu reseña y puntaje de esta receta?')) return;
+            delete estadoResenaForm[id];
             const { error } = await db.from('resenas').delete().eq('receta_id', id).eq('user_id', usuarioActual.id);
             if (error) return toast('No se pudo borrar: ' + error.message);
             await cargarResenasPara([id], true);
