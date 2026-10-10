@@ -8,15 +8,18 @@
   },
   "vars": {
     // Monetización de los enlaces de salida (/go). Ver README.md → "Monetizar los enlaces".
-    // Opción 1: acortador que paga por clic, con {url} donde va el destino.
-    //   Ej: "https://servicio.com/api?api=TU_TOKEN&url={url}"
-    "MONETIZAR_URL": "",
-    // Opción 2: página propia con un anuncio de AdSense antes de salir.
-    //   Ej: "ca-pub-1234567890123456" y el ID de un bloque de anuncios.
-    //   Con ADSENSE_CLIENTE cargado también se sirve /ads.txt.
+    // Página puente propia: un banner y redirección automática a los 3 segundos.
+    // Completá UNA de estas opciones:
+    //   A-ADS (solo banners, sin pop-ups, sin aprobación): el número de tu bloque de anuncios.
+    "AADS_ID": "",
+    //   Otra red (ej. Native Banner de Adsterra): pegá su código HTML entre comillas.
+    "ANUNCIO_SALIDA_HTML": "",
+    //   Google AdSense (requiere aprobación). Con ADSENSE_CLIENTE también se sirve /ads.txt.
     "ADSENSE_CLIENTE": "",
-    "ADSENSE_BLOQUE_SALIDA": ""
-    // Las dos vacías = salida directa, sin monetizar.
+    "ADSENSE_BLOQUE_SALIDA": "",
+    // Acortador con {url} (desaconsejado: abren muchas ventanas). Si se carga, tiene prioridad.
+    "MONETIZAR_URL": ""
+    // Todo vacío = salida directa, sin monetizar.
   },
   "rules": [
     {

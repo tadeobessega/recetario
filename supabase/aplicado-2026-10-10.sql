@@ -204,3 +204,12 @@ alter table public.notificaciones add constraint notificaciones_tipo_valido chec
 alter table public.notificaciones alter column actor_id drop not null;
 
 -- Funciones, triggers y reglas de moderación: ver supabase/moderacion.sql
+
+-- 10. Página puente: título de receta sin sesión; enlaces de recetas moderadas desactivados
+create or replace function public.titulo_de_receta(p_receta text) returns text
+language sql stable security definer set search_path = public as $$
+  select titulo from recetas where id::text = p_receta and publica and not moderada limit 1
+$$;
+revoke execute on function public.titulo_de_receta(text) from public;
+grant execute on function public.titulo_de_receta(text) to anon, authenticated;
+-- link_de_receta ahora exige "and not moderada" (ver definición en Supabase)

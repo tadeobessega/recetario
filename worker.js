@@ -8,24 +8,24 @@
 //
 // Cómo se monetiza cada salida (se configura en wrangler.jsonc → "vars"):
 //
-//   1) MONETIZAR_URL (acortador que paga por clic, tipo ShrinkMe / ouo.io / Linkvertise):
-//        "MONETIZAR_URL": "https://servicio.com/api?api=TU_TOKEN&url={url}"
-//      {url} se reemplaza por el destino. La persona pasa por la página del acortador.
+//   Página puente propia (recomendado): "Te llevamos a Instagram…" con el nombre de la
+//   receta, UN banner y redirección automática a los 3 segundos (botón "Ir ahora").
+//   Sin ventanas emergentes. El banner sale de lo primero que esté configurado:
+//     - AADS_ID: número del bloque de anuncios de A-ADS (a-ads.com). Solo banners, sin
+//       pop-ups ni cookies, sin aprobación ni tráfico mínimo. Paga en Bitcoin.
+//     - ANUNCIO_SALIDA_HTML: código HTML de cualquier red (ej. "Native Banner" de Adsterra).
+//       Usá solo formatos de banner, nunca "Popunder" ni "Social Bar".
+//     - ADSENSE_CLIENTE + ADSENSE_BLOQUE_SALIDA: un bloque de Google AdSense.
 //
-//   2) ADSENSE_CLIENTE + ADSENSE_BLOQUE_SALIDA (página propia con un anuncio):
-//        "ADSENSE_CLIENTE": "ca-pub-1234567890123456",
-//        "ADSENSE_BLOQUE_SALIDA": "1234567890"
-//      Antes de salir se muestra una página de Mi Recetario con un anuncio y una
-//      cuenta regresiva de unos segundos. Con ADSENSE_CLIENTE cargado, además se
-//      sirve /ads.txt, que AdSense pide para pagar.
+//   MONETIZAR_URL: acortador con {url} (ShrinkMe, etc.). Tiene prioridad si está cargado.
+//   Desaconsejado: esos servicios abren muchas ventanas y espantan a la gente.
 //
-//   Si los dos están vacíos, la salida es directa (sin monetizar).
-//   Si están los dos, gana MONETIZAR_URL.
+//   Si no hay nada configurado, la salida es directa.
 
 const SUPABASE_URL = 'https://nwkmdonyrqantliwlebi.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im53a21kb255cnFhbnRsaXdsZWJpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk5MzU0NjAsImV4cCI6MjEwNTUxMTQ2MH0.lh28WPqEKoWBUycuaVf_6tnG0LK_sVLpxP0Yd6lhlxY';   // clave "anon": es pública por diseño
 const TIPOS_VALIDOS = new Set(['ig', 'tt', 'web']);
-const SEGUNDOS_ESPERA = 5;
+const SEGUNDOS_ESPERA = 3;
 
 const cabecerasSupabase = {
   apikey: SUPABASE_KEY,
@@ -46,12 +46,14 @@ async function destinoDe(id, tipo) {
 
 async function tituloDe(id) {
   try {
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/recetas?id=eq.${encodeURIComponent(id)}&select=titulo&limit=1`, {
-      headers: cabecerasSupabase
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/titulo_de_receta`, {
+      method: 'POST',
+      headers: cabecerasSupabase,
+      body: JSON.stringify({ p_receta: id })
     });
     if (!res.ok) return '';
-    const filas = await res.json();
-    return (filas && filas[0] && filas[0].titulo) || '';
+    const t = await res.json();
+    return typeof t === 'string' ? t : '';
   } catch (e) {
     return '';
   }
@@ -65,7 +67,26 @@ function nombreDestino(tipo, destino) {
   try { return new URL(destino).hostname.replace(/^www\./, ''); } catch (e) { return 'el sitio'; }
 }
 
-function paginaSalida({ destino, tipo, titulo, cliente, bloque }) {
+// Banner a mostrar en la página puente, según lo configurado
+function anuncioSalida(env) {
+  const aads = String(env.AADS_ID || '').trim();
+  if (/^\d+$/.test(aads)) {
+    return { html: `<iframe data-aa="${aads}" src="https://ad.a-ads.com/${aads}?size=300x250" style="width:300px;height:250px;border:0;padding:0;overflow:hidden;background-color:transparent;" scrolling="no" title="Publicidad"></iframe>`, cabeza: '' };
+  }
+  const html = String(env.ANUNCIO_SALIDA_HTML || '').trim();
+  if (html) return { html, cabeza: '' };
+  const cliente = String(env.ADSENSE_CLIENTE || '').trim();
+  const bloque = String(env.ADSENSE_BLOQUE_SALIDA || '').trim();
+  if (cliente && bloque) {
+    return {
+      cabeza: `<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${esc(cliente)}" crossorigin="anonymous"></script>`,
+      html: `<ins class="adsbygoogle" style="display:block;width:100%;min-height:250px" data-ad-client="${esc(cliente)}" data-ad-slot="${esc(bloque)}" data-ad-format="auto" data-full-width-responsive="true"></ins><script>try{(window.adsbygoogle=window.adsbygoogle||[]).push({})}catch(e){}</script>`
+    };
+  }
+  return null;
+}
+
+function paginaSalida({ destino, tipo, titulo, anuncio }) {
   const sitio = nombreDestino(tipo, destino);
   const destinoJson = JSON.stringify(destino).replace(/</g, '\\u003c');
   return `<!DOCTYPE html>
@@ -74,47 +95,48 @@ function paginaSalida({ destino, tipo, titulo, cliente, bloque }) {
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="robots" content="noindex">
-<title>Saliendo de Mi Recetario</title>
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${esc(cliente)}" crossorigin="anonymous"></script>
+<meta name="theme-color" content="#1E4D36">
+<title>Te llevamos a ${esc(sitio)} · Mi Recetario</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700&family=Figtree:wght@400;600&display=swap" rel="stylesheet">
+${anuncio.cabeza}
 <style>
-  body { margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 16px; box-sizing: border-box;
-         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #fcfbf8; color: #2b2d42; }
-  .caja { width: 100%; max-width: 440px; background: #fff; border: 1px solid #ebe7dc; border-radius: 18px; padding: 28px 24px;
-          box-shadow: 0 12px 40px rgba(27,67,50,.10); text-align: center; }
-  h1 { font-size: 1.1rem; color: #1b4332; margin: 0 0 6px; }
-  p { margin: 0; font-size: .9rem; color: #6b7280; }
-  .receta { margin-top: 14px; font-weight: 600; color: #1b4332; }
-  .anuncio { margin: 20px 0; min-height: 120px; }
-  .etiqueta { display: block; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: #9ca3af; margin-bottom: 6px; }
-  a.boton { display: inline-block; background: #1b4332; color: #fff; text-decoration: none; padding: 12px 22px; border-radius: 12px; font-size: .9rem; font-weight: 600; }
-  a.boton[aria-disabled="true"] { opacity: .5; pointer-events: none; }
-  .volver { display: block; margin-top: 16px; font-size: .8rem; color: #6b7280; }
+  * { box-sizing: border-box; }
+  body { margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 16px;
+         font-family: Figtree, -apple-system, "Segoe UI", Roboto, sans-serif; background: #EEF2EB; color: #26332C; }
+  .caja { width: 100%; max-width: 420px; background: #fff; border-radius: 22px; overflow: hidden;
+          box-shadow: 0 18px 50px -12px rgba(30,77,54,.25); text-align: center; }
+  .cabeza { background: #1E4D36; color: #fff; padding: 22px 22px 18px; }
+  .marca { display: inline-flex; align-items: center; gap: 8px; font-family: "Bricolage Grotesque", Figtree, sans-serif; font-weight: 700; font-size: 15px; color: #F0B429; }
+  h1 { font-family: "Bricolage Grotesque", Figtree, sans-serif; font-size: 1.35rem; margin: 10px 0 4px; letter-spacing: -.01em; }
+  .receta { margin: 0; font-size: .92rem; color: rgba(255,255,255,.75); }
+  .barra { height: 4px; background: rgba(255,255,255,.15); margin-top: 16px; border-radius: 4px; overflow: hidden; }
+  .barra span { display: block; height: 100%; width: 0; background: #F0B429; animation: llenar ${SEGUNDOS_ESPERA}s linear forwards; }
+  @keyframes llenar { to { width: 100%; } }
+  @media (prefers-reduced-motion: reduce) { .barra span { animation: none; width: 100%; } }
+  .cuerpo { padding: 18px 20px 22px; }
+  .anuncio { min-height: 250px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; }
+  .etiqueta { font-size: 11px; color: #9aa59d; }
+  a.boton { display: block; margin-top: 16px; background: #1E4D36; color: #fff; text-decoration: none; padding: 13px 22px; border-radius: 14px; font-weight: 600; }
+  a.boton:hover { background: #163B29; }
+  .volver { display: inline-block; margin-top: 12px; font-size: .82rem; color: #6b776f; }
 </style>
 </head>
 <body>
   <div class="caja">
-    <h1>Te llevamos a ${esc(sitio)}</h1>
-    <p>Abrimos el enlace original de la receta en <span id="cuenta">${SEGUNDOS_ESPERA}</span> segundos.</p>
-    ${titulo ? `<p class="receta">${esc(titulo)}</p>` : ''}
-    <div class="anuncio">
-      <span class="etiqueta">Publicidad</span>
-      <ins class="adsbygoogle" style="display:block" data-ad-client="${esc(cliente)}" data-ad-slot="${esc(bloque)}" data-ad-format="auto" data-full-width-responsive="true"></ins>
+    <div class="cabeza">
+      <span class="marca">Mi Recetario</span>
+      <h1>Te llevamos a ${esc(sitio)}…</h1>
+      ${titulo ? `<p class="receta">${esc(titulo)}</p>` : ''}
+      <div class="barra"><span></span></div>
     </div>
-    <a id="ir" class="boton" href="${esc(destino)}" rel="noopener noreferrer nofollow" aria-disabled="true">Ir a ${esc(sitio)}</a>
-    <a class="volver" href="/">Volver a Mi Recetario</a>
+    <div class="cuerpo">
+      <div class="anuncio"><span class="etiqueta">Publicidad</span>${anuncio.html}</div>
+      <a class="boton" href="${esc(destino)}" rel="noopener noreferrer nofollow">Ir ahora a ${esc(sitio)}</a>
+      <a class="volver" href="/">Volver a Mi Recetario</a>
+    </div>
   </div>
 <script>
-  try { (window.adsbygoogle = window.adsbygoogle || []).push({}); } catch (e) {}
-  var destino = ${destinoJson};
-  var n = ${SEGUNDOS_ESPERA};
-  var cuenta = document.getElementById('cuenta');
-  var ir = document.getElementById('ir');
-  setTimeout(function () { ir.setAttribute('aria-disabled', 'false'); }, 2000);
-  var t = setInterval(function () {
-    n -= 1;
-    cuenta.textContent = Math.max(n, 0);
-    if (n <= 0) { clearInterval(t); window.location.replace(destino); }
-  }, 1000);
+  setTimeout(function () { window.location.replace(${destinoJson}); }, ${SEGUNDOS_ESPERA * 1000});
 </script>
 <noscript><meta http-equiv="refresh" content="${SEGUNDOS_ESPERA};url=${esc(destino)}"></noscript>
 </body>
@@ -151,12 +173,11 @@ async function manejarSalida(url, env) {
     });
   }
 
-  // 2) Página propia con anuncio
-  const cliente = (env.ADSENSE_CLIENTE || '').trim();
-  const bloque = (env.ADSENSE_BLOQUE_SALIDA || '').trim();
-  if (cliente && bloque) {
+  // 2) Página puente propia con un banner y redirección automática
+  const anuncio = anuncioSalida(env);
+  if (anuncio) {
     const titulo = await tituloDe(id);
-    return new Response(paginaSalida({ destino, tipo, titulo, cliente, bloque }), {
+    return new Response(paginaSalida({ destino, tipo, titulo, anuncio }), {
       status: 200,
       headers: {
         'Content-Type': 'text/html; charset=utf-8',

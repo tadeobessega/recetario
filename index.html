@@ -2318,13 +2318,15 @@
         // 1) Creá tu cuenta en https://adsense.google.com y agregá tu dominio.
         // 2) Creá un bloque de anuncios (tipo "In-feed" o "Display") y pegá acá los dos IDs.
         // Mientras estén vacíos, el inicio muestra un recuadro "Espacio publicitario" para ver dónde va cada anuncio.
+        // Opción sin aprobación y sin pop-ups: A-ADS (a-ads.com). Pegá el número de tu bloque de anuncios.
+        const AADS_ID = '';           // ej: '2412345'
         const ADSENSE_CLIENTE = '';   // ej: 'ca-pub-1234567890123456'
         const ADSENSE_BLOQUE = '';    // ej: '1234567890'
-        const ANUNCIOS_ACTIVOS = !!(ADSENSE_CLIENTE && ADSENSE_BLOQUE);
+        const ANUNCIOS_ACTIVOS = /^\d+$/.test(AADS_ID) || !!(ADSENSE_CLIENTE && ADSENSE_BLOQUE);
         let scriptAdsenseCargado = false;
 
         function cargarScriptAdsense() {
-            if (!ANUNCIOS_ACTIVOS || scriptAdsenseCargado) return;
+            if (!ADSENSE_CLIENTE || !ADSENSE_BLOQUE || scriptAdsenseCargado) return;
             scriptAdsenseCargado = true;
             const s = document.createElement('script');
             s.async = true;
@@ -2346,6 +2348,13 @@
 
         function tarjetaAnuncio(indice) {
             if (!ANUNCIOS_ACTIVOS) return '';
+            if (/^\d+$/.test(AADS_ID)) {
+                return `
+            <div class="bg-white ring-1 ring-beige-border rounded-2xl p-4 space-y-2 flex flex-col items-center">
+                <span class="self-start text-xs text-tinta/40">Publicidad</span>
+                <iframe data-aa="${AADS_ID}" src="https://ad.a-ads.com/${AADS_ID}?size=300x250" loading="lazy" scrolling="no" title="Publicidad" style="width:300px;height:250px;border:0;padding:0;overflow:hidden;background-color:transparent;"></iframe>
+            </div>`;
+            }
             if (ANUNCIOS_ACTIVOS) {
                 return `
             <div class="bg-white ring-1 ring-beige-border rounded-2xl p-4 space-y-2 overflow-hidden">

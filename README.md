@@ -17,21 +17,23 @@ Recetario social: cargás tus recetas, las organizás en colecciones, seguís a 
 
 ## Monetizar los enlaces de las recetas
 
-Los botones de Instagram, TikTok y web de las recetas públicas no van directo al destino: pasan por `https://tu-dominio/go?r=<receta>&t=<ig|tt|web>`. El worker busca el destino real en la base, registra el clic en la tabla `clics_enlaces` y después hace una de estas tres cosas, según lo que configures en `wrangler.jsonc → vars`:
+Los botones de Instagram, TikTok y web de las recetas públicas pasan por `https://tu-dominio/go?r=<receta>&t=<ig|tt|web>`. El worker busca el destino real en la base y registra el clic en `clics_enlaces`. Si hay un anuncio configurado, muestra una **página puente propia**: "Te llevamos a Instagram…", con el nombre de la receta, un solo banner y redirección automática a los 3 segundos (con botón "Ir ahora"). No abre ventanas emergentes.
 
-| Modo | Qué configurar | Qué ve la persona |
+El banner se configura en `wrangler.jsonc → vars`. Completá una sola opción:
+
+| Opción | Qué cargar | Notas |
 |---|---|---|
-| Acortador que paga por clic | `MONETIZAR_URL` con `{url}` donde va el destino. Ej: `https://servicio.com/api?api=TU_TOKEN&url={url}` | La página del acortador (ShrinkMe, ouo.io, Linkvertise, etc.) y después el destino. |
-| Página propia con anuncio | `ADSENSE_CLIENTE` (`ca-pub-…`) y `ADSENSE_BLOQUE_SALIDA` (ID de un bloque de AdSense) | Una página de Mi Recetario con el nombre de la receta, un anuncio y una cuenta regresiva de 5 segundos. |
-| Directo | Todo vacío | El destino, sin pasos intermedios. |
+| **A-ADS** (recomendada) | `AADS_ID`: el número de tu bloque de anuncios | Solo banners, sin pop-ups ni cookies, sin aprobación ni tráfico mínimo. Paga poco y en Bitcoin. |
+| Otra red | `ANUNCIO_SALIDA_HTML`: el código del anuncio | Por ejemplo, el "Native Banner" de Adsterra. Usá solo banners, nunca Popunder ni Social Bar. |
+| Google AdSense | `ADSENSE_CLIENTE` y `ADSENSE_BLOQUE_SALIDA` | Requiere que Google apruebe el sitio. |
 
-Si cargás las dos opciones, gana el acortador. Cuántas salidas genera cada receta lo ves en Supabase → *Table editor* → `clics_enlaces`.
+Todo vacío = salida directa. Los acortadores que pagan por clic (`MONETIZAR_URL`) siguen soportados, pero no los recomiendo: abren muchas ventanas y espantan a la gente.
 
-Recomendación: empezá con la página propia con anuncio. La gente sigue dentro de tu marca, no hay pop-ups de terceros y todo queda en una sola cuenta de AdSense. Los acortadores pagan por clic pero suelen mostrar publicidad agresiva, y eso puede hacer que la gente deje de tocar los enlaces.
+**Cómo crear el bloque en A-ADS:** entrá a a-ads.com, creá una cuenta, elegí *Create ad unit*, tamaño **300×250**, y copiá el número que aparece en el código (`data-aa="…"`). Ese mismo número sirve para los anuncios del feed (`AADS_ID` en `index.html`).
 
 ## Publicidad en el inicio
 
-Cada 6 publicaciones del inicio aparece un espacio publicitario (`ANUNCIO_CADA_N_POSTS` en `index.html`). Para que muestre anuncios reales:
+Cada 10 publicaciones del inicio aparece un espacio publicitario (`ANUNCIO_CADA_N_POSTS` en `index.html`). Para que muestre anuncios reales:
 
 1. Creá tu cuenta en [AdSense](https://adsense.google.com) y agregá tu dominio.
 2. Creá un bloque de anuncios (tipo *In-feed* o *Display*).
