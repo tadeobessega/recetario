@@ -10,7 +10,7 @@
     // Monetización de los enlaces de salida (/go). Ver README.md → "Monetizar los enlaces".
     // Opción 1: acortador que paga por clic, con {url} donde va el destino.
     //   Ej: "https://servicio.com/api?api=TU_TOKEN&url={url}"
-    "MONETIZAR_URL": "https://shrinkme.io/st?api=80f4f44a0d0e68bdc25e8721dd9803860b571f8a&url={url}",
+    "MONETIZAR_URL": "",
     // Opción 2: página propia con un anuncio de AdSense antes de salir.
     //   Ej: "ca-pub-1234567890123456" y el ID de un bloque de anuncios.
     //   Con ADSENSE_CLIENTE cargado también se sirve /ads.txt.
