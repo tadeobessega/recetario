@@ -13,6 +13,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Supabase JS Client -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Base de ingredientes para sugerir al cargar recetas -->
+    <script src="ingredientes.js"></script>
     
     <script>
         // Paleta "huerta": papel salvia, albahaca, hoja, yema y tomate.
@@ -209,6 +211,10 @@
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v14m7-7H5"></path></svg>
                         <span class="hidden sm:inline">Agregar receta</span>
                     </button>
+                    <button id="btn-moderacion" onclick="cambiarPestana('moderacion')" title="Moderación" class="hidden relative w-9 h-9 items-center justify-center text-white/75 hover:text-white hover:bg-white/10 rounded-xl transition">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                        <span id="badge-moderacion" class="hidden absolute top-0.5 right-0.5 min-w-[17px] h-[17px] px-1 rounded-full bg-mostaza text-verde-ingles text-[10px] font-bold flex items-center justify-center ring-2 ring-verde-ingles">0</span>
+                    </button>
                     <button onclick="abrirNotificaciones()" title="Notificaciones" class="relative w-9 h-9 flex items-center justify-center text-white/75 hover:text-white hover:bg-white/10 rounded-xl transition">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
                         <span id="badge-notificaciones" class="hidden absolute top-0.5 right-0.5 min-w-[17px] h-[17px] px-1 rounded-full bg-rojo-excluir text-white text-[10px] font-bold flex items-center justify-center ring-2 ring-verde-ingles">0</span>
@@ -252,6 +258,20 @@
         </header>
 
         <main class="flex-grow max-w-[75rem] w-full mx-auto px-3 sm:px-6 pt-5 sm:pt-7 pb-12">
+
+            <div id="aviso-sancion" class="hidden mb-5 rounded-2xl bg-red-50 ring-1 ring-red-200 text-rojo-hover p-4 text-sm"></div>
+
+            <!-- MODERACIÓN (solo administradores) -->
+            <section id="pestana-moderacion" class="hidden">
+                <div class="flex flex-wrap items-end justify-between gap-3 mb-5">
+                    <div>
+                        <h2 class="text-2xl font-bold text-verde-ingles">Moderación</h2>
+                        <p class="text-sm text-tinta/60 mt-1">Revisá lo que la comunidad denunció. Solo vos ves esta sección.</p>
+                    </div>
+                    <div id="moderacion-subtabs" class="flex gap-2"></div>
+                </div>
+                <div id="moderacion-contenido"></div>
+            </section>
 
             <!-- PESTAÑA FILTRAR RECETAS -->
             <section id="pestana-filtrar">
@@ -400,7 +420,7 @@
                                 </button>
 
                                 <div id="dropdown-form-ingredientes" class="hidden absolute left-0 right-0 top-full mt-1 bg-white border border-beige-border rounded-xl shadow-soft-lg z-30 max-h-56 flex flex-col p-2 space-y-1.5">
-                                    <input type="text" id="input-buscar-ingrediente-form" placeholder="Escribe un ingrediente..." oninput="filtrarDropdownFormIngredientes()" class="w-full p-2.5 text-sm bg-beige-base border border-beige-border rounded-lg focus:outline-none focus:ring-2 focus:ring-verde-chip/25 focus:border-verde-chip">
+                                    <input type="text" id="input-buscar-ingrediente-form" placeholder="Buscá entre cientos de ingredientes…" oninput="filtrarDropdownFormIngredientes()" class="w-full p-2.5 text-sm bg-beige-base border border-beige-border rounded-lg focus:outline-none focus:ring-2 focus:ring-verde-chip/25 focus:border-verde-chip">
                                     <div id="lista-opciones-form-ingredientes" class="overflow-y-auto space-y-0.5 flex-grow"></div>
                                 </div>
                             </div>
@@ -485,6 +505,18 @@
                     <button type="button" onclick="cargarTimeline(true)" title="Actualizar" class="p-2.5 rounded-xl border border-beige-border bg-white text-tinta/60 hover:text-verde-ingles hover:bg-beige-base transition">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
                     </button>
+                </div>
+                <div id="compositor" class="bg-white rounded-2xl ring-1 ring-beige-border shadow-soft p-4 space-y-3">
+                    <div class="flex gap-3">
+                        <span id="compositor-avatar" class="shrink-0"></span>
+                        <textarea id="compositor-texto" rows="2" maxlength="500" placeholder="¿Qué cocinaste hoy? Compartí una foto…" class="flex-1 min-w-0 p-3 bg-beige-base border border-transparent rounded-xl text-[15px] resize-none focus:ring-2 focus:ring-verde-chip/25 focus:border-verde-chip focus:outline-none"></textarea>
+                    </div>
+                    <div id="fotos-post"></div>
+                    <input type="file" id="input-fotos-post" accept="image/*" multiple class="hidden" onchange="agregarFotosForm('post', this)">
+                    <div class="flex items-center justify-between gap-3">
+                        <p class="text-xs text-tinta/50">Para compartir una receta completa, usá <button type="button" onclick="cambiarPestana('agregar')" class="font-semibold text-verde-chip hover:underline">Agregar receta</button>.</p>
+                        <button type="button" id="btn-publicar-suelto" onclick="publicarSuelto()" class="h-9 px-4 rounded-xl bg-verde-ingles hover:bg-verde-hover text-white text-sm font-semibold transition disabled:opacity-50 shrink-0">Publicar</button>
+                    </div>
                 </div>
                 <div id="timeline-lista" class="flex flex-col gap-5"></div>
                </div>
@@ -658,13 +690,29 @@
             <p id="compartir-post-texto" class="text-sm text-tinta/60">Se guardó en tu recetario. Si querés, también aparece como publicación tuya para quienes te siguen, con una descripción opcional.</p>
             <div id="compartir-post-receta" class="text-sm font-medium text-tinta bg-beige-base border border-beige-border rounded-xl px-3 py-2.5 truncate"></div>
             <textarea id="compartir-post-descripcion" rows="3" maxlength="500" placeholder="Agregá una descripción (opcional)..." class="w-full p-3 bg-beige-base border border-beige-border rounded-xl text-sm focus:ring-2 focus:ring-verde-chip/25 focus:border-verde-chip focus:outline-none"></textarea>
-            <div>
-                <div id="fotos-post" class="grid grid-cols-4 gap-2"></div>
-                <input type="file" id="input-fotos-post" accept="image/*" multiple class="hidden" onchange="agregarFotosForm('post', this)">
-            </div>
+
             <div class="flex gap-2">
                 <button type="button" onclick="rechazarCompartirPost()" class="flex-1 py-2.5 rounded-xl text-sm font-medium border border-beige-border text-tinta/70 hover:bg-beige-base transition">No, gracias</button>
                 <button type="button" id="btn-confirmar-post" onclick="confirmarCompartirPost()" class="flex-1 py-2.5 rounded-xl text-sm font-medium bg-verde-ingles hover:bg-verde-hover text-white transition disabled:opacity-60">Publicar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DENUNCIA -->
+    <div id="modal-denuncia" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-verde-ingles/25 backdrop-blur-[2px]" onclick="if(event.target===this) cerrarDenuncia()">
+        <div class="bg-white w-full max-w-sm rounded-2xl p-6 shadow-soft-lg space-y-4">
+            <div class="flex justify-between items-start gap-3">
+                <div>
+                    <h2 id="denuncia-titulo" class="text-lg font-bold text-verde-ingles">Denunciar</h2>
+                    <p class="text-sm text-tinta/60 mt-0.5">Contanos qué pasa. La denuncia es anónima para la otra persona.</p>
+                </div>
+                <button type="button" onclick="cerrarDenuncia()" title="Cerrar" class="w-9 h-9 shrink-0 inline-flex items-center justify-center rounded-xl text-tinta/45 hover:text-verde-ingles hover:bg-beige-base transition"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+            </div>
+            <div id="denuncia-motivos" class="space-y-2"></div>
+            <textarea id="denuncia-detalle" rows="2" maxlength="500" placeholder="Más detalles (opcional)" class="w-full p-3 bg-beige-base border border-transparent rounded-xl text-sm focus:ring-2 focus:ring-verde-chip/25 focus:border-verde-chip focus:outline-none"></textarea>
+            <div class="flex gap-2">
+                <button type="button" onclick="cerrarDenuncia()" class="flex-1 h-10 rounded-xl text-sm font-semibold border border-beige-border text-tinta/70 hover:bg-beige-base transition">Cancelar</button>
+                <button type="button" id="btn-enviar-denuncia" onclick="enviarDenuncia()" class="flex-1 h-10 rounded-xl text-sm font-semibold bg-rojo-excluir hover:bg-rojo-hover text-white transition disabled:opacity-50">Enviar denuncia</button>
             </div>
         </div>
     </div>
@@ -683,33 +731,36 @@
         </div>
     </div>
 
-    <!-- MODAL MENSAJES -->
-    <div id="modal-mensajes" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-verde-ingles/25 backdrop-blur-[2px]" onclick="if(event.target===this) cerrarMensajes()">
-        <div class="bg-fondo w-full max-w-md rounded-2xl shadow-soft-lg border border-beige-border max-h-[85vh] flex flex-col overflow-hidden">
-            <!-- Lista de conversaciones -->
-            <div id="mensajes-vista-lista" class="p-6 space-y-4 flex flex-col min-h-0">
-                <div class="flex justify-between items-center">
-                    <h2 class="text-lg font-semibold text-verde-ingles">Mensajes</h2>
-                    <button type="button" onclick="cerrarMensajes()" title="Cerrar" class="p-2 rounded-lg text-tinta/45 hover:text-verde-ingles hover:bg-beige-base transition"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+    <!-- MENSAJES: panel con las conversaciones (desplegable) -->
+    <div id="panel-mensajes" class="hidden fixed inset-0 z-[52] sm:bg-transparent bg-fondo" onclick="if(event.target===this) cerrarMensajes()">
+        <div class="absolute inset-0 sm:inset-auto sm:top-[5.25rem] sm:right-[max(1.5rem,calc((100vw-72rem)/2+0.5rem))] sm:w-[23rem] sm:max-h-[70vh] bg-white sm:rounded-2xl sm:shadow-soft-lg sm:ring-1 sm:ring-beige-border flex flex-col overflow-hidden">
+            <div class="flex items-center justify-between gap-2 px-4 pt-4 pb-2">
+                <div>
+                    <h2 class="text-xl font-bold text-verde-ingles">Mensajes</h2>
+                    <p class="text-xs text-tinta/55">Con personas que se siguen mutuamente.</p>
                 </div>
-                <p class="text-xs text-tinta/60 -mt-2">Solo podés escribirte con personas que se siguen mutuamente.</p>
-                <div id="mensajes-lista-conversaciones" class="flex flex-col gap-2 overflow-y-auto pr-1"></div>
+                <button type="button" onclick="cerrarMensajes()" title="Cerrar" class="w-9 h-9 inline-flex items-center justify-center rounded-xl text-tinta/45 hover:text-verde-ingles hover:bg-beige-base transition"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
             </div>
-            <!-- Chat abierto -->
-            <div id="mensajes-vista-chat" class="hidden flex flex-col h-[70vh]">
-                <div class="flex items-center gap-2 p-4 border-b border-beige-border shrink-0">
-                    <button type="button" onclick="cerrarConversacion()" class="p-1.5 rounded-lg text-tinta/45 hover:text-verde-ingles hover:bg-beige-base transition"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg></button>
-                    <div id="chat-cabecera-autor" class="flex-1 min-w-0"></div>
-                    <button type="button" onclick="cerrarMensajes()" title="Cerrar" class="p-2 rounded-lg text-tinta/45 hover:text-verde-ingles hover:bg-beige-base transition"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
-                </div>
-                <div id="chat-mensajes" class="flex-1 overflow-y-auto p-4 space-y-2"></div>
-                <form onsubmit="enviarMensaje(event)" class="p-3 border-t border-beige-border flex gap-2 shrink-0">
-                    <input type="text" id="chat-input" maxlength="2000" placeholder="Escribí un mensaje..." class="flex-1 p-2.5 bg-beige-base border border-beige-border rounded-xl text-sm focus:ring-2 focus:ring-verde-chip/25 focus:border-verde-chip focus:outline-none">
-                    <button type="submit" class="bg-verde-ingles hover:bg-verde-hover text-white px-4 rounded-xl text-sm font-medium transition">Enviar</button>
-                </form>
-            </div>
+            <div id="mensajes-lista-conversaciones" class="flex flex-col gap-1 overflow-y-auto px-2 pb-3"></div>
         </div>
     </div>
+
+    <!-- CHAT abierto: acoplado abajo a la derecha (pantalla completa en el celular) -->
+    <div id="chat-dock" class="hidden fixed z-[56] inset-0 sm:inset-auto sm:bottom-0 sm:right-[max(1.5rem,calc((100vw-72rem)/2+0.5rem))] sm:w-[22rem] sm:h-[30rem] bg-white sm:rounded-t-2xl shadow-soft-lg sm:ring-1 sm:ring-beige-border flex flex-col overflow-hidden">
+        <div class="flex items-center gap-2 px-3 h-14 bg-verde-ingles text-white shrink-0">
+            <button type="button" id="chat-cabecera-autor" class="flex items-center gap-2.5 min-w-0 flex-1 text-left"></button>
+            <button type="button" onclick="minimizarChat()" title="Minimizar" class="w-9 h-9 inline-flex items-center justify-center rounded-xl text-white/75 hover:text-white hover:bg-white/10"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14"></path></svg></button>
+            <button type="button" onclick="cerrarConversacion()" title="Cerrar chat" class="w-9 h-9 inline-flex items-center justify-center rounded-xl text-white/75 hover:text-white hover:bg-white/10"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+        </div>
+        <div id="chat-mensajes" class="flex-1 overflow-y-auto px-3 py-4 space-y-1.5 bg-fondo/60"></div>
+        <form onsubmit="enviarMensaje(event)" class="p-2.5 border-t border-beige-border flex gap-2 shrink-0 bg-white pb-[calc(0.625rem+env(safe-area-inset-bottom))] sm:pb-2.5">
+            <input type="text" id="chat-input" maxlength="2000" autocomplete="off" placeholder="Escribí un mensaje…" class="flex-1 min-w-0 h-10 px-3.5 bg-beige-base border border-transparent rounded-full text-sm focus:ring-2 focus:ring-verde-chip/25 focus:border-verde-chip focus:outline-none">
+            <button type="submit" title="Enviar" class="w-10 h-10 shrink-0 rounded-full bg-verde-ingles hover:bg-verde-hover text-white inline-flex items-center justify-center transition"><svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19V5m0 0l-6 6m6-6l6 6"></path></svg></button>
+        </form>
+    </div>
+
+    <!-- Chat minimizado: burbuja con la foto de la persona -->
+    <button type="button" id="chat-burbuja" onclick="restaurarChat()" class="hidden fixed z-[56] bottom-[calc(6rem+env(safe-area-inset-bottom))] sm:bottom-6 right-4 sm:right-6 rounded-full shadow-soft-lg ring-4 ring-white"></button>
 
     <!-- VISOR DE FOTOS -->
     <div id="visor-fotos" class="hidden fixed inset-0 z-[70] bg-[#0d1f16]/95 flex items-center justify-center p-4" onclick="if(event.target===this) cerrarVisor()">
@@ -1088,6 +1139,21 @@
             return Array.from(set).sort((a, b) => a.localeCompare(b, 'es', { sensitivity: 'base' }));
         }
 
+        function normalizarTexto(t) {
+            return String(t || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+        }
+
+        // Ingredientes para sugerir en el formulario: los usados en recetas + la base general, sin repetir
+        function obtenerIngredientesSugeridos() {
+            const vistos = new Set();
+            const lista = [];
+            [...obtenerTodosLosIngredientes(), ...(window.INGREDIENTES_BASE || [])].forEach(i => {
+                const k = normalizarTexto(i);
+                if (k && !vistos.has(k)) { vistos.add(k); lista.push(i); }
+            });
+            return lista;
+        }
+
         function toggleDropdown(id) {
             const el = document.getElementById(id);
             const estaOculto = el.classList.contains('hidden');
@@ -1284,11 +1350,14 @@
             const contenedor = document.getElementById('lista-opciones-form-ingredientes');
             contenedor.innerHTML = '';
 
-            const todosDB = obtenerTodosLosIngredientes();
-            const disponibles = todosDB.filter(ing => 
-                !ingredientesFormSeleccionados.includes(ing) && 
-                ing.toLowerCase().includes(queryLower)
-            );
+            // Primero los ingredientes ya usados en recetas; después la base general (sin tildes ni mayúsculas)
+            const todosDB = obtenerIngredientesSugeridos();
+            const q = normalizarTexto(query);
+            const elegidos = new Set(ingredientesFormSeleccionados.map(normalizarTexto));
+            const coincidencias = todosDB.filter(ing => !elegidos.has(normalizarTexto(ing)) && normalizarTexto(ing).includes(q));
+            // los que empiezan con lo escrito van primero
+            coincidencias.sort((a, b) => (normalizarTexto(b).startsWith(q) ? 1 : 0) - (normalizarTexto(a).startsWith(q) ? 1 : 0));
+            const disponibles = coincidencias.slice(0, 40);
 
             disponibles.forEach(ing => {
                 const btn = document.createElement('button');
@@ -1299,8 +1368,7 @@
                 contenedor.appendChild(btn);
             });
 
-            const existeExacto = todosDB.some(i => i.toLowerCase() === queryLower) || 
-                                 ingredientesFormSeleccionados.some(i => i.toLowerCase() === queryLower);
+            const existeExacto = todosDB.some(i => normalizarTexto(i) === q) || elegidos.has(q);
 
             if (query.length > 0 && !existeExacto) {
                 const btnNuevo = document.createElement('button');
@@ -1317,7 +1385,10 @@
         }
 
         function agregarIngredienteForm(ingrediente) {
-            const ingFormateado = ingrediente.charAt(0).toUpperCase() + ingrediente.slice(1);
+            // si ya existe con otra escritura (tildes, mayúsculas), se usa la versión conocida
+            const conocido = obtenerIngredientesSugeridos().find(i => normalizarTexto(i) === normalizarTexto(ingrediente));
+            const base = (conocido || ingrediente).trim();
+            const ingFormateado = base.charAt(0).toUpperCase() + base.slice(1);
             if (!ingredientesFormSeleccionados.includes(ingFormateado)) {
                 ingredientesFormSeleccionados.push(ingFormateado);
                 renderizarChipsFormIngredientes();
@@ -1632,21 +1703,25 @@
                 tipo: r.tipo_comida || null,
                 porciones: r.porciones || null,
                 creada: r.created_at || null,
-                fotos: (r.fotos || []).filter(fotoSegura)
+                fotos: (r.fotos || []).filter(fotoSegura),
+                moderada: !!r.moderada
             };
         }
 
         function mapearPost(row) {
             const receta = row.recetas ? mapearReceta(row.recetas) : null;
             if (receta) recetasVistas[receta.id] = receta;
-            return {
+            const post = {
                 id: String(row.id),
                 userId: row.user_id ? String(row.user_id) : null,
                 descripcion: row.descripcion || '',
                 creada: row.created_at || null,
                 fotos: (row.fotos || []).filter(fotoSegura),
+                moderada: !!row.moderada,
                 receta
             };
+            postsVistos[post.id] = post;
+            return post;
         }
 
         async function asegurarPerfiles(ids) {
@@ -1674,7 +1749,7 @@
 
         // ---------- Navegación ----------
         const TABS = ['inicio', 'filtrar', 'colecciones', 'explorar', 'perfil'];
-        const VISTAS = ['inicio', 'filtrar', 'colecciones', 'explorar', 'perfil', 'agregar', 'detalle'];
+        const VISTAS = ['inicio', 'filtrar', 'colecciones', 'explorar', 'perfil', 'agregar', 'detalle', 'moderacion'];
         const TAB_BASE = 'flex-1 sm:flex-none flex flex-col sm:flex-row items-center justify-center gap-0.5 sm:gap-2 px-1 sm:px-3.5 py-1.5 sm:py-2 rounded-xl text-[11px] sm:text-sm font-semibold transition ';
         const TAB_ACTIVA = TAB_BASE + 'text-mostaza bg-white/10 sm:text-verde-ingles sm:bg-white sm:shadow-soft';
         const TAB_INACTIVA = TAB_BASE + 'text-white/60 hover:text-white sm:hover:bg-white/10';
@@ -1701,6 +1776,7 @@
             if (vista === 'inicio' && timeline.cargado) renderTimeline();
             if (vista === 'colecciones') cargarColecciones();
             if (vista === 'explorar') iniciarExplorar();
+            if (vista === 'moderacion') cargarModeracion();
             window.scrollTo({ top: 0 });
         }
 
@@ -1716,6 +1792,7 @@
             else if (vistaActual === 'detalle') renderDetalle();
             else if (vistaActual === 'explorar') renderExplorar();
             else if (vistaActual === 'colecciones') renderMisColecciones();
+            else if (vistaActual === 'moderacion') renderModeracion();
         }
 
         // ---------- Compartir ----------
@@ -1902,6 +1979,7 @@
                             <span class="text-xs text-tinta/45">${tiempoRelativo(res.creada)}</span>
                         </div>
                         ${res.texto ? `<p class="text-sm text-tinta/80 mt-1">${esc(res.texto)}</p>` : ''}
+                        <button type="button" onclick="abrirDenuncia('resena', '${esc(res.id)}')" class="text-[11px] font-semibold text-tinta/40 hover:text-rojo-excluir mt-1">Denunciar</button>
                     </div>
                 </div>`;
             }).join('');
@@ -2021,9 +2099,9 @@
             const agregar = lista.length < MAX_FOTOS[tipo] ? `
                 <label for="input-fotos-${tipo}" class="aspect-square rounded-xl border-2 border-dashed border-verde-chip/35 bg-verde-suave/40 hover:bg-verde-suave text-verde-ingles flex flex-col items-center justify-center gap-1 cursor-pointer transition text-center px-1">
                     ${svg('M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9zM15 13a3 3 0 11-6 0 3 3 0 016 0z', 'w-6 h-6')}
-                    <span class="text-xs font-semibold leading-tight">${tipo === 'post' && !lista.length ? 'Sumar fotos de cómo te salió' : 'Agregar fotos'}</span>
+                    <span class="text-xs font-semibold leading-tight">${tipo === 'post' && !lista.length ? 'Agregar fotos' : 'Agregar'}</span>
                 </label>` : '';
-            cont.className = tipo === 'post' && !lista.length ? 'grid grid-cols-1' : (tipo === 'receta' ? 'grid grid-cols-3 sm:grid-cols-4 gap-2' : 'grid grid-cols-4 gap-2');
+            cont.className = tipo === 'post' && !lista.length ? 'grid grid-cols-1' : (tipo === 'receta' ? 'grid grid-cols-3 sm:grid-cols-4 gap-2' : 'grid grid-cols-4 sm:grid-cols-6 gap-2');
             cont.innerHTML = miniaturas + (tipo === 'post' && !lista.length
                 ? agregar.replace('aspect-square', 'h-14 !flex-row').replace('w-6 h-6', 'w-5 h-5')
                 : agregar);
@@ -2191,6 +2269,7 @@
             return `
             <article class="${claseArticulo}">
                 ${portada}
+                ${r.moderada ? `<div class="text-xs font-semibold text-rojo-hover bg-red-50 rounded-lg px-3 py-2">Ocultada por moderación: ${propia ? 'solo vos la ves' : 'no la ve nadie más'}.</div>` : ''}
                 ${(propia || opts.ocultarAutor) ? '' : `<div>${chipAutor(r.userId, ctx === 'inicio' ? tiempoRelativo(r.creada) : '')}</div>`}
 
                 <div class="flex justify-between items-start gap-3">
@@ -2230,6 +2309,7 @@
                         <p class="text-[15px] leading-relaxed whitespace-pre-line bg-beige-base/70 p-4 rounded-xl">${esc(r.procedimiento)}</p>
                     </div>` : ''}
                     ${bloqueResenas(r)}
+                    ${propia ? '' : `<div class="flex justify-end"><button type="button" onclick="abrirDenuncia('receta', '${idAttr}')" class="inline-flex items-center gap-1 text-xs font-semibold text-tinta/40 hover:text-rojo-excluir">${svg('M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9', 'w-3.5 h-3.5')}Denunciar receta</button></div>`}
                 </div>
             </article>`;
         }
@@ -2282,21 +2362,473 @@
 
         function tarjetaPost(p, ctx) {
             const r = p.receta;
-            if (!r) return '';
-            const esRepost = p.userId !== r.userId;
+            const propio = p.userId === usuarioActual.id;
+            const esRepost = r && p.userId !== r.userId;
             const caption = p.descripcion ? `<p class="text-[15px] leading-relaxed whitespace-pre-line">${esc(p.descripcion)}</p>` : '';
             const notaRepost = esRepost
-                ? `<span class="inline-flex items-center gap-1 text-xs text-tinta/55">${svg('M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15', 'w-3.5 h-3.5')}compartió una receta</span>`
+                ? `<span class="hidden sm:inline-flex items-center gap-1 text-xs text-tinta/55">${svg('M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15', 'w-3.5 h-3.5')}compartió una receta</span>`
                 : '';
+            const items = [];
+            if (propio) items.push({ texto: 'Eliminar publicación', accion: `eliminarPublicacion('${esc(p.id)}')`, peligro: true });
+            else {
+                items.push({ texto: 'Denunciar publicación', accion: `abrirDenuncia('publicacion', '${esc(p.id)}')`, peligro: true });
+                if (esAdmin) items.push({ texto: 'Eliminar (moderación)', accion: `eliminarPublicacion('${esc(p.id)}')`, peligro: true });
+            }
+            const avisoModerada = p.moderada
+                ? `<div class="text-xs font-semibold text-rojo-hover bg-red-50 rounded-lg px-3 py-2">Ocultada por moderación: solo ${propio ? 'vos la ves' : 'la ve su autor y moderación'}.</div>` : '';
             return `
             <article class="bg-white rounded-2xl p-4 sm:p-5 shadow-soft ring-1 ring-beige-border space-y-3">
-                <div class="flex items-center justify-between gap-3">${chipAutor(p.userId, tiempoRelativo(p.creada))}${notaRepost}</div>
-                ${caption}
-                ${grillaFotos(p.fotos || [], 'p-' + ctx + '-' + p.id)}
-                <div class="bg-fondo/70 ring-1 ring-beige-border rounded-xl overflow-hidden">
-                    ${tarjetaReceta(r, ctx + 'p' + String(p.id).replace(/[^a-zA-Z0-9_-]/g, ''), { ocultarAutor: !esRepost, anidada: true })}
+                <div class="flex items-center justify-between gap-3">
+                    ${chipAutor(p.userId, tiempoRelativo(p.creada))}
+                    <div class="flex items-center gap-2 shrink-0">${notaRepost}${menuAcciones('post-' + ctx + '-' + p.id, items)}</div>
                 </div>
+                ${avisoModerada}
+                ${caption}
+                ${r ? '' : grillaFotos(p.fotos || [], 'p-' + ctx + '-' + p.id)}
+                ${r ? `<div class="bg-fondo/70 ring-1 ring-beige-border rounded-xl overflow-hidden">
+                    ${tarjetaReceta(r, ctx + 'p' + String(p.id).replace(/[^a-zA-Z0-9_-]/g, ''), { ocultarAutor: !esRepost, anidada: true })}
+                </div>` : ''}
+                ${bloqueComentarios(p)}
             </article>`;
+        }
+
+        // ---------- Menú de acciones (⋯) ----------
+        function menuAcciones(clave, items) {
+            if (!items.length) return '';
+            const id = 'menu-' + String(clave).replace(/[^a-zA-Z0-9_-]/g, '');
+            return `<div class="relative">
+                <button type="button" onclick="alternarMenu(event, '${id}')" title="Más opciones" class="${BTN_ICONO_NEUTRO}">${svg('M5 12h.01M12 12h.01M19 12h.01', 'w-5 h-5')}</button>
+                <div id="${id}" data-menu class="hidden absolute right-0 top-10 z-30 min-w-[13rem] bg-white rounded-xl shadow-soft-lg ring-1 ring-beige-border py-1.5">
+                    ${items.map(it => `<button type="button" onclick="cerrarMenus(); ${it.accion}" class="w-full text-left px-3.5 py-2 text-sm font-medium hover:bg-beige-base ${it.peligro ? 'text-rojo-excluir' : 'text-tinta'}">${esc(it.texto)}</button>`).join('')}
+                </div>
+            </div>`;
+        }
+        function alternarMenu(e, id) {
+            e.stopPropagation();
+            const m = el(id);
+            const abierto = m && !m.classList.contains('hidden');
+            cerrarMenus();
+            if (m && !abierto) m.classList.remove('hidden');
+        }
+        function cerrarMenus() { document.querySelectorAll('[data-menu]').forEach(m => m.classList.add('hidden')); }
+        document.addEventListener('click', e => { if (!e.target.closest('[data-menu]')) cerrarMenus(); });
+
+        function errorAmigable(err, accion) {
+            const m = (err && err.message) || '';
+            if (/row-level security|violates row-level/i.test(m)) {
+                return sancionActiva ? 'Tu cuenta no puede publicar por ahora (sanción de moderación).' : `No se pudo ${accion}.`;
+            }
+            return `No se pudo ${accion}: ${m || 'error desconocido'}`;
+        }
+
+        // ---------- Publicaciones sueltas (foto + texto, sin receta) ----------
+        async function publicarSuelto() {
+            const texto = el('compositor-texto').value.trim();
+            if (!fotosForm.post.length) return toast('Sumá al menos una foto. Para compartir una receta completa, usá Agregar receta.');
+            const btn = el('btn-publicar-suelto');
+            btn.disabled = true;
+            try {
+                const fotos = await subirFotosForm('post', (n, total) => { btn.innerText = `Subiendo ${n} de ${total}…`; });
+                btn.innerText = 'Publicando…';
+                const { error } = await db.from('publicaciones').insert({ user_id: usuarioActual.id, receta_id: null, descripcion: texto || null, fotos });
+                if (error) throw error;
+                el('compositor-texto').value = '';
+                limpiarFotosForm('post');
+                toast('Publicado');
+                cargarTimeline(true);
+            } catch (err) {
+                toast(errorAmigable(err, 'publicar'));
+            } finally {
+                btn.disabled = false;
+                btn.innerText = 'Publicar';
+            }
+        }
+
+        async function eliminarPublicacion(id) {
+            const p = postsVistos[id];
+            if (!confirm(p && p.userId !== usuarioActual.id ? '¿Eliminar esta publicación de otra persona? (moderación)' : '¿Eliminar esta publicación? La receta no se borra.')) return;
+            const { error } = await db.from('publicaciones').delete().eq('id', id);
+            if (error) return toast(errorAmigable(error, 'eliminar'));
+            if (p && !p.receta && p.userId === usuarioActual.id) borrarFotos(p.fotos);
+            timeline.items = timeline.items.filter(x => x.id !== id);
+            toast('Publicación eliminada');
+            if (vistaActual === 'detalle' && detalleActual && detalleActual.tipo === 'post') volverVista();
+            else refrescarVistaActual();
+        }
+
+        async function abrirPublicacion(id) {
+            detalleActual = null;
+            cambiarPestana('detalle');
+            el('detalle-contenido').innerHTML = cargandoHTML();
+            try {
+                const { data, error } = await db.from('publicaciones').select('*, recetas(*)').eq('id', id).maybeSingle();
+                if (error || !data || (data.receta_id && !data.recetas)) {
+                    detalleActual = { error: 'Esta publicación ya no está disponible.' };
+                } else {
+                    const post = mapearPost(data);
+                    await asegurarPerfiles([post.userId, post.receta && post.receta.userId]);
+                    if (post.receta) await cargarResenasPara([post.receta.id]);
+                    await cargarComentariosDe([post.id]);
+                    comentariosAbiertos[post.id] = true;
+                    detalleActual = { tipo: 'post', post };
+                }
+            } catch (err) {
+                detalleActual = { error: 'No se pudo abrir la publicación.' };
+            }
+            renderDetalle();
+        }
+
+        // ---------- Comentarios ----------
+        const comentariosPorPost = {};
+        const comentariosAbiertos = {};
+        const postsVistos = {};
+
+        async function cargarComentariosDe(ids) {
+            const pedir = [...new Set(ids.filter(Boolean))];
+            if (!pedir.length) return;
+            try {
+                const { data, error } = await db.from('comentarios').select('*').in('publicacion_id', pedir).order('created_at', { ascending: true });
+                if (error) throw error;
+                pedir.forEach(id => { comentariosPorPost[id] = []; });
+                (data || []).forEach(c => { (comentariosPorPost[c.publicacion_id] = comentariosPorPost[c.publicacion_id] || []).push(c); });
+                await asegurarPerfiles((data || []).map(c => c.user_id));
+            } catch (err) {
+                console.warn('No se pudieron cargar los comentarios:', err);
+            }
+        }
+
+        function comentarioHTML(c, p) {
+            const autor = perfilesCache[c.user_id];
+            const mio = c.user_id === usuarioActual.id;
+            const puedeBorrar = mio || p.userId === usuarioActual.id || esAdmin;
+            return `
+                <div class="flex gap-2.5">
+                    <button type="button" onclick="verPerfilPorId('${esc(c.user_id)}')" class="shrink-0">${avatarHTML(autor, 'w-8 h-8', 'text-xs')}</button>
+                    <div class="min-w-0 flex-1">
+                        <div class="inline-block max-w-full bg-beige-base rounded-2xl rounded-tl-md px-3 py-2 ${c.moderada ? 'ring-1 ring-red-200' : ''}">
+                            <button type="button" onclick="verPerfilPorId('${esc(c.user_id)}')" class="block text-[13px] font-semibold hover:text-verde-ingles">${esc(autor ? (autor.nombre || autor.usuario) : 'Alguien')}</button>
+                            <p class="text-sm leading-snug whitespace-pre-line break-words">${esc(c.texto)}</p>
+                        </div>
+                        <div class="flex items-center gap-3 px-2 pt-0.5 text-[11px] text-tinta/45">
+                            <span>${tiempoRelativo(c.created_at)}</span>
+                            ${c.moderada ? '<span class="font-semibold text-rojo-hover">Oculto por moderación</span>' : ''}
+                            ${puedeBorrar ? `<button type="button" onclick="borrarComentario('${esc(c.id)}', '${esc(p.id)}')" class="font-semibold hover:text-rojo-excluir">Eliminar</button>` : ''}
+                            ${mio ? '' : `<button type="button" onclick="abrirDenuncia('comentario', '${esc(c.id)}')" class="font-semibold hover:text-rojo-excluir">Denunciar</button>`}
+                        </div>
+                    </div>
+                </div>`;
+        }
+
+        function bloqueComentarios(p) {
+            const lista = comentariosPorPost[p.id] || [];
+            const abiertos = !!comentariosAbiertos[p.id];
+            const visibles = abiertos ? lista : lista.slice(-2);
+            return `
+            <div data-com="${esc(p.id)}" class="pt-3 border-t border-beige-border/70 space-y-2.5">
+                ${lista.length > 2 && !abiertos ? `<button type="button" onclick="verTodosComentarios('${esc(p.id)}')" class="text-sm font-semibold text-tinta/55 hover:text-verde-ingles">Ver los ${lista.length} comentarios</button>` : ''}
+                ${visibles.map(c => comentarioHTML(c, p)).join('')}
+                <form onsubmit="enviarComentario(event, '${esc(p.id)}')" class="flex items-center gap-2">
+                    ${avatarHTML(perfilActual, 'w-8 h-8', 'text-xs')}
+                    <input type="text" name="texto" maxlength="1000" autocomplete="off" placeholder="${lista.length ? 'Escribí un comentario…' : 'Sé la primera persona en comentar…'}" class="flex-1 min-w-0 h-9 px-3.5 bg-beige-base border border-transparent rounded-full text-sm focus:ring-2 focus:ring-verde-chip/25 focus:border-verde-chip focus:outline-none">
+                    <button type="submit" title="Comentar" class="w-9 h-9 shrink-0 rounded-full text-verde-chip hover:bg-verde-suave inline-flex items-center justify-center transition">${svg('M12 19V5m0 0l-6 6m6-6l6 6', 'w-[18px] h-[18px]')}</button>
+                </form>
+            </div>`;
+        }
+
+        function repintarComentarios(pid) {
+            const p = postsVistos[pid];
+            if (!p) return;
+            document.querySelectorAll(`[data-com="${CSS.escape(pid)}"]`).forEach(n => { n.outerHTML = bloqueComentarios(p); });
+        }
+
+        function verTodosComentarios(pid) { comentariosAbiertos[pid] = true; repintarComentarios(pid); }
+
+        async function enviarComentario(e, pid) {
+            e.preventDefault();
+            const input = e.target.querySelector('input[name="texto"]');
+            const texto = input.value.trim();
+            if (!texto) return;
+            input.disabled = true;
+            const { data, error } = await db.from('comentarios').insert({ publicacion_id: pid, user_id: usuarioActual.id, texto }).select().single();
+            input.disabled = false;
+            if (error) return toast(errorAmigable(error, 'comentar'));
+            (comentariosPorPost[pid] = comentariosPorPost[pid] || []).push(data);
+            comentariosAbiertos[pid] = true;
+            repintarComentarios(pid);
+            const nuevo = document.querySelector(`[data-com="${CSS.escape(pid)}"] input[name="texto"]`);
+            if (nuevo) nuevo.focus();
+        }
+
+        async function borrarComentario(cid, pid) {
+            if (!confirm('¿Eliminar este comentario?')) return;
+            const { error } = await db.from('comentarios').delete().eq('id', cid);
+            if (error) return toast(errorAmigable(error, 'eliminar el comentario'));
+            comentariosPorPost[pid] = (comentariosPorPost[pid] || []).filter(c => c.id !== cid);
+            repintarComentarios(pid);
+        }
+
+        // ---------- Denuncias ----------
+        const MOTIVOS_DENUNCIA = {
+            ofensivo: 'Contenido ofensivo o discriminatorio',
+            foto: 'Foto inapropiada',
+            acoso: 'Acoso o amenazas',
+            spam: 'Spam o publicidad engañosa',
+            otro: 'Otro motivo'
+        };
+        const NOMBRE_TIPO = { publicacion: 'publicación', comentario: 'comentario', receta: 'receta', resena: 'reseña' };
+        const ETIQUETA_TIPO = { publicacion: 'Publicación', comentario: 'Comentario', receta: 'Receta', resena: 'Reseña' };
+        let denunciaActual = null;
+
+        function abrirDenuncia(tipo, id) {
+            denunciaActual = { tipo, id };
+            el('denuncia-titulo').innerText = 'Denunciar ' + NOMBRE_TIPO[tipo];
+            el('denuncia-motivos').innerHTML = Object.entries(MOTIVOS_DENUNCIA).map(([k, t], i) => `
+                <label class="flex items-center gap-3 p-3 rounded-xl ring-1 ring-beige-border cursor-pointer hover:bg-beige-base has-[:checked]:ring-2 has-[:checked]:ring-rojo-excluir/50 has-[:checked]:bg-red-50/60">
+                    <input type="radio" name="motivo-denuncia" value="${k}" ${i === 0 ? 'checked' : ''} class="accent-[#C8432B]">
+                    <span class="text-sm font-medium">${t}</span>
+                </label>`).join('');
+            el('denuncia-detalle').value = '';
+            el('modal-denuncia').classList.remove('hidden');
+        }
+
+        function cerrarDenuncia() { el('modal-denuncia').classList.add('hidden'); denunciaActual = null; }
+
+        async function enviarDenuncia() {
+            if (!denunciaActual) return;
+            const motivo = (document.querySelector('input[name="motivo-denuncia"]:checked') || {}).value || 'otro';
+            const detalle = el('denuncia-detalle').value.trim() || null;
+            const btn = el('btn-enviar-denuncia');
+            btn.disabled = true;
+            const { error } = await db.from('denuncias').insert({ denunciante_id: usuarioActual.id, tipo: denunciaActual.tipo, objeto_id: denunciaActual.id, motivo, detalle });
+            btn.disabled = false;
+            if (error) {
+                if (/duplicate|unique/i.test(error.message)) { cerrarDenuncia(); return toast('Ya habías denunciado esto. Lo estamos revisando.'); }
+                if (/propio/i.test(error.message)) return toast('No podés denunciar tu propio contenido.');
+                return toast('No se pudo enviar la denuncia: ' + error.message);
+            }
+            cerrarDenuncia();
+            toast('Gracias. Vamos a revisar la denuncia.');
+        }
+
+        // ---------- Sanciones (aviso a la persona sancionada) ----------
+        let sancionActiva = null;
+        async function cargarSancionPropia() {
+            sancionActiva = null;
+            try {
+                const { data } = await db.from('sanciones').select('*').eq('user_id', usuarioActual.id).eq('levantada', false);
+                const ahora = Date.now();
+                sancionActiva = (data || []).filter(x => (x.tipo === 'suspension' || x.tipo === 'bloqueo') && (!x.hasta || new Date(x.hasta).getTime() > ahora))
+                    .sort((a, b) => (a.tipo === 'bloqueo' ? -1 : 1))[0] || null;
+            } catch (e) { /* sin aviso */ }
+            const aviso = el('aviso-sancion');
+            if (sancionActiva) {
+                const hasta = sancionActiva.hasta ? new Date(sancionActiva.hasta).toLocaleDateString('es-AR', { day: 'numeric', month: 'long' }) : null;
+                aviso.innerHTML = `<strong class="font-semibold">${sancionActiva.tipo === 'bloqueo' ? 'Tu cuenta está bloqueada para publicar.' : `Tu cuenta está suspendida hasta el ${esc(hasta)}.`}</strong> Podés seguir viendo recetas, pero no publicar, comentar, calificar ni enviar mensajes. Motivo: ${esc(MOTIVOS_DENUNCIA[sancionActiva.motivo] || sancionActiva.motivo || 'infracción de las normas')}.`;
+                aviso.classList.remove('hidden');
+            } else aviso.classList.add('hidden');
+        }
+
+        // ---------- Moderación (administradores) ----------
+        let esAdmin = false;
+        let moderacion = { sub: 'pendientes', grupos: [], resueltas: [], sanciones: [], objetos: {}, previas: {} };
+
+        async function cargarEsAdmin() {
+            esAdmin = false;
+            try {
+                const { data } = await db.from('administradores').select('user_id').eq('user_id', usuarioActual.id).maybeSingle();
+                esAdmin = !!data;
+            } catch (e) { /* no es admin */ }
+            const btn = el('btn-moderacion');
+            btn.classList.toggle('hidden', !esAdmin);
+            btn.classList.toggle('inline-flex', esAdmin);
+            if (esAdmin) contarDenunciasPendientes();
+        }
+
+        async function contarDenunciasPendientes() {
+            const { count } = await db.from('denuncias').select('*', { count: 'exact', head: true }).eq('estado', 'pendiente');
+            const b = el('badge-moderacion');
+            b.textContent = count > 9 ? '9+' : (count || 0);
+            b.classList.toggle('hidden', !count);
+        }
+
+        async function traerObjetos(lista) {
+            const porTipo = { publicacion: [], comentario: [], receta: [], resena: [] };
+            lista.forEach(d => { if (porTipo[d.tipo]) porTipo[d.tipo].push(d.objeto_id); });
+            const pedidos = [];
+            if (porTipo.publicacion.length) pedidos.push(db.from('publicaciones').select('*, recetas(*)').in('id', porTipo.publicacion).then(r => (r.data || []).forEach(x => { moderacion.objetos['publicacion:' + x.id] = x; })));
+            if (porTipo.comentario.length) pedidos.push(db.from('comentarios').select('*').in('id', porTipo.comentario).then(r => (r.data || []).forEach(x => { moderacion.objetos['comentario:' + x.id] = x; })));
+            if (porTipo.receta.length) pedidos.push(db.from('recetas').select('*').in('id', porTipo.receta).then(r => (r.data || []).forEach(x => { moderacion.objetos['receta:' + x.id] = x; })));
+            if (porTipo.resena.length) pedidos.push(db.from('resenas').select('*').in('id', porTipo.resena).then(r => (r.data || []).forEach(x => { moderacion.objetos['resena:' + x.id] = x; })));
+            await Promise.all(pedidos);
+        }
+
+        async function cargarModeracion() {
+            if (!esAdmin) return;
+            el('moderacion-contenido').innerHTML = cargandoHTML();
+            try {
+                const [pend, res, sanc] = await Promise.all([
+                    db.from('denuncias').select('*').eq('estado', 'pendiente').order('created_at', { ascending: false }).limit(300),
+                    db.from('denuncias').select('*').neq('estado', 'pendiente').order('resuelta_at', { ascending: false }).limit(80),
+                    db.from('sanciones').select('*').eq('levantada', false).order('created_at', { ascending: false })
+                ]);
+                const grupos = new Map();
+                (pend.data || []).forEach(d => {
+                    const k = d.tipo + ':' + d.objeto_id;
+                    if (!grupos.has(k)) grupos.set(k, { clave: k, tipo: d.tipo, objetoId: d.objeto_id, autorId: d.autor_id, denuncias: [] });
+                    grupos.get(k).denuncias.push(d);
+                });
+                const resueltas = new Map();
+                (res.data || []).forEach(d => { const k = d.tipo + ':' + d.objeto_id; if (!resueltas.has(k)) resueltas.set(k, d); });
+                moderacion.grupos = [...grupos.values()].sort((a, b) => b.denuncias.length - a.denuncias.length);
+                moderacion.resueltas = [...resueltas.values()];
+                const ahora = Date.now();
+                moderacion.sanciones = (sanc.data || []).filter(x => !x.hasta || new Date(x.hasta).getTime() > ahora || x.tipo === 'advertencia');
+                moderacion.objetos = {};
+                await traerObjetos([...(pend.data || []), ...(res.data || [])]);
+                const autores = [...new Set([...moderacion.grupos.map(g => g.autorId), ...moderacion.sanciones.map(x => x.user_id), ...moderacion.resueltas.map(d => d.autor_id)])].filter(Boolean);
+                await asegurarPerfiles([...autores, ...(pend.data || []).map(d => d.denunciante_id)]);
+                moderacion.previas = {};
+                if (autores.length) {
+                    const { data } = await db.from('sanciones').select('user_id').in('user_id', autores);
+                    (data || []).forEach(x => { moderacion.previas[x.user_id] = (moderacion.previas[x.user_id] || 0) + 1; });
+                }
+            } catch (err) {
+                console.error(err);
+                el('moderacion-contenido').innerHTML = estadoVacioHTML(ESCUDO_MOD, 'No se pudo cargar', 'Probá de nuevo en un momento.', '', '');
+                return;
+            }
+            contarDenunciasPendientes();
+            renderModeracion();
+        }
+
+        const ESCUDO_MOD = 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z';
+
+        function cambiarSubModeracion(sub) { moderacion.sub = sub; renderModeracion(); }
+
+        function vistaPreviaObjeto(tipo, obj) {
+            if (!obj) return '<p class="text-sm text-tinta/50">Este contenido ya no existe (fue eliminado).</p>';
+            const oculto = obj.moderada ? '<span class="inline-flex text-[11px] font-semibold text-rojo-hover bg-red-50 rounded-full px-2 h-5 items-center">Oculto</span>' : '';
+            if (tipo === 'publicacion') {
+                const fotos = (obj.fotos || []).filter(fotoSegura);
+                const rf = obj.recetas ? (obj.recetas.fotos || []).filter(fotoSegura) : [];
+                return `<div class="space-y-2">${oculto}
+                    ${obj.descripcion ? `<p class="text-[15px] whitespace-pre-line">${esc(obj.descripcion)}</p>` : ''}
+                    ${grillaFotos(fotos, 'mod-p-' + obj.id)}
+                    ${obj.recetas ? `<div class="text-sm bg-beige-base rounded-xl p-3"><span class="text-tinta/55">Receta:</span> <button type="button" onclick="abrirReceta('${esc(obj.recetas.id)}')" class="font-semibold text-verde-ingles hover:underline">${esc(obj.recetas.titulo)}</button>${rf.length ? tiraFotos(rf.length > 1 ? rf : [...rf, ...rf].slice(0, 2), 'mod-pr-' + obj.id) : ''}</div>` : ''}
+                </div>`;
+            }
+            if (tipo === 'comentario') return `<div class="space-y-1">${oculto}<p class="text-[15px] bg-beige-base rounded-2xl px-3 py-2 inline-block whitespace-pre-line">${esc(obj.texto)}</p></div>`;
+            if (tipo === 'receta') {
+                const fotos = (obj.fotos || []).filter(fotoSegura);
+                return `<div class="space-y-2">${oculto}
+                    <button type="button" onclick="abrirReceta('${esc(obj.id)}')" class="font-display text-lg font-semibold text-verde-ingles hover:underline text-left">${esc(obj.titulo)}</button>
+                    ${obj.descripcion ? `<p class="text-sm text-tinta/70">${esc(obj.descripcion)}</p>` : ''}
+                    ${grillaFotos(fotos, 'mod-r-' + obj.id)}
+                    ${obj.procedimiento ? `<p class="text-sm text-tinta/70 line-clamp-3 whitespace-pre-line">${esc(obj.procedimiento)}</p>` : ''}
+                </div>`;
+            }
+            return `<div class="space-y-1">${oculto}${estrellasHTML(parseFloat(obj.puntaje) || 0)}${obj.texto ? `<p class="text-[15px]">${esc(obj.texto)}</p>` : ''}</div>`;
+        }
+
+        function renderModeracion() {
+            const sub = moderacion.sub;
+            const chip = (k, t, n) => `<button type="button" onclick="cambiarSubModeracion('${k}')" class="${PILDORA} h-9 px-3.5 text-sm ${sub === k ? 'bg-verde-ingles text-white border-verde-ingles' : 'bg-white text-tinta/70 border-beige-border hover:text-verde-ingles'}">${t}${n ? ` <span class="${sub === k ? 'text-mostaza' : 'text-rojo-excluir'}">${n}</span>` : ''}</button>`;
+            el('moderacion-subtabs').innerHTML = chip('pendientes', 'Pendientes', moderacion.grupos.length) + chip('resueltas', 'Resueltas') + chip('sanciones', 'Sanciones', moderacion.sanciones.length);
+            const cont = el('moderacion-contenido');
+
+            if (sub === 'pendientes') {
+                if (!moderacion.grupos.length) { cont.innerHTML = estadoVacioHTML(ESCUDO_MOD, 'No hay denuncias pendientes', 'Cuando alguien denuncie una publicación, comentario, receta o reseña, va a aparecer acá.', '', ''); return; }
+                cont.innerHTML = `<div class="grid grid-cols-1 lg:grid-cols-2 gap-5 items-start">${moderacion.grupos.map(g => {
+                    const obj = moderacion.objetos[g.clave];
+                    const autor = perfilesCache[g.autorId];
+                    const previas = moderacion.previas[g.autorId] || 0;
+                    const k = g.clave.replace(/[^a-zA-Z0-9]/g, '');
+                    const d0 = g.denuncias[0].id;
+                    return `
+                    <article class="bg-white rounded-2xl ring-1 ring-beige-border shadow-soft p-5 space-y-4">
+                        <div class="flex flex-wrap items-center gap-2">
+                            <span class="inline-flex items-center h-6 px-2.5 rounded-full text-xs font-semibold bg-verde-suave text-verde-ingles">${esc(ETIQUETA_TIPO[g.tipo])}</span>
+                            <span class="inline-flex items-center h-6 px-2.5 rounded-full text-xs font-semibold bg-red-50 text-rojo-hover">${g.denuncias.length} ${g.denuncias.length === 1 ? 'denuncia' : 'denuncias'}</span>
+                            ${previas ? `<span class="inline-flex items-center h-6 px-2.5 rounded-full text-xs font-semibold bg-yema-suave text-[#7A5300]">${previas} ${previas === 1 ? 'sanción previa' : 'sanciones previas'}</span>` : ''}
+                        </div>
+                        <div class="flex items-center justify-between gap-3">${chipAutor(g.autorId, obj ? tiempoRelativo(obj.created_at) : '')}</div>
+                        ${vistaPreviaObjeto(g.tipo, obj)}
+                        <ul class="space-y-2 text-sm">${g.denuncias.map(d => {
+                            const quien = perfilesCache[d.denunciante_id];
+                            return `<li class="bg-beige-base/70 rounded-xl px-3 py-2">
+                                <span class="font-semibold">${esc(MOTIVOS_DENUNCIA[d.motivo] || d.motivo)}</span>
+                                <span class="text-tinta/50"> · ${esc(quien ? '@' + quien.usuario : 'alguien')} · ${tiempoRelativo(d.created_at)}</span>
+                                ${d.detalle ? `<p class="text-tinta/75 mt-0.5">${esc(d.detalle)}</p>` : ''}
+                            </li>`;
+                        }).join('')}</ul>
+                        <input id="nota-${k}" type="text" maxlength="300" placeholder="Nota para el registro (opcional)" class="w-full h-10 px-3 bg-beige-base border border-transparent rounded-xl text-sm focus:ring-2 focus:ring-verde-chip/25 focus:border-verde-chip focus:outline-none">
+                        <div class="flex flex-wrap gap-2">
+                            <button type="button" onclick="resolverDenuncia('${d0}', false, null, '${k}')" class="${PILDORA} h-9 bg-white text-tinta/70 border-beige-border hover:bg-beige-base">Desestimar</button>
+                            <button type="button" onclick="resolverDenuncia('${d0}', true, null, '${k}')" class="${PILDORA} h-9 bg-verde-ingles text-white border-verde-ingles hover:bg-verde-hover">Ocultar</button>
+                            <button type="button" onclick="resolverDenuncia('${d0}', true, 'advertencia', '${k}')" class="${PILDORA} h-9 bg-yema-suave text-[#7A5300] border-transparent hover:bg-mostaza/40">Ocultar y advertir</button>
+                            <span class="inline-flex items-center rounded-full ring-1 ring-red-200 overflow-hidden">
+                                <button type="button" onclick="resolverDenuncia('${d0}', true, 'suspension', '${k}')" class="h-9 px-3 text-xs font-semibold text-rojo-hover hover:bg-red-50">Ocultar y suspender</button>
+                                <select id="dias-${k}" class="h-9 pr-2 pl-1 text-xs font-semibold text-rojo-hover bg-transparent border-0 focus:ring-0"><option value="1">1 día</option><option value="7" selected>7 días</option><option value="30">30 días</option></select>
+                            </span>
+                            <button type="button" onclick="resolverDenuncia('${d0}', true, 'bloqueo', '${k}')" class="${PILDORA} h-9 bg-rojo-excluir text-white border-rojo-excluir hover:bg-rojo-hover">Ocultar y bloquear</button>
+                        </div>
+                    </article>`;
+                }).join('')}</div>`;
+                return;
+            }
+
+            if (sub === 'resueltas') {
+                if (!moderacion.resueltas.length) { cont.innerHTML = estadoVacioHTML(ESCUDO_MOD, 'Todavía no resolviste denuncias', 'Acá queda el historial de lo que aceptaste o desestimaste.', '', ''); return; }
+                cont.innerHTML = `<div class="bg-white rounded-2xl ring-1 ring-beige-border shadow-soft divide-y divide-beige-border">${moderacion.resueltas.map(d => {
+                    const obj = moderacion.objetos[d.tipo + ':' + d.objeto_id];
+                    const autor = perfilesCache[d.autor_id];
+                    const aceptada = d.estado === 'aceptada';
+                    return `<div class="flex flex-wrap items-center gap-3 p-4">
+                        <span class="inline-flex items-center h-6 px-2.5 rounded-full text-xs font-semibold ${aceptada ? 'bg-red-50 text-rojo-hover' : 'bg-beige-base text-tinta/60'}">${aceptada ? 'Aceptada' : 'Desestimada'}</span>
+                        <span class="text-sm"><span class="font-semibold">${esc(ETIQUETA_TIPO[d.tipo])}</span> de ${esc(autor ? '@' + autor.usuario : 'alguien')} · ${esc(MOTIVOS_DENUNCIA[d.motivo] || d.motivo)}</span>
+                        <span class="text-xs text-tinta/45">${tiempoRelativo(d.resuelta_at)}${d.resolucion ? ' · ' + esc(d.resolucion) : ''}</span>
+                        ${aceptada && obj && obj.moderada ? `<button type="button" onclick="restaurarContenido('${esc(d.tipo)}', '${esc(d.objeto_id)}')" class="${PILDORA} ml-auto bg-white text-verde-ingles border-beige-border hover:bg-beige-base">Volver a mostrar</button>` : ''}
+                    </div>`;
+                }).join('')}</div>`;
+                return;
+            }
+
+            if (!moderacion.sanciones.length) { cont.innerHTML = estadoVacioHTML(ESCUDO_MOD, 'No hay sanciones activas', 'Las suspensiones, bloqueos y advertencias que apliques van a aparecer acá.', '', ''); return; }
+            cont.innerHTML = `<div class="bg-white rounded-2xl ring-1 ring-beige-border shadow-soft divide-y divide-beige-border">${moderacion.sanciones.map(x => {
+                const nombre = { advertencia: 'Advertencia', suspension: 'Suspensión', bloqueo: 'Bloqueo' }[x.tipo];
+                return `<div class="flex flex-wrap items-center gap-3 p-4">
+                    ${chipAutor(x.user_id, '')}
+                    <span class="inline-flex items-center h-6 px-2.5 rounded-full text-xs font-semibold ${x.tipo === 'advertencia' ? 'bg-yema-suave text-[#7A5300]' : 'bg-red-50 text-rojo-hover'}">${nombre}${x.hasta ? ' hasta ' + new Date(x.hasta).toLocaleDateString('es-AR') : ''}</span>
+                    <span class="text-xs text-tinta/50">${esc(MOTIVOS_DENUNCIA[x.motivo] || x.motivo || '')} · ${tiempoRelativo(x.created_at)}</span>
+                    ${x.tipo !== 'advertencia' ? `<button type="button" onclick="levantarSancion('${esc(x.id)}')" class="${PILDORA} ml-auto bg-white text-verde-ingles border-beige-border hover:bg-beige-base">Levantar</button>` : ''}
+                </div>`;
+            }).join('')}</div>`;
+        }
+
+        async function resolverDenuncia(id, aceptar, sancion, k) {
+            const nota = (el('nota-' + k) || {}).value || null;
+            const dias = sancion === 'suspension' ? parseInt((el('dias-' + k) || {}).value || '7', 10) : null;
+            const textos = { advertencia: 'ocultar el contenido y advertir', suspension: `ocultar el contenido y suspender ${dias} ${dias === 1 ? 'día' : 'días'}`, bloqueo: 'ocultar el contenido y bloquear la cuenta' };
+            if (aceptar && sancion && !confirm(`¿Confirmás ${textos[sancion]}?`)) return;
+            const { error } = await db.rpc('resolver_denuncia', { p_id: id, p_aceptar: aceptar, p_sancion: sancion, p_dias: dias, p_nota: nota });
+            if (error) return toast('No se pudo resolver: ' + error.message);
+            toast(aceptar ? 'Contenido ocultado' + (sancion ? ' y sanción aplicada' : '') : 'Denuncia desestimada');
+            cargarModeracion();
+        }
+
+        async function restaurarContenido(tipo, id) {
+            const { error } = await db.rpc('restaurar_contenido', { p_tipo: tipo, p_id: id });
+            if (error) return toast('No se pudo: ' + error.message);
+            toast('El contenido se vuelve a mostrar');
+            cargarModeracion();
+        }
+
+        async function levantarSancion(id) {
+            if (!confirm('¿Levantar esta sanción? La persona vuelve a poder publicar.')) return;
+            const { error } = await db.rpc('levantar_sancion', { p_id: id });
+            if (error) return toast('No se pudo: ' + error.message);
+            toast('Sanción levantada');
+            cargarModeracion();
         }
 
         // Posts con un anuncio cada ANUNCIO_CADA_N_POSTS. "desde" permite seguir la cuenta
@@ -2408,7 +2940,6 @@
             el('compartir-post-receta').innerText = r ? r.nombre : '';
             el('compartir-post-receta').classList.toggle('hidden', !r);
             el('compartir-post-descripcion').value = '';
-            limpiarFotosForm('post');
             el('modal-compartir-post').classList.remove('hidden');
             setTimeout(() => el('compartir-post-descripcion').focus(), 50);
         }
@@ -2424,7 +2955,6 @@
         }
 
         function omitirCompartirPost() {
-            limpiarFotosForm('post');
             recetaParaCompartirPost = null;
             el('modal-compartir-post').classList.add('hidden');
         }
@@ -2436,15 +2966,13 @@
             const btn = el('btn-confirmar-post');
             btn.disabled = true;
             try {
-                const fotos = await subirFotosForm('post', (n, total) => { btn.innerText = `Subiendo ${n} de ${total}…`; });
                 btn.innerText = 'Publicando…';
                 // Si ya existe un post tuyo de esta receta, solo se actualiza la descripción
                 const previo = await db.from('publicaciones').select('id')
                     .eq('user_id', usuarioActual.id).eq('receta_id', recetaId).limit(1).maybeSingle();
-                const cambios = fotos.length ? { descripcion, fotos } : { descripcion };
                 const { error } = previo.data
-                    ? await db.from('publicaciones').update(cambios).eq('id', previo.data.id)
-                    : await db.from('publicaciones').insert({ user_id: usuarioActual.id, receta_id: recetaId, descripcion, fotos });
+                    ? await db.from('publicaciones').update({ descripcion }).eq('id', previo.data.id)
+                    : await db.from('publicaciones').insert({ user_id: usuarioActual.id, receta_id: recetaId, descripcion });
                 if (error) throw error;
                 omitirCompartirPost();
                 toast(previo.data ? 'Publicación actualizada' : 'Publicado en tu perfil');
@@ -2533,9 +3061,10 @@
                     .range(timeline.offset, timeline.offset + PAGINA_TIMELINE - 1);
                 if (error) throw error;
                 const filas = data || [];
-                const nuevas = filas.filter(row => row.recetas).map(mapearPost);
-                await asegurarPerfiles(nuevas.flatMap(p => [p.userId, p.receta.userId]));
-                await cargarResenasPara(nuevas.map(p => p.receta.id));
+                const nuevas = filas.filter(row => row.recetas || !row.receta_id).map(mapearPost);
+                await asegurarPerfiles(nuevas.flatMap(p => [p.userId, p.receta && p.receta.userId]));
+                await cargarResenasPara(nuevas.filter(p => p.receta).map(p => p.receta.id));
+                await cargarComentariosDe(nuevas.map(p => p.id));
                 timeline.items.push(...nuevas);
                 timeline.offset += filas.length;
                 timeline.fin = filas.length < PAGINA_TIMELINE;
@@ -2555,7 +3084,7 @@
         async function cargarSugerenciasTimeline() {
             try {
                 const excluir = new Set([usuarioActual.id, ...seguidos]);
-                const yaEnInicio = new Set(timeline.items.map(p => p.receta.id));
+                const yaEnInicio = new Set(timeline.items.filter(p => p.receta).map(p => p.receta.id));
                 const candidatos = [];
 
                 let q = db.from('publicaciones').select('*, recetas(*)')
@@ -3208,6 +3737,10 @@
                 el('detalle-contenido').innerHTML = volver + estadoVacioHTML(ICONO_COLECCION, 'No disponible', d.error, '', '');
                 return;
             }
+            if (d.tipo === 'post') {
+                el('detalle-contenido').innerHTML = volver + tarjetaPost(d.post, 'detalle');
+                return;
+            }
 
             let cabecera = '';
             if (d.tipo === 'coleccion') {
@@ -3370,7 +3903,7 @@
             delete recetasVistas[id];
             if (perfilVisto) perfilVisto.recetas = perfilVisto.recetas.filter(x => x.id !== id);
             if (detalleActual && detalleActual.recetas) detalleActual.recetas = detalleActual.recetas.filter(x => x.id !== id);
-            timeline.items = timeline.items.filter(x => x.receta.id !== id);
+            timeline.items = timeline.items.filter(x => !x.receta || x.receta.id !== id);
             timeline.sugerencias = (timeline.sugerencias || []).filter(x => x.receta.id !== id);
             await cargarRecetas();
             refrescarVistaActual();
@@ -3556,7 +4089,8 @@
 
         function iconoNotificacion(tipo) {
             if (tipo === 'seguidor') return ICONO_USUARIOS;
-            if (tipo === 'mensaje') return ICONO_MENSAJE;
+            if (tipo === 'mensaje' || tipo === 'comentario') return ICONO_MENSAJE;
+            if (tipo === 'moderacion') return ESCUDO_MOD;
             return 'M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.196-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z';
         }
 
@@ -3588,6 +4122,8 @@
             if (n.tipo === 'resena') return `${nombre} reseñó tu receta${tituloRecetaNotif(n.receta_id)}${estrellas}`;
             if (n.tipo === 'puntaje') return `${nombre} calificó tu receta${tituloRecetaNotif(n.receta_id)}${estrellas}`;
             if (n.tipo === 'mensaje') return `${nombre} te envió un mensaje`;
+            if (n.tipo === 'comentario') return `${nombre} comentó tu publicación${n.detalle ? `: <span class="text-tinta/70">“${esc(n.detalle)}”</span>` : ''}`;
+            if (n.tipo === 'moderacion') return `<span class="font-medium text-rojo-hover">Moderación:</span> ${esc(n.detalle || 'Ocultamos contenido tuyo que infringe las normas.')}`;
             return 'Novedad';
         }
 
@@ -3619,7 +4155,12 @@
             cerrarNotificaciones();
             if (n.tipo === 'seguidor') await verPerfilPorId(n.actor_id);
             else if ((n.tipo === 'resena' || n.tipo === 'puntaje') && n.receta_id) await abrirReceta(String(n.receta_id));
-            else if (n.tipo === 'mensaje') { await abrirMensajes(); await abrirConversacion(n.actor_id); }
+            else if (n.tipo === 'mensaje') { await abrirConversacion(n.actor_id); }
+            else if (n.tipo === 'comentario' && n.publicacion_id) await abrirPublicacion(String(n.publicacion_id));
+            else if (n.tipo === 'moderacion') {
+                if (n.publicacion_id) await abrirPublicacion(String(n.publicacion_id));
+                else if (n.receta_id) await abrirReceta(String(n.receta_id));
+            }
         }
 
         function abrirNotificaciones() {
@@ -3686,45 +4227,63 @@
             const mutuos = [...seguidos].filter(id => seguidoresMios.has(id));
             const conConversacion = new Set(conversaciones.map(c => c.otroId));
             const nuevosContactos = mutuos.filter(id => !conConversacion.has(id));
+            const activa = conversacionAbierta ? conversacionAbierta.otroId : null;
 
             const filasConv = conversaciones.map(c => {
                 const p = perfilesCache[c.otroId];
                 return `
-                <button type="button" onclick="abrirConversacion('${esc(c.otroId)}')" class="w-full text-left flex items-center gap-3 p-3 rounded-xl border border-beige-border hover:bg-beige-base transition">
-                    ${avatarHTML(p, 'w-10 h-10', 'text-sm')}
+                <button type="button" onclick="abrirConversacion('${esc(c.otroId)}')" class="w-full text-left flex items-center gap-3 p-2.5 rounded-xl transition ${c.otroId === activa ? 'bg-verde-suave/60' : 'hover:bg-beige-base'}">
+                    ${avatarHTML(p, 'w-11 h-11', 'text-sm')}
                     <span class="min-w-0 flex-1">
-                        <span class="block text-sm font-medium text-tinta truncate">${esc(p ? (p.nombre || p.usuario) : 'Alguien')}</span>
-                        <span class="block text-xs text-tinta/60 truncate">${esc(c.ultimoTexto || 'Sin mensajes todavía')}</span>
+                        <span class="flex items-baseline justify-between gap-2">
+                            <span class="text-sm ${c.noLeidos ? 'font-bold' : 'font-semibold'} truncate">${esc(p ? (p.nombre || p.usuario) : 'Alguien')}</span>
+                            <span class="text-[11px] text-tinta/45 shrink-0">${tiempoRelativo(c.ultimaFecha)}</span>
+                        </span>
+                        <span class="block text-xs truncate ${c.noLeidos ? 'text-tinta font-semibold' : 'text-tinta/55'}">${esc(c.ultimoTexto || 'Sin mensajes todavía')}</span>
                     </span>
-                    ${c.noLeidos ? `<span class="shrink-0 min-w-[18px] h-[18px] px-1 rounded-full bg-rojo-excluir text-white text-[10px] font-bold flex items-center justify-center">${c.noLeidos}</span>` : ''}
+                    ${c.noLeidos ? `<span class="shrink-0 min-w-[20px] h-5 px-1.5 rounded-full bg-rojo-excluir text-white text-[11px] font-bold flex items-center justify-center">${c.noLeidos}</span>` : ''}
                 </button>`;
             }).join('');
 
             const filasNuevos = nuevosContactos.map(id => {
                 const p = perfilesCache[id];
                 return `
-                <button type="button" onclick="abrirConversacion('${esc(id)}')" class="w-full text-left flex items-center gap-3 p-3 rounded-xl border border-dashed border-beige-border hover:bg-beige-base transition">
+                <button type="button" onclick="abrirConversacion('${esc(id)}')" class="w-full text-left flex items-center gap-3 p-2.5 rounded-xl hover:bg-beige-base transition">
                     ${avatarHTML(p, 'w-9 h-9', 'text-xs')}
-                    <span class="text-sm text-tinta/80 truncate">Escribirle a ${esc(p ? (p.nombre || p.usuario) : 'esta persona')}</span>
+                    <span class="text-sm text-tinta/80 truncate flex-1">${esc(p ? (p.nombre || p.usuario) : 'esta persona')}</span>
+                    <span class="text-xs font-semibold text-verde-chip shrink-0">Escribir</span>
                 </button>`;
             }).join('');
 
-            const contenido = filasConv + (nuevosContactos.length ? `<div class="text-sm font-semibold text-verde-ingles pt-3">Empezar una conversación</div>${filasNuevos}` : '');
-            cont.innerHTML = contenido || estadoVacioHTML(ICONO_MENSAJE, 'Sin conversaciones', 'Cuando se sigan mutuamente con alguien, van a poder escribirse acá.', '', '');
+            const contenido = filasConv + (nuevosContactos.length ? `<div class="text-sm font-semibold text-verde-ingles px-2.5 pt-3 pb-1">Empezar una conversación</div>${filasNuevos}` : '');
+            cont.innerHTML = contenido || `<div class="px-2.5 py-10 text-center text-sm text-tinta/55">Cuando se sigan mutuamente con alguien, van a poder escribirse acá.</div>`;
         }
 
         async function abrirMensajes() {
-            el('modal-mensajes').classList.remove('hidden');
-            el('mensajes-vista-lista').classList.remove('hidden');
-            el('mensajes-vista-chat').classList.add('hidden');
+            const panel = el('panel-mensajes');
+            if (!panel.classList.contains('hidden')) return cerrarMensajes();
+            panel.classList.remove('hidden');
+            el('mensajes-lista-conversaciones').innerHTML = cargandoHTML();
             await asegurarPerfiles([...seguidos, ...seguidoresMios]);
             await cargarConversaciones();
             renderMensajesLista();
         }
 
         function cerrarMensajes() {
-            el('modal-mensajes').classList.add('hidden');
-            cerrarConversacion(true);
+            el('panel-mensajes').classList.add('hidden');
+        }
+
+        let chatMinimizado = false;
+        let noLeidosMinimizado = 0;
+
+        function pintarCabeceraChat() {
+            if (!conversacionAbierta) return;
+            const p = perfilesCache[conversacionAbierta.otroId];
+            const cab = el('chat-cabecera-autor');
+            cab.innerHTML = `${avatarHTML(p, 'w-9 h-9', 'text-sm')}<span class="min-w-0"><span class="block text-sm font-semibold truncate">${esc(p ? (p.nombre || p.usuario) : 'Chat')}</span>${p ? `<span class="block text-xs text-white/60 truncate">@${esc(p.usuario)}</span>` : ''}</span>`;
+            cab.onclick = () => { minimizarChat(); verPerfilPorId(conversacionAbierta.otroId); };
+            el('chat-burbuja').innerHTML = `<span class="relative block">${avatarHTML(p, 'w-14 h-14', 'text-xl')}${noLeidosMinimizado ? `<span class="absolute -top-1 -right-1 min-w-[22px] h-[22px] px-1 rounded-full bg-rojo-excluir text-white text-xs font-bold flex items-center justify-center ring-2 ring-white">${noLeidosMinimizado}</span>` : ''}</span>`;
+            el('chat-burbuja').title = 'Abrir chat con ' + (p ? (p.nombre || p.usuario) : '');
         }
 
         async function abrirConversacion(otroId) {
@@ -3742,16 +4301,35 @@
                     conv = ins.data;
                 }
                 conversacionAbierta = { id: conv.id, otroId, mensajes: [] };
-                el('mensajes-vista-lista').classList.add('hidden');
-                el('mensajes-vista-chat').classList.remove('hidden');
+                chatMinimizado = false; noLeidosMinimizado = 0;
+                cerrarMensajes();
                 await asegurarPerfiles([otroId]);
-                const p = perfilesCache[otroId];
-                el('chat-cabecera-autor').innerHTML = `<span class="text-sm font-medium text-tinta">${esc(p ? (p.nombre || p.usuario) : 'Chat')}</span>`;
+                pintarCabeceraChat();
+                el('chat-burbuja').classList.add('hidden');
+                el('chat-dock').classList.remove('hidden');
+                el('chat-mensajes').innerHTML = cargandoHTML();
                 await cargarMensajesConversacion();
                 suscribirseAMensajes(conv.id);
+                if (window.matchMedia('(min-width: 640px)').matches) el('chat-input').focus();
             } catch (err) {
                 toast('No se pudo abrir la conversación: ' + err.message);
             }
+        }
+
+        function minimizarChat() {
+            if (!conversacionAbierta) return;
+            chatMinimizado = true;
+            el('chat-dock').classList.add('hidden');
+            pintarCabeceraChat();
+            el('chat-burbuja').classList.remove('hidden');
+        }
+
+        function restaurarChat() {
+            if (!conversacionAbierta) return;
+            chatMinimizado = false; noLeidosMinimizado = 0;
+            el('chat-burbuja').classList.add('hidden');
+            el('chat-dock').classList.remove('hidden');
+            cargarMensajesConversacion();
         }
 
         async function cargarMensajesConversacion() {
@@ -3761,17 +4339,32 @@
             conversacionAbierta.mensajes = data || [];
             renderChat();
             const noLeidos = conversacionAbierta.mensajes.filter(m => m.remitente_id !== usuarioActual.id && !m.leido).map(m => m.id);
-            if (noLeidos.length) db.from('mensajes').update({ leido: true }).in('id', noLeidos).then(() => {});
+            if (noLeidos.length) {
+                db.from('mensajes').update({ leido: true }).in('id', noLeidos).then(() => cargarConversaciones());
+            }
         }
 
         function renderChat() {
             const cont = el('chat-mensajes');
             if (!conversacionAbierta) return;
-            cont.innerHTML = conversacionAbierta.mensajes.map(m => {
+            const msjs = conversacionAbierta.mensajes;
+            if (!msjs.length) {
+                const p = perfilesCache[conversacionAbierta.otroId];
+                cont.innerHTML = `<div class="h-full flex flex-col items-center justify-center text-center gap-2 text-tinta/55 text-sm px-6">${avatarHTML(p, 'w-16 h-16', 'text-2xl')}<span>Empezá la conversación con ${esc(p ? (p.nombre || p.usuario) : 'esta persona')}.</span></div>`;
+                return;
+            }
+            let diaPrevio = '';
+            cont.innerHTML = msjs.map((m, i) => {
                 const mio = m.remitente_id === usuarioActual.id;
-                return `<div class="flex ${mio ? 'justify-end' : 'justify-start'}">
-                    <div class="max-w-[75%] px-3.5 py-2 rounded-2xl text-sm ${mio ? 'bg-verde-ingles text-white rounded-br-sm' : 'bg-beige-base text-tinta rounded-bl-sm'}">
-                        <span class="whitespace-pre-line">${esc(m.texto)}</span>
+                const fecha = new Date(m.created_at);
+                const dia = fecha.toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric', month: 'long' });
+                const separador = dia !== diaPrevio ? `<div class="text-center text-[11px] text-tinta/45 py-2 first-letter:uppercase">${esc(dia)}</div>` : '';
+                diaPrevio = dia;
+                const siguienteMismo = msjs[i + 1] && msjs[i + 1].remitente_id === m.remitente_id;
+                const hora = fecha.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' });
+                return `${separador}<div class="flex ${mio ? 'justify-end' : 'justify-start'} ${siguienteMismo ? '' : 'mb-1.5'}">
+                    <div title="${esc(hora)}" class="max-w-[78%] px-3.5 py-2 rounded-2xl text-sm leading-snug ${mio ? 'bg-verde-ingles text-white' : 'bg-white ring-1 ring-beige-border text-tinta'} ${siguienteMismo ? '' : (mio ? 'rounded-br-md' : 'rounded-bl-md')}">
+                        <span class="whitespace-pre-line break-words">${esc(m.texto)}</span>
                     </div>
                 </div>`;
             }).join('');
@@ -3787,18 +4380,20 @@
                     conversacionAbierta.mensajes.push(payload.new);
                     renderChat();
                     if (payload.new.remitente_id !== usuarioActual.id) {
-                        db.from('mensajes').update({ leido: true }).eq('id', payload.new.id).then(() => {});
+                        if (chatMinimizado) { noLeidosMinimizado += 1; pintarCabeceraChat(); }
+                        else db.from('mensajes').update({ leido: true }).eq('id', payload.new.id).then(() => {});
                     }
                 })
                 .subscribe();
         }
 
-        function cerrarConversacion(sinRecargarLista) {
+        function cerrarConversacion() {
             if (canalMensajesRT) { db.removeChannel(canalMensajesRT); canalMensajesRT = null; }
             conversacionAbierta = null;
-            el('mensajes-vista-chat').classList.add('hidden');
-            el('mensajes-vista-lista').classList.remove('hidden');
-            if (!sinRecargarLista) cargarConversaciones().then(renderMensajesLista);
+            chatMinimizado = false; noLeidosMinimizado = 0;
+            el('chat-dock').classList.add('hidden');
+            el('chat-burbuja').classList.add('hidden');
+            cargarConversaciones();
         }
 
         async function enviarMensaje(e) {
@@ -3828,6 +4423,8 @@
                     if (!el('modal-notificaciones').classList.contains('hidden')) renderNotificaciones();
                     if (n.tipo === 'resena' || n.tipo === 'puntaje') toast('Nueva calificación en una receta tuya');
                     if (n.tipo === 'seguidor') { toast('Tenés un nuevo seguidor'); cargarSeguidos(); }
+                    if (n.tipo === 'comentario') toast('Nuevo comentario en tu publicación');
+                    if (n.tipo === 'moderacion') { toast('Tenés un aviso de moderación'); cargarSancionPropia(); }
                 })
                 // Mensajes nuevos (la base solo manda los de tus conversaciones)
                 .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'mensajes' }, payload => {
@@ -3836,7 +4433,7 @@
                     if (conversacionAbierta && conversacionAbierta.id === m.conversacion_id) return;
                     mensajesNoLeidos += 1;
                     pintarBadgeMensajes();
-                    if (el('modal-mensajes').classList.contains('hidden')) toast('Tenés un mensaje nuevo');
+                    if (el('panel-mensajes').classList.contains('hidden')) toast('Tenés un mensaje nuevo');
                     else cargarConversaciones().then(renderMensajesLista);
                 })
                 .subscribe();
@@ -3851,10 +4448,12 @@
 
             recuperarEnlacePendiente();
             pintarFotosForm('receta');
+            pintarFotosForm('post');
             pintarTipoFiltro();
             pintarCategoriaFiltro();
             await cargarPerfil();
-            await Promise.all([cargarSeguidos(), cargarRecetas(), cargarMisColecciones(), cargarColeccionesGuardadas()]);
+            el('compositor-avatar').innerHTML = avatarHTML(perfilActual, 'w-10 h-10', 'text-sm');
+            await Promise.all([cargarSeguidos(), cargarRecetas(), cargarMisColecciones(), cargarColeccionesGuardadas(), cargarEsAdmin(), cargarSancionPropia()]);
             renderMisColecciones();
             cargarNotificaciones();
             cargarConversaciones();
@@ -3871,6 +4470,11 @@
             usuarioActual = null;
             perfilActual = null;
             appIniciada = false;
+            esAdmin = false;
+            sancionActiva = null;
+            el('btn-moderacion').classList.add('hidden');
+            el('aviso-sancion').classList.add('hidden');
+            limpiarFotosForm('post');
             recetas = [];
             seguidos = new Set();
             seguidoresMios = new Set();
@@ -3897,7 +4501,7 @@
             Object.keys(recetasVistas).forEach(k => delete recetasVistas[k]);
             vistaActual = 'filtrar';
             vistaPrevia = null;
-            ['modal-perfil', 'modal-coleccion', 'modal-personas', 'modal-notificaciones', 'modal-mensajes', 'modal-agregar-coleccion', 'modal-compartir-post'].forEach(id => el(id).classList.add('hidden'));
+            ['modal-perfil', 'modal-coleccion', 'modal-personas', 'modal-notificaciones', 'panel-mensajes', 'chat-dock', 'chat-burbuja', 'modal-agregar-coleccion', 'modal-compartir-post'].forEach(id => el(id).classList.add('hidden'));
             document.getElementById('app-principal').classList.add('hidden');
             document.getElementById('pantalla-login').classList.remove('hidden');
             mostrarModoAuth('login');

@@ -145,3 +145,62 @@ create policy "fotos subir" on storage.objects for insert to authenticated
   with check (bucket_id = 'fotos' and (storage.foldername(name))[1] = auth.uid()::text);
 create policy "fotos borrar" on storage.objects for delete to authenticated
   using (bucket_id = 'fotos' and (storage.foldername(name))[1] = auth.uid()::text);
+
+-- =====================================================================
+-- 9. Comentarios, denuncias, moderación y sanciones; posts sin receta
+-- =====================================================================
+update public.publicaciones set fotos = '{}' where receta_id is not null and cardinality(fotos) > 0;
+alter table public.publicaciones alter column receta_id drop not null;
+alter table public.publicaciones add constraint publicaciones_con_contenido check (receta_id is not null or cardinality(fotos) > 0) not valid;
+alter table public.publicaciones add column if not exists moderada boolean not null default false;
+alter table public.recetas       add column if not exists moderada boolean not null default false;
+alter table public.resenas       add column if not exists moderada boolean not null default false;
+
+create table if not exists public.administradores (user_id uuid primary key references auth.users (id) on delete cascade, created_at timestamptz not null default now());
+alter table public.administradores enable row level security;
+insert into public.administradores (user_id) values ('95ad4613-055d-4415-aff2-2e46811d553d') on conflict do nothing;  -- tadeo
+
+create table if not exists public.comentarios (
+  id uuid primary key default gen_random_uuid(),
+  publicacion_id uuid not null references public.publicaciones (id) on delete cascade,
+  user_id uuid not null default auth.uid() references public.perfiles (id) on delete cascade,
+  texto text not null check (char_length(btrim(texto)) between 1 and 1000),
+  moderada boolean not null default false,
+  created_at timestamptz not null default now());
+create index if not exists comentarios_post_idx on public.comentarios (publicacion_id, created_at);
+alter table public.comentarios enable row level security;
+
+create table if not exists public.denuncias (
+  id uuid primary key default gen_random_uuid(),
+  denunciante_id uuid not null default auth.uid() references auth.users (id) on delete cascade,
+  tipo text not null check (tipo in ('publicacion', 'comentario', 'receta', 'resena')),
+  objeto_id uuid not null,
+  autor_id uuid references auth.users (id) on delete cascade,
+  motivo text not null check (motivo in ('ofensivo', 'foto', 'acoso', 'spam', 'otro')),
+  detalle text check (detalle is null or char_length(detalle) <= 500),
+  estado text not null default 'pendiente' check (estado in ('pendiente', 'aceptada', 'desestimada')),
+  resolucion text, resuelta_por uuid references auth.users (id) on delete set null, resuelta_at timestamptz,
+  created_at timestamptz not null default now(),
+  unique (denunciante_id, tipo, objeto_id));
+create index if not exists denuncias_estado_idx on public.denuncias (estado, created_at desc);
+alter table public.denuncias enable row level security;
+
+create table if not exists public.sanciones (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users (id) on delete cascade,
+  tipo text not null check (tipo in ('advertencia', 'suspension', 'bloqueo')),
+  motivo text, hasta timestamptz,
+  denuncia_id uuid references public.denuncias (id) on delete set null,
+  creada_por uuid references auth.users (id) on delete set null,
+  levantada boolean not null default false,
+  created_at timestamptz not null default now());
+create index if not exists sanciones_user_idx on public.sanciones (user_id);
+alter table public.sanciones enable row level security;
+
+alter table public.notificaciones add column if not exists publicacion_id uuid references public.publicaciones (id) on delete cascade;
+alter table public.notificaciones add column if not exists detalle text;
+alter table public.notificaciones drop constraint notificaciones_tipo_valido;
+alter table public.notificaciones add constraint notificaciones_tipo_valido check (tipo in ('seguidor', 'resena', 'puntaje', 'mensaje', 'comentario', 'moderacion'));
+alter table public.notificaciones alter column actor_id drop not null;
+
+-- Funciones, triggers y reglas de moderación: ver supabase/moderacion.sql

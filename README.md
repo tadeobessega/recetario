@@ -4,7 +4,8 @@ Recetario social: cargás tus recetas, las organizás en colecciones, seguís a 
 
 - `index.html`: toda la app (HTML + Tailwind + Supabase JS).
 - `worker.js`: worker de Cloudflare. Sirve la app, resuelve los enlaces de salida (`/go`) y sirve `/ads.txt`.
-- `supabase/esquema.sql`: tablas, reglas de acceso y funciones de la base.
+- `ingredientes.js`: base de ~690 ingredientes que se sugieren al cargar recetas.
+- `supabase/esquema.sql`: tablas, reglas de acceso y funciones de la base. `supabase/moderacion.sql`: comentarios, denuncias y sanciones.
 - `pol_tica_de_privacidad.html` y `politica-seguridad.html`: políticas, enlazadas al pie de la app.
 
 ## Puesta en marcha
@@ -38,3 +39,14 @@ Cada 6 publicaciones del inicio aparece un espacio publicitario (`ANUNCIO_CADA_N
 4. En `wrangler.jsonc`, completá `ADSENSE_CLIENTE` para que el worker sirva `/ads.txt`. Google lo pide para aprobar el sitio y pagar.
 
 Mientras esos datos estén vacíos, el inicio muestra un recuadro "Espacio publicitario" en cada lugar donde va a ir un anuncio.
+
+## Moderación
+
+Cualquier persona puede denunciar publicaciones, comentarios, recetas y reseñas (menú ⋯ o el enlace "Denunciar"). Las cuentas que figuran en la tabla `administradores` ven el escudo en el encabezado, con la cantidad de denuncias pendientes. Desde ahí se puede:
+
+- **Desestimar** la denuncia.
+- **Ocultar** el contenido. Deja de verse para todo el mundo salvo su autor, que ve el aviso "Ocultada por moderación".
+- **Ocultar y sancionar:** advertencia, suspensión de 1, 7 o 30 días, o bloqueo. Una cuenta suspendida o bloqueada puede seguir mirando, pero no puede publicar, comentar, calificar ni mandar mensajes. Esto lo controla la base, no solo la app.
+- **Volver a mostrar** contenido ocultado y **levantar** sanciones.
+
+Para sumar a otra persona como administradora: Supabase → *Table editor* → `administradores` → *Insert row* con su `user_id`.
