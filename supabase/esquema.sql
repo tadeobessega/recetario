@@ -521,4 +521,36 @@ begin
   end if;
 end $$;
 
+-- ---------------------------------------------------------------------
+-- 8. Fotos de recetas (hasta 8) y de posts (hasta 4)
+-- ---------------------------------------------------------------------
+alter table public.recetas       add column if not exists fotos text[] not null default '{}';
+alter table public.publicaciones add column if not exists fotos text[] not null default '{}';
+do $$ begin
+  if not exists (select 1 from pg_constraint where conname = 'recetas_fotos_max') then
+    alter table public.recetas add constraint recetas_fotos_max check (cardinality(fotos) <= 8);
+  end if;
+  if not exists (select 1 from pg_constraint where conname = 'publicaciones_fotos_max') then
+    alter table public.publicaciones add constraint publicaciones_fotos_max check (cardinality(fotos) <= 4);
+  end if;
+end $$;
+
+insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+values ('fotos', 'fotos', true, 5242880, array['image/jpeg', 'image/png', 'image/webp'])
+on conflict (id) do nothing;
+
+do $$ begin
+  if not exists (select 1 from pg_policies where schemaname = 'storage' and tablename = 'objects' and policyname = 'fotos lectura') then
+    create policy "fotos lectura" on storage.objects for select using (bucket_id = 'fotos');
+  end if;
+  if not exists (select 1 from pg_policies where schemaname = 'storage' and tablename = 'objects' and policyname = 'fotos subir') then
+    create policy "fotos subir" on storage.objects for insert to authenticated
+      with check (bucket_id = 'fotos' and (storage.foldername(name))[1] = auth.uid()::text);
+  end if;
+  if not exists (select 1 from pg_policies where schemaname = 'storage' and tablename = 'objects' and policyname = 'fotos borrar') then
+    create policy "fotos borrar" on storage.objects for delete to authenticated
+      using (bucket_id = 'fotos' and (storage.foldername(name))[1] = auth.uid()::text);
+  end if;
+end $$;
+
 commit;

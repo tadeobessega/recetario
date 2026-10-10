@@ -131,3 +131,17 @@ alter function public.hay_seguimiento_mutuo(uuid, uuid) set search_path = public
 alter function public.mensajes_bloquear_edicion() set search_path = public;
 alter function public.resenas_bloquear_autorresena() set search_path = public;
 alter view public.recetas_ranking set (security_invoker = true);
+
+-- 8. Fotos en recetas (hasta 8) y en posts (hasta 4)
+alter table public.recetas       add column if not exists fotos text[] not null default '{}';
+alter table public.publicaciones add column if not exists fotos text[] not null default '{}';
+alter table public.recetas       add constraint recetas_fotos_max check (cardinality(fotos) <= 8);
+alter table public.publicaciones add constraint publicaciones_fotos_max check (cardinality(fotos) <= 4);
+insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+values ('fotos', 'fotos', true, 5242880, array['image/jpeg', 'image/png', 'image/webp'])
+on conflict (id) do nothing;
+create policy "fotos lectura" on storage.objects for select using (bucket_id = 'fotos');
+create policy "fotos subir" on storage.objects for insert to authenticated
+  with check (bucket_id = 'fotos' and (storage.foldername(name))[1] = auth.uid()::text);
+create policy "fotos borrar" on storage.objects for delete to authenticated
+  using (bucket_id = 'fotos' and (storage.foldername(name))[1] = auth.uid()::text);

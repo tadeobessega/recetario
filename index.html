@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <meta name="theme-color" content="#F4F5F0">
+    <meta name="theme-color" content="#1E4D36">
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Supabase JS Client -->
@@ -25,10 +25,10 @@
                         display: ['"Bricolage Grotesque"', 'Figtree', 'ui-sans-serif', 'system-ui', 'sans-serif'],
                     },
                     colors: {
-                        'fondo': '#F4F5F0',        // papel salvia
-                        'beige-base': '#EDF0E7',   // superficies suaves, inputs
+                        'fondo': '#EEF2EB',        // papel salvia
+                        'beige-base': '#E8EEE5',   // superficies suaves, inputs
                         'beige-card': '#FFFFFF',
-                        'beige-border': '#DDE2D5', // líneas
+                        'beige-border': '#D4DECF', // líneas
                         'verde-ingles': '#1E4D36', // albahaca (principal)
                         'verde-hover': '#163B29',
                         'verde-chip': '#2E7D57',   // hoja (activo, ok)
@@ -57,7 +57,7 @@
         *, *::before, *::after, ::placeholder { font-style: normal !important; }
         em, i, cite, address, dfn, var { font-style: normal !important; }
         body {
-            background-color: #F4F5F0;
+            background-color: #EEF2EB;
             color: #26332C;
             font-family: 'Figtree', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
             line-height: 1.6;
@@ -74,7 +74,7 @@
         input:focus, textarea:focus { background-color: #fff; }
         ::-webkit-scrollbar { width: 8px; height: 8px; }
         ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #CBD2C3; border-radius: 8px; border: 2px solid #F4F5F0; }
+        ::-webkit-scrollbar-thumb { background: #CBD2C3; border-radius: 8px; border: 2px solid #EEF2EB; }
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(-2px); }
             to { opacity: 1; transform: translateY(0); }
@@ -194,13 +194,13 @@
 
     <!-- APP PRINCIPAL -->
     <div id="app-principal" class="hidden min-h-screen flex flex-col">
-        <header class="sticky top-0 z-30 bg-fondo sm:bg-fondo/90 sm:backdrop-blur-md border-b border-beige-border">
+        <header class="sticky top-0 z-30 bg-verde-ingles text-white shadow-[0_1px_0_rgba(0,0,0,0.08)]">
             <div class="max-w-4xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-3">
                 <button type="button" onclick="cambiarPestana('inicio')" class="flex items-center gap-2.5 min-w-0" title="Inicio">
-                    <span class="w-9 h-9 rounded-xl bg-verde-ingles text-mostaza flex items-center justify-center shrink-0">
+                    <span class="w-9 h-9 rounded-xl bg-mostaza text-verde-ingles flex items-center justify-center shrink-0">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 11h14v4.5A4.5 4.5 0 0114.5 20h-5A4.5 4.5 0 015 15.5V11zM3 11h18M9.5 7.5c0-1 .7-1.5.7-2.5M13.8 7.5c0-1 .7-1.5.7-2.5"></path></svg>
                     </span>
-                    <span class="font-display text-xl font-bold text-verde-ingles tracking-tight whitespace-nowrap">Mi Recetario</span>
+                    <span class="font-display text-xl font-bold text-white tracking-tight whitespace-nowrap">Mi Recetario</span>
                 </button>
 
                 <div class="flex items-center gap-1 sm:gap-1.5">
@@ -208,22 +208,22 @@
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v14m7-7H5"></path></svg>
                         <span class="hidden sm:inline">Agregar receta</span>
                     </button>
-                    <button onclick="abrirNotificaciones()" title="Notificaciones" class="relative w-9 h-9 flex items-center justify-center text-verde-ingles/70 hover:text-verde-ingles hover:bg-beige-base rounded-xl transition">
+                    <button onclick="abrirNotificaciones()" title="Notificaciones" class="relative w-9 h-9 flex items-center justify-center text-white/75 hover:text-white hover:bg-white/10 rounded-xl transition">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
-                        <span id="badge-notificaciones" class="hidden absolute top-0.5 right-0.5 min-w-[17px] h-[17px] px-1 rounded-full bg-rojo-excluir text-white text-[10px] font-bold flex items-center justify-center ring-2 ring-fondo">0</span>
+                        <span id="badge-notificaciones" class="hidden absolute top-0.5 right-0.5 min-w-[17px] h-[17px] px-1 rounded-full bg-rojo-excluir text-white text-[10px] font-bold flex items-center justify-center ring-2 ring-verde-ingles">0</span>
                     </button>
-                    <button onclick="abrirMensajes()" title="Mensajes" class="relative w-9 h-9 flex items-center justify-center text-verde-ingles/70 hover:text-verde-ingles hover:bg-beige-base rounded-xl transition">
+                    <button onclick="abrirMensajes()" title="Mensajes" class="relative w-9 h-9 flex items-center justify-center text-white/75 hover:text-white hover:bg-white/10 rounded-xl transition">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
-                        <span id="badge-mensajes" class="hidden absolute top-0.5 right-0.5 min-w-[17px] h-[17px] px-1 rounded-full bg-rojo-excluir text-white text-[10px] font-bold flex items-center justify-center ring-2 ring-fondo">0</span>
+                        <span id="badge-mensajes" class="hidden absolute top-0.5 right-0.5 min-w-[17px] h-[17px] px-1 rounded-full bg-rojo-excluir text-white text-[10px] font-bold flex items-center justify-center ring-2 ring-verde-ingles">0</span>
                     </button>
-                    <button id="btn-avatar-header" onclick="verPerfilPropio()" title="Mi perfil" class="hidden sm:block ml-1 rounded-full ring-2 ring-transparent hover:ring-verde-chip/40 transition"></button>
-                    <button onclick="cerrarSesion()" title="Cerrar sesión" class="w-9 h-9 flex items-center justify-center text-verde-ingles/50 hover:text-rojo-excluir hover:bg-beige-base rounded-xl transition">
+                    <button id="btn-avatar-header" onclick="verPerfilPropio()" title="Mi perfil" class="hidden sm:block ml-1 rounded-full ring-2 ring-white/25 hover:ring-white/70 transition"></button>
+                    <button onclick="cerrarSesion()" title="Cerrar sesión" class="w-9 h-9 flex items-center justify-center text-white/55 hover:text-white hover:bg-white/10 rounded-xl transition">
                         <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
                     </button>
                 </div>
             </div>
             <!-- Pestañas: arriba en compu, barra fija abajo en el celular -->
-            <nav id="nav-pestanas" class="fixed sm:static bottom-0 inset-x-0 z-40 bg-white/95 sm:bg-transparent backdrop-blur-md sm:backdrop-blur-0 border-t sm:border-0 border-beige-border pb-[env(safe-area-inset-bottom)] sm:pb-0">
+            <nav id="nav-pestanas" class="fixed sm:static bottom-0 inset-x-0 z-40 bg-verde-ingles sm:bg-transparent border-t border-white/10 sm:border-0 pb-[env(safe-area-inset-bottom)] sm:pb-0 shadow-[0_-6px_20px_-8px_rgba(30,77,54,0.5)] sm:shadow-none">
                 <div class="max-w-4xl mx-auto px-2 sm:px-6 flex sm:gap-1 sm:pb-3">
                 <button id="tab-btn-inicio" onclick="cambiarPestana('inicio')" class="">
                     <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
@@ -357,6 +357,15 @@
                         <div>
                             <label class="block text-sm font-semibold text-verde-ingles mb-2">Breve descripción (opcional)</label>
                             <input type="text" id="input-descripcion" placeholder="Ej: Plato clásico crocante con puré cremoso" class="w-full p-3 bg-beige-base border border-beige-border rounded-xl text-sm focus:ring-2 focus:ring-verde-chip/25 focus:border-verde-chip focus:outline-none">
+                        </div>
+
+                        <div>
+                            <div class="flex items-baseline justify-between mb-2">
+                                <label class="block text-sm font-semibold text-verde-ingles">Fotos (opcional)</label>
+                                <span class="text-xs text-tinta/50">Hasta 8. La primera es la portada.</span>
+                            </div>
+                            <div id="fotos-form" class="grid grid-cols-3 sm:grid-cols-4 gap-2"></div>
+                            <input type="file" id="input-fotos-receta" accept="image/*" multiple class="hidden" onchange="agregarFotosForm('receta', this)">
                         </div>
 
                         <div>
@@ -636,6 +645,10 @@
             <p id="compartir-post-texto" class="text-sm text-tinta/60">Se guardó en tu recetario. Si querés, también aparece como publicación tuya para quienes te siguen, con una descripción opcional.</p>
             <div id="compartir-post-receta" class="text-sm font-medium text-tinta bg-beige-base border border-beige-border rounded-xl px-3 py-2.5 truncate"></div>
             <textarea id="compartir-post-descripcion" rows="3" maxlength="500" placeholder="Agregá una descripción (opcional)..." class="w-full p-3 bg-beige-base border border-beige-border rounded-xl text-sm focus:ring-2 focus:ring-verde-chip/25 focus:border-verde-chip focus:outline-none"></textarea>
+            <div>
+                <div id="fotos-post" class="grid grid-cols-4 gap-2"></div>
+                <input type="file" id="input-fotos-post" accept="image/*" multiple class="hidden" onchange="agregarFotosForm('post', this)">
+            </div>
             <div class="flex gap-2">
                 <button type="button" onclick="rechazarCompartirPost()" class="flex-1 py-2.5 rounded-xl text-sm font-medium border border-beige-border text-tinta/70 hover:bg-beige-base transition">No, gracias</button>
                 <button type="button" id="btn-confirmar-post" onclick="confirmarCompartirPost()" class="flex-1 py-2.5 rounded-xl text-sm font-medium bg-verde-ingles hover:bg-verde-hover text-white transition disabled:opacity-60">Publicar</button>
@@ -685,7 +698,16 @@
         </div>
     </div>
 
-    <div id="toast" class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] bg-verde-ingles text-white text-sm px-5 py-3 rounded-xl shadow-soft-lg max-w-[90vw] text-center"></div>
+    <!-- VISOR DE FOTOS -->
+    <div id="visor-fotos" class="hidden fixed inset-0 z-[70] bg-[#0d1f16]/95 flex items-center justify-center p-4" onclick="if(event.target===this) cerrarVisor()">
+        <img id="visor-img" src="" alt="" class="max-w-full max-h-[85vh] rounded-xl object-contain shadow-soft-lg">
+        <button type="button" onclick="cerrarVisor()" title="Cerrar" class="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+        <button type="button" id="visor-ant" onclick="moverVisor(-1)" title="Anterior" class="absolute left-3 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg></button>
+        <button type="button" id="visor-sig" onclick="moverVisor(1)" title="Siguiente" class="absolute right-3 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></button>
+        <span id="visor-contador" class="absolute bottom-5 left-1/2 -translate-x-1/2 text-sm text-white/70"></span>
+    </div>
+
+    <div id="toast" class="hidden fixed bottom-24 sm:bottom-6 left-1/2 -translate-x-1/2 z-[60] bg-verde-ingles text-white text-sm px-5 py-3 rounded-xl shadow-soft-lg max-w-[90vw] text-center"></div>
 
     <footer class="w-full text-center py-5 px-4 text-xs text-tinta/45 space-x-3">
         <a href="/pol_tica_de_privacidad.html" class="underline hover:text-verde-ingles transition">Política de privacidad</a>
@@ -1364,6 +1386,18 @@
                 return;
             }
 
+            const btnGuardar = document.querySelector('#form-receta button[type="submit"]');
+            const textoBtn = btnGuardar.innerHTML;
+            btnGuardar.disabled = true;
+            let fotos;
+            try {
+                fotos = await subirFotosForm('receta', (n, total) => { btnGuardar.innerHTML = `<span>Subiendo foto ${n} de ${total}…</span>`; });
+            } catch (err) {
+                btnGuardar.disabled = false; btnGuardar.innerHTML = textoBtn;
+                return alert('No se pudo subir una foto: ' + (err.message || 'error desconocido'));
+            }
+            btnGuardar.innerHTML = '<span>Guardando…</span>';
+
             const cantidades = [];
             const filas = document.querySelectorAll('#tabla-body-cantidades tr[data-ingrediente]');
             filas.forEach(fila => {
@@ -1383,19 +1417,24 @@
                 link_otro,
                 tipo_comida,
                 porciones,
+                fotos,
                 publica: document.getElementById('input-publica').checked,
                 user_id: usuarioActual.id
             };
 
             let nuevaId = null;
+            const restaurarBtn = () => { btnGuardar.disabled = false; btnGuardar.innerHTML = textoBtn; };
             if (id) {
                 const { error } = await db.from('recetas').update(datosReceta).eq('id', id);
-                if (error) return alert("Error al actualizar la receta: " + error.message);
+                if (error) { restaurarBtn(); return alert("Error al actualizar la receta: " + error.message); }
             } else {
                 const { data, error } = await db.from('recetas').insert([datosReceta]).select('id').single();
-                if (error) return alert("Error al guardar la receta: " + error.message);
+                if (error) { restaurarBtn(); return alert("Error al guardar la receta: " + error.message); }
                 nuevaId = data ? String(data.id) : null;
             }
+            restaurarBtn();
+            borrarFotos(fotosQuitadas);
+            fotosQuitadas = [];
 
             await cargarRecetas();
             cancelarEdicion();
@@ -1420,6 +1459,10 @@
             document.getElementById('input-tiktok').value = receta.tiktok || '';
             document.getElementById('input-link').value = receta.link || '';
             document.getElementById('input-porciones').value = receta.porciones || '';
+            limpiarFotosForm('receta');
+            fotosQuitadas = [];
+            fotosForm.receta = receta.fotos.map(url => ({ url }));
+            pintarFotosForm('receta');
             document.getElementById('input-publica').checked = receta.publica !== false;
             document.querySelectorAll('input[name="tipo-comida"]').forEach(r => { r.checked = r.value === receta.tipo; });
 
@@ -1447,6 +1490,8 @@
             ingredientesFormSeleccionados = [];
             renderizarChipsFormIngredientes();
             sincronizarTablaCantidadesAuto();
+            limpiarFotosForm('receta');
+            fotosQuitadas = [];
         }
 
 
@@ -1573,7 +1618,8 @@
                 publica: r.publica !== false,
                 tipo: r.tipo_comida || null,
                 porciones: r.porciones || null,
-                creada: r.created_at || null
+                creada: r.created_at || null,
+                fotos: (r.fotos || []).filter(fotoSegura)
             };
         }
 
@@ -1585,6 +1631,7 @@
                 userId: row.user_id ? String(row.user_id) : null,
                 descripcion: row.descripcion || '',
                 creada: row.created_at || null,
+                fotos: (row.fotos || []).filter(fotoSegura),
                 receta
             };
         }
@@ -1616,8 +1663,8 @@
         const TABS = ['inicio', 'filtrar', 'colecciones', 'explorar', 'perfil'];
         const VISTAS = ['inicio', 'filtrar', 'colecciones', 'explorar', 'perfil', 'agregar', 'detalle'];
         const TAB_BASE = 'flex-1 sm:flex-none flex flex-col sm:flex-row items-center justify-center gap-0.5 sm:gap-2 px-1 sm:px-3.5 pt-2 pb-1.5 sm:py-2 sm:rounded-xl text-[11px] sm:text-sm font-semibold transition ';
-        const TAB_ACTIVA = TAB_BASE + 'text-verde-ingles sm:bg-white sm:shadow-soft sm:ring-1 sm:ring-beige-border';
-        const TAB_INACTIVA = TAB_BASE + 'text-verde-ingles/50 hover:text-verde-ingles sm:hover:bg-white/60';
+        const TAB_ACTIVA = TAB_BASE + 'text-mostaza sm:text-verde-ingles sm:bg-white sm:shadow-soft';
+        const TAB_INACTIVA = TAB_BASE + 'text-white/60 hover:text-white sm:hover:bg-white/10';
 
         function actualizarTabs() {
             let activa = vistaActual;
@@ -1873,6 +1920,175 @@
             </div>`;
         }
 
+        // ---------- Fotos (recetas y posts) ----------
+        const PREFIJO_FOTOS = SUPABASE_URL + '/storage/v1/object/public/fotos/';
+        const MAX_FOTOS = { receta: 8, post: 4 };
+        function fotoSegura(u) { return typeof u === 'string' && u.startsWith(PREFIJO_FOTOS); }
+
+        // Achica la foto en el navegador (lado mayor 1600 px, JPEG) para que suba rápido y pese poco
+        function achicarFoto(archivo, maxLado) {
+            maxLado = maxLado || 1600;
+            return new Promise((resolve, reject) => {
+                const url = URL.createObjectURL(archivo);
+                const img = new Image();
+                img.onload = () => {
+                    const escala = Math.min(1, maxLado / Math.max(img.width, img.height));
+                    const c = document.createElement('canvas');
+                    c.width = Math.round(img.width * escala);
+                    c.height = Math.round(img.height * escala);
+                    c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+                    URL.revokeObjectURL(url);
+                    c.toBlob(b => b ? resolve(b) : reject(new Error('No se pudo procesar la foto')), 'image/jpeg', 0.84);
+                };
+                img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('No se pudo leer la foto')); };
+                img.src = url;
+            });
+        }
+
+        async function subirFoto(archivo) {
+            const blob = await achicarFoto(archivo);
+            const ruta = `${usuarioActual.id}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.jpg`;
+            const { error } = await db.storage.from('fotos').upload(ruta, blob, { contentType: 'image/jpeg', cacheControl: '31536000' });
+            if (error) throw error;
+            return db.storage.from('fotos').getPublicUrl(ruta).data.publicUrl;
+        }
+
+        // Borra del almacenamiento las fotos propias que ya no se usan (si falla, no pasa nada)
+        function borrarFotos(urls) {
+            const rutas = (urls || []).filter(fotoSegura).map(u => u.slice(PREFIJO_FOTOS.length))
+                .filter(r => r.startsWith(usuarioActual.id + '/'));
+            if (rutas.length) db.storage.from('fotos').remove(rutas).then(() => {}, () => {});
+        }
+
+        // Fotos elegidas en un formulario, antes de guardar: { url } ya subida o { archivo, vista } nueva
+        const fotosForm = { receta: [], post: [] };
+        let fotosQuitadas = [];
+
+        function agregarFotosForm(tipo, input) {
+            const archivos = [...(input.files || [])].filter(f => f.type.startsWith('image/'));
+            input.value = '';
+            const lugar = MAX_FOTOS[tipo] - fotosForm[tipo].length;
+            if (archivos.length > lugar) toast(`Podés sumar hasta ${MAX_FOTOS[tipo]} fotos.`);
+            archivos.slice(0, Math.max(0, lugar)).forEach(archivo => {
+                if (archivo.size > 25 * 1024 * 1024) return toast('Una de las fotos es muy pesada (máximo 25 MB).');
+                fotosForm[tipo].push({ archivo, vista: URL.createObjectURL(archivo) });
+            });
+            pintarFotosForm(tipo);
+        }
+
+        function quitarFotoForm(tipo, i) {
+            const f = fotosForm[tipo][i];
+            if (!f) return;
+            if (f.vista) URL.revokeObjectURL(f.vista);
+            if (f.url) fotosQuitadas.push(f.url);
+            fotosForm[tipo].splice(i, 1);
+            pintarFotosForm(tipo);
+        }
+
+        function moverFotoForm(tipo, i) {
+            if (i <= 0) return;
+            const l = fotosForm[tipo];
+            [l[i - 1], l[i]] = [l[i], l[i - 1]];
+            pintarFotosForm(tipo);
+        }
+
+        function pintarFotosForm(tipo) {
+            const cont = el(tipo === 'receta' ? 'fotos-form' : 'fotos-post');
+            if (!cont) return;
+            const lista = fotosForm[tipo];
+            const miniaturas = lista.map((f, i) => `
+                <div class="relative aspect-square rounded-xl overflow-hidden bg-beige-base ring-1 ring-beige-border group">
+                    <img src="${esc(f.url || f.vista)}" alt="" class="w-full h-full object-cover">
+                    ${tipo === 'receta' && i === 0 ? '<span class="absolute left-1.5 bottom-1.5 text-[11px] font-semibold bg-verde-ingles text-white px-2 py-0.5 rounded-full">Portada</span>' : ''}
+                    <div class="absolute top-1.5 right-1.5 flex gap-1">
+                        ${tipo === 'receta' && i > 0 ? `<button type="button" onclick="moverFotoForm('${tipo}', ${i})" title="Mover antes" class="w-7 h-7 rounded-full bg-white/90 text-verde-ingles flex items-center justify-center shadow">${svg('M15 19l-7-7 7-7', 'w-3.5 h-3.5')}</button>` : ''}
+                        <button type="button" onclick="quitarFotoForm('${tipo}', ${i})" title="Quitar foto" class="w-7 h-7 rounded-full bg-white/90 text-rojo-excluir flex items-center justify-center shadow">${svg('M6 18L18 6M6 6l12 12', 'w-3.5 h-3.5')}</button>
+                    </div>
+                </div>`).join('');
+            const agregar = lista.length < MAX_FOTOS[tipo] ? `
+                <label for="input-fotos-${tipo}" class="aspect-square rounded-xl border-2 border-dashed border-verde-chip/35 bg-verde-suave/40 hover:bg-verde-suave text-verde-ingles flex flex-col items-center justify-center gap-1 cursor-pointer transition text-center px-1">
+                    ${svg('M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9zM15 13a3 3 0 11-6 0 3 3 0 016 0z', 'w-6 h-6')}
+                    <span class="text-xs font-semibold leading-tight">${tipo === 'post' && !lista.length ? 'Sumar fotos de cómo te salió' : 'Agregar fotos'}</span>
+                </label>` : '';
+            cont.className = tipo === 'post' && !lista.length ? 'grid grid-cols-1' : (tipo === 'receta' ? 'grid grid-cols-3 sm:grid-cols-4 gap-2' : 'grid grid-cols-4 gap-2');
+            cont.innerHTML = miniaturas + (tipo === 'post' && !lista.length
+                ? agregar.replace('aspect-square', 'h-14 !flex-row').replace('w-6 h-6', 'w-5 h-5')
+                : agregar);
+        }
+
+        function limpiarFotosForm(tipo) {
+            fotosForm[tipo].forEach(f => { if (f.vista) URL.revokeObjectURL(f.vista); });
+            fotosForm[tipo] = [];
+            pintarFotosForm(tipo);
+        }
+
+        // Sube las fotos nuevas y devuelve la lista final de URLs, en orden
+        async function subirFotosForm(tipo, alAvanzar) {
+            const lista = fotosForm[tipo];
+            const nuevas = lista.filter(f => f.archivo).length;
+            let hechas = 0;
+            const urls = [];
+            for (const f of lista) {
+                if (f.url) { urls.push(f.url); continue; }
+                if (alAvanzar) alAvanzar(++hechas, nuevas);
+                f.url = await subirFoto(f.archivo);
+                URL.revokeObjectURL(f.vista);
+                delete f.archivo; delete f.vista;
+                urls.push(f.url);
+            }
+            return urls;
+        }
+
+        // Visor a pantalla completa
+        let visor = { fotos: [], i: 0 };
+        const galerias = {};
+        function abrirVisor(clave, i) {
+            const fotos = galerias[clave];
+            if (!fotos || !fotos.length) return;
+            visor = { fotos, i: i || 0 };
+            pintarVisor();
+            el('visor-fotos').classList.remove('hidden');
+        }
+        function pintarVisor() {
+            el('visor-img').src = visor.fotos[visor.i];
+            const varias = visor.fotos.length > 1;
+            el('visor-ant').classList.toggle('hidden', !varias);
+            el('visor-sig').classList.toggle('hidden', !varias);
+            el('visor-contador').innerText = varias ? `${visor.i + 1} de ${visor.fotos.length}` : '';
+        }
+        function moverVisor(d) {
+            visor.i = (visor.i + d + visor.fotos.length) % visor.fotos.length;
+            pintarVisor();
+        }
+        function cerrarVisor() { el('visor-fotos').classList.add('hidden'); el('visor-img').src = ''; }
+        document.addEventListener('keydown', e => {
+            if (el('visor-fotos').classList.contains('hidden')) return;
+            if (e.key === 'Escape') cerrarVisor();
+            if (e.key === 'ArrowLeft') moverVisor(-1);
+            if (e.key === 'ArrowRight') moverVisor(1);
+        });
+
+        // Grilla de fotos (posts) o tira (detalle de receta)
+        function grillaFotos(fotos, clave) {
+            if (!fotos.length) return '';
+            galerias[clave] = fotos;
+            const n = Math.min(fotos.length, 4);
+            const cols = n === 1 ? 'grid-cols-1' : 'grid-cols-2';
+            return `<div class="grid ${cols} gap-1.5 rounded-xl overflow-hidden">${fotos.slice(0, 4).map((u, i) => `
+                <button type="button" onclick="abrirVisor('${esc(clave)}', ${i})" class="relative block bg-beige-base ${n === 1 ? 'aspect-[4/3]' : (n === 3 && i === 0 ? 'row-span-2 aspect-auto' : 'aspect-square')}">
+                    <img src="${esc(u)}" alt="" loading="lazy" class="absolute inset-0 w-full h-full object-cover">
+                </button>`).join('')}</div>`;
+        }
+
+        function tiraFotos(fotos, clave) {
+            if (fotos.length < 2) return '';
+            galerias[clave] = fotos;
+            return `<div class="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1 snap-x">${fotos.map((u, i) => `
+                <button type="button" onclick="abrirVisor('${esc(clave)}', ${i})" class="relative shrink-0 w-28 h-28 rounded-xl overflow-hidden bg-beige-base ring-1 ring-beige-border snap-start">
+                    <img src="${esc(u)}" alt="" loading="lazy" class="absolute inset-0 w-full h-full object-cover">
+                </button>`).join('')}</div>`;
+        }
+
         // ---------- Piezas visuales compartidas ----------
         // Botón de ícono: siempre 36×36, ícono de 18px, mismo radio
         const BTN_ICONO = 'w-9 h-9 shrink-0 inline-flex items-center justify-center rounded-xl transition ';
@@ -1916,7 +2132,7 @@
 
             const chipsIngredientes = r.ingredientes.map(ing => {
                 const esIncluido = ingredientesIncluidos.includes(ing);
-                return `<span class="inline-flex items-center h-7 px-2.5 rounded-lg text-xs ${esIncluido ? 'bg-verde-chip text-white font-semibold' : 'bg-beige-base text-tinta/75'}">${esc(ing)}</span>`;
+                return `<span class="inline-flex items-center h-7 px-2.5 rounded-lg text-xs ${esIncluido ? 'bg-verde-chip text-white font-semibold' : 'bg-verde-suave/70 text-verde-ingles'}">${esc(ing)}</span>`;
             }).join('');
 
             const pill = (href, icono, texto, clase) => `
@@ -1950,10 +2166,18 @@
 
             const claseArticulo = opts.anidada
                 ? 'p-5 space-y-4'
-                : 'bg-white rounded-2xl p-5 sm:p-6 shadow-soft ring-1 ring-beige-border space-y-4';
+                : 'bg-white rounded-2xl p-5 sm:p-6 shadow-soft ring-1 ring-beige-border space-y-4 overflow-hidden';
+            const claveGaleria = 'r-' + ctx + '-' + r.id;
+            if (r.fotos.length) galerias[claveGaleria] = r.fotos;
+            const portada = r.fotos.length ? `
+                <button type="button" onclick="abrirVisor('${esc(claveGaleria)}', 0)" class="relative block ${opts.anidada ? '-mx-5 -mt-5 w-[calc(100%+2.5rem)]' : '-mx-5 -mt-5 sm:-mx-6 sm:-mt-6 w-[calc(100%+2.5rem)] sm:w-[calc(100%+3rem)]'} aspect-[16/10] sm:aspect-[21/9] bg-beige-base overflow-hidden">
+                    <img src="${esc(r.fotos[0])}" alt="${esc(r.nombre)}" loading="lazy" class="absolute inset-0 w-full h-full object-cover">
+                    ${r.fotos.length > 1 ? `<span class="absolute right-3 bottom-3 inline-flex items-center gap-1 text-xs font-semibold bg-verde-ingles/85 text-white px-2.5 h-7 rounded-full">${svg('M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z', 'w-3.5 h-3.5')}${r.fotos.length}</span>` : ''}
+                </button>` : '';
 
             return `
             <article class="${claseArticulo}">
+                ${portada}
                 ${(propia || opts.ocultarAutor) ? '' : `<div>${chipAutor(r.userId, ctx === 'inicio' ? tiempoRelativo(r.creada) : '')}</div>`}
 
                 <div class="flex justify-between items-start gap-3">
@@ -1976,10 +2200,11 @@
                         <button type="button" onclick="compartirReceta('${idAttr}')" title="Copiar enlace para compartir" class="${BTN_ICONO_NEUTRO} !w-8 !h-8 !rounded-full">${svg(ICONO_COMPARTIR, 'w-4 h-4')}</button>
                         <span class="ml-1">${resumenResenasCompacto(r.id)}</span>
                     </div>
-                    <button id="btn-det-${ctx}-${idAttr}" onclick="toggleDetalle('${ctx}', '${idAttr}')" class="${PILDORA} shrink-0 bg-white text-verde-ingles border-beige-border hover:bg-beige-base">${etiquetaVerMas(abierta)}</button>
+                    <button id="btn-det-${ctx}-${idAttr}" onclick="toggleDetalle('${ctx}', '${idAttr}')" class="${PILDORA} shrink-0 bg-verde-suave/60 text-verde-ingles border-transparent hover:bg-verde-suave">${etiquetaVerMas(abierta)}</button>
                 </div>
 
                 <div id="det-${ctx}-${idAttr}" class="${abierta ? '' : 'hidden'} pt-1 space-y-5">
+                    ${tiraFotos(r.fotos, claveGaleria)}
                     <div class="space-y-2">
                         <h4 class="text-sm font-semibold text-verde-ingles">Ingredientes${r.porciones ? ` <span class="font-normal text-tinta/55">· para ${esc(r.porciones)}</span>` : ''}</h4>
                         <div class="rounded-xl overflow-hidden ring-1 ring-beige-border bg-white">
@@ -2053,6 +2278,7 @@
             <article class="bg-white rounded-2xl p-4 sm:p-5 shadow-soft ring-1 ring-beige-border space-y-3">
                 <div class="flex items-center justify-between gap-3">${chipAutor(p.userId, tiempoRelativo(p.creada))}${notaRepost}</div>
                 ${caption}
+                ${grillaFotos(p.fotos || [], 'p-' + ctx + '-' + p.id)}
                 <div class="bg-fondo/70 ring-1 ring-beige-border rounded-xl overflow-hidden">
                     ${tarjetaReceta(r, ctx + 'p' + String(p.id).replace(/[^a-zA-Z0-9_-]/g, ''), { ocultarAutor: !esRepost, anidada: true })}
                 </div>
@@ -2168,6 +2394,7 @@
             el('compartir-post-receta').innerText = r ? r.nombre : '';
             el('compartir-post-receta').classList.toggle('hidden', !r);
             el('compartir-post-descripcion').value = '';
+            limpiarFotosForm('post');
             el('modal-compartir-post').classList.remove('hidden');
             setTimeout(() => el('compartir-post-descripcion').focus(), 50);
         }
@@ -2183,6 +2410,7 @@
         }
 
         function omitirCompartirPost() {
+            limpiarFotosForm('post');
             recetaParaCompartirPost = null;
             el('modal-compartir-post').classList.add('hidden');
         }
@@ -2194,12 +2422,15 @@
             const btn = el('btn-confirmar-post');
             btn.disabled = true;
             try {
+                const fotos = await subirFotosForm('post', (n, total) => { btn.innerText = `Subiendo ${n} de ${total}…`; });
+                btn.innerText = 'Publicando…';
                 // Si ya existe un post tuyo de esta receta, solo se actualiza la descripción
                 const previo = await db.from('publicaciones').select('id')
                     .eq('user_id', usuarioActual.id).eq('receta_id', recetaId).limit(1).maybeSingle();
+                const cambios = fotos.length ? { descripcion, fotos } : { descripcion };
                 const { error } = previo.data
-                    ? await db.from('publicaciones').update({ descripcion }).eq('id', previo.data.id)
-                    : await db.from('publicaciones').insert({ user_id: usuarioActual.id, receta_id: recetaId, descripcion });
+                    ? await db.from('publicaciones').update(cambios).eq('id', previo.data.id)
+                    : await db.from('publicaciones').insert({ user_id: usuarioActual.id, receta_id: recetaId, descripcion, fotos });
                 if (error) throw error;
                 omitirCompartirPost();
                 toast(previo.data ? 'Publicación actualizada' : 'Publicado en tu perfil');
@@ -2209,6 +2440,7 @@
                 toast('No se pudo publicar: ' + (err.message || 'error desconocido'));
             } finally {
                 btn.disabled = false;
+                btn.innerText = 'Publicar';
             }
         }
 
@@ -3079,11 +3311,13 @@
 
         async function eliminarReceta(id) {
             if (!confirm('¿Seguro que deseas eliminar esta receta?')) return;
+            const fotosDeLaReceta = (buscarReceta(id) || {}).fotos || [];
             const { error } = await db.from('recetas').delete().eq('id', id);
             if (error) {
                 alert('Error al eliminar la receta: ' + error.message);
                 return;
             }
+            borrarFotos(fotosDeLaReceta);
             delete recetasVistas[id];
             if (perfilVisto) perfilVisto.recetas = perfilVisto.recetas.filter(x => x.id !== id);
             if (detalleActual && detalleActual.recetas) detalleActual.recetas = detalleActual.recetas.filter(x => x.id !== id);
@@ -3567,6 +3801,7 @@
             document.getElementById('app-principal').classList.remove('hidden');
 
             recuperarEnlacePendiente();
+            pintarFotosForm('receta');
             pintarTipoFiltro();
             pintarCategoriaFiltro();
             await cargarPerfil();
