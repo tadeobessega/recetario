@@ -7,9 +7,16 @@
     "binding": "ASSETS"
   },
   "vars": {
-    // Opcional. Plantilla del servicio de monetización, con {url} donde va el destino.
-    // Vacío = redirección directa, sin monetizar.
-    "MONETIZAR_URL": ""
+    // Monetización de los enlaces de salida (/go). Ver README.md → "Monetizar los enlaces".
+    // Opción 1: acortador que paga por clic, con {url} donde va el destino.
+    //   Ej: "https://servicio.com/api?api=TU_TOKEN&url={url}"
+    "MONETIZAR_URL": "",
+    // Opción 2: página propia con un anuncio de AdSense antes de salir.
+    //   Ej: "ca-pub-1234567890123456" y el ID de un bloque de anuncios.
+    //   Con ADSENSE_CLIENTE cargado también se sirve /ads.txt.
+    "ADSENSE_CLIENTE": "",
+    "ADSENSE_BLOQUE_SALIDA": ""
+    // Las dos vacías = salida directa, sin monetizar.
   },
   "rules": [
     {
