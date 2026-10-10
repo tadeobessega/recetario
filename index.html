@@ -772,7 +772,7 @@
         let canalNotificacionesRT = null;
         let recetaParaColeccion = null;
         let recetaParaCompartirPost = null;
-        const ANUNCIO_CADA_N_POSTS = 6;
+        const ANUNCIO_CADA_N_POSTS = 10; // publicidad mínima en el feed: 1 cada 10 posts
         let estadoExpandido = {};
 
         window.onload = async function() {
@@ -2265,6 +2265,7 @@
         }
 
         function tarjetaAnuncio(indice) {
+            if (!ANUNCIOS_ACTIVOS) return '';
             if (ANUNCIOS_ACTIVOS) {
                 return `
             <div class="bg-white ring-1 ring-beige-border rounded-2xl p-4 space-y-2 overflow-hidden">
