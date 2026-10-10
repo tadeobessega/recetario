@@ -4,38 +4,50 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mi Recetario Personal</title>
-    <!-- Tipografía: Inter -->
+    <!-- Tipografía: Bricolage Grotesque (títulos) + Figtree (texto) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <meta name="theme-color" content="#F4F5F0">
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Supabase JS Client -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
     <script>
+        // Paleta "huerta": papel salvia, albahaca, hoja, yema y tomate.
+        // Los nombres de las clases se mantienen para no tocar todo el HTML.
         tailwind.config = {
             theme: {
                 extend: {
                     fontFamily: {
-                        sans: ['Inter', 'ui-sans-serif', 'system-ui', '-apple-system', '"Segoe UI"', 'Roboto', 'Arial', 'sans-serif'],
+                        sans: ['Figtree', 'ui-sans-serif', 'system-ui', '-apple-system', '"Segoe UI"', 'Roboto', 'Arial', 'sans-serif'],
+                        display: ['"Bricolage Grotesque"', 'Figtree', 'ui-sans-serif', 'system-ui', 'sans-serif'],
                     },
                     colors: {
-                        'fondo': '#fffdf9',
-                        'beige-base': '#f8f6f0',
-                        'beige-card': '#ffffff',
-                        'beige-border': '#ebe7dc',
-                        'verde-ingles': '#1b4332',
-                        'verde-hover': '#2d5a27',
-                        'verde-chip': '#2d6a4f',
-                        'mostaza': '#c68b59',
-                        'mostaza-hover': '#b07d3b',
-                        'rojo-excluir': '#c0392b',
-                        'rojo-hover': '#a93226'
+                        'fondo': '#F4F5F0',        // papel salvia
+                        'beige-base': '#EDF0E7',   // superficies suaves, inputs
+                        'beige-card': '#FFFFFF',
+                        'beige-border': '#DDE2D5', // líneas
+                        'verde-ingles': '#1E4D36', // albahaca (principal)
+                        'verde-hover': '#163B29',
+                        'verde-chip': '#2E7D57',   // hoja (activo, ok)
+                        'verde-suave': '#DCEBDF',
+                        'mostaza': '#F0B429',      // yema (acento)
+                        'mostaza-hover': '#E0A115',
+                        'yema-suave': '#FCEFC7',
+                        'rosa-suave': '#F8DDE2',
+                        'rosa-texto': '#8E2F47',
+                        'tinta': '#26332C',
+                        'rojo-excluir': '#C8432B', // tomate
+                        'rojo-hover': '#A9361F'
                     },
                     boxShadow: {
-                        'soft': '0 1px 2px rgba(27, 67, 50, 0.04), 0 6px 20px rgba(27, 67, 50, 0.05)',
-                        'soft-lg': '0 12px 40px rgba(27, 67, 50, 0.10)'
+                        'soft': '0 1px 0 rgba(30, 77, 54, 0.04), 0 2px 10px -4px rgba(30, 77, 54, 0.10)',
+                        'soft-lg': '0 18px 50px -12px rgba(30, 77, 54, 0.25)'
+                    },
+                    borderRadius: {
+                        '2xl': '1.25rem'
                     }
                 }
             }
@@ -45,56 +57,60 @@
         *, *::before, *::after, ::placeholder { font-style: normal !important; }
         em, i, cite, address, dfn, var { font-style: normal !important; }
         body {
-            background-color: #fffdf9;
-            color: #2b2d42;
-            font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
-            letter-spacing: 0.02em;
-            line-height: 1.65;
+            background-color: #F4F5F0;
+            color: #26332C;
+            font-family: 'Figtree', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+            line-height: 1.6;
+            -webkit-tap-highlight-color: transparent;
         }
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
+        h1, h2, h3, .font-display {
+            font-family: 'Bricolage Grotesque', 'Figtree', ui-sans-serif, system-ui, sans-serif;
+            letter-spacing: -0.015em;
         }
-        ::-webkit-scrollbar-track {
-            background: #fffdf9;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #c68b59;
-            border-radius: 4px;
-        }
+        /* Íconos: un solo grosor de trazo en toda la app */
+        svg[stroke="currentColor"] path { stroke-width: 1.8; }
+        ::selection { background: #FCEFC7; }
+        :focus-visible { outline: 2px solid #2E7D57; outline-offset: 2px; border-radius: 10px; }
+        input:focus, textarea:focus { background-color: #fff; }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #CBD2C3; border-radius: 8px; border: 2px solid #F4F5F0; }
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(-2px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        .chip-anim {
-            animation: fadeIn 0.15s ease-out forwards;
+        .chip-anim { animation: fadeIn 0.15s ease-out forwards; }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation: none !important; transition: none !important; }
+        }
+        /* Espacio para la barra de pestañas de abajo en el celular */
+        @media (max-width: 639px) {
+            #app-principal main { padding-bottom: calc(6rem + env(safe-area-inset-bottom)); }
         }
     </style>
 </head>
-<body class="min-h-screen flex flex-col font-sans antialiased bg-fondo text-gray-800">
+<body class="min-h-screen flex flex-col font-sans antialiased bg-fondo text-tinta">
 
     <!-- PANTALLA DE LOGIN -->
     <div id="pantalla-login" class="min-h-screen flex items-center justify-center p-4">
-        <div class="bg-beige-card w-full max-w-sm rounded-2xl p-6 sm:p-8 shadow-soft-lg border border-beige-border space-y-6">
-            <div class="text-center space-y-2">
-                <div class="inline-flex p-3 bg-beige-base rounded-2xl border border-beige-border text-verde-ingles">
-                    <svg class="w-8 h-8 text-mostaza" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
-                    </svg>
-                </div>
-                <h1 class="text-xl font-semibold text-verde-ingles">Mi Recetario</h1>
-                <p class="text-xs text-gray-500 leading-relaxed">Guardá tus recetas, organizalas en colecciones y seguí a otras personas para ver lo que cocinan.</p>
-                <p id="login-subtitulo" class="text-sm text-gray-500">Inicia sesión para ver tus recetas</p>
-                <p id="login-aviso-enlace" class="hidden text-xs text-verde-ingles bg-beige-base border border-beige-border rounded-lg p-2.5">Ingresá o creá tu cuenta para ver lo que te compartieron.</p>
+        <div class="bg-beige-card w-full max-w-sm rounded-[1.75rem] p-7 sm:p-9 shadow-soft-lg space-y-6">
+            <div class="space-y-3">
+                <span class="w-12 h-12 rounded-2xl bg-verde-ingles text-mostaza flex items-center justify-center">
+                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 11h14v4.5A4.5 4.5 0 0114.5 20h-5A4.5 4.5 0 015 15.5V11zM3 11h18M9.5 7.5c0-1 .7-1.5.7-2.5M13.8 7.5c0-1 .7-1.5.7-2.5"></path></svg>
+                </span>
+                <h1 class="font-display text-3xl font-bold text-verde-ingles tracking-tight">Mi Recetario</h1>
+                <p class="text-sm text-tinta/70 leading-relaxed">Guardá tus recetas, armá colecciones y mirá qué cocina la gente que seguís.</p>
+                <p id="login-subtitulo" class="text-sm font-semibold text-verde-ingles pt-1">Iniciá sesión para ver tus recetas</p>
+                <p id="login-aviso-enlace" class="hidden text-xs text-verde-ingles bg-yema-suave rounded-lg p-2.5">Ingresá o creá tu cuenta para ver lo que te compartieron.</p>
             </div>
 
             <div id="bloque-google" class="space-y-4">
-                <button type="button" onclick="ingresarConGoogle()" class="w-full flex items-center justify-center gap-3 bg-white border border-beige-border hover:bg-beige-base text-gray-700 py-3 rounded-xl text-sm font-medium shadow-soft transition">
+                <button type="button" onclick="ingresarConGoogle()" class="w-full flex items-center justify-center gap-3 bg-white border border-beige-border hover:bg-beige-base text-tinta/80 py-3 rounded-xl text-sm font-medium shadow-soft transition">
                     <svg class="w-5 h-5" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
                     <span>Continuar con Google</span>
                 </button>
                 <div id="google-mensaje" class="hidden"></div>
-                <div class="flex items-center gap-3 text-xs text-gray-400">
+                <div class="flex items-center gap-3 text-xs text-tinta/45">
                     <span class="flex-1 h-px bg-beige-border"></span>
                     <span>o con usuario o email</span>
                     <span class="flex-1 h-px bg-beige-border"></span>
@@ -104,15 +120,15 @@
             <form id="form-login" onsubmit="ejecutarLogin(event)" class="space-y-5">
                 <div>
                     <label class="block text-sm font-medium text-verde-ingles mb-2">Usuario</label>
-                    <input type="text" id="login-usuario" required placeholder="Usuario" class="w-full p-3 bg-beige-base border border-beige-border rounded-xl text-sm focus:ring-1 focus:ring-verde-ingles focus:outline-none">
+                    <input type="text" id="login-usuario" required placeholder="Usuario" class="w-full p-3 bg-beige-base border border-beige-border rounded-xl text-sm focus:ring-2 focus:ring-verde-chip/25 focus:border-verde-chip focus:outline-none">
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-verde-ingles mb-2">Contraseña</label>
-                    <input type="password" id="login-password" required placeholder="••••••••" class="w-full p-3 bg-beige-base border border-beige-border rounded-xl text-sm focus:ring-1 focus:ring-verde-ingles focus:outline-none">
+                    <input type="password" id="login-password" required placeholder="••••••••" class="w-full p-3 bg-beige-base border border-beige-border rounded-xl text-sm focus:ring-2 focus:ring-verde-chip/25 focus:border-verde-chip focus:outline-none">
                 </div>
 
                 <div class="flex justify-end -mt-2">
-                    <button type="button" onclick="mostrarModoAuth('olvide')" class="text-xs text-gray-500 hover:text-verde-ingles underline">¿Olvidaste tu contraseña?</button>
+                    <button type="button" onclick="mostrarModoAuth('olvide')" class="text-xs text-tinta/60 hover:text-verde-ingles underline">¿Olvidaste tu contraseña?</button>
                 </div>
 
                 <div id="login-error" class="hidden text-sm text-rojo-excluir text-center font-medium bg-red-50 p-2 rounded-lg border border-red-200"></div>
@@ -120,26 +136,26 @@
                 <button type="submit" id="btn-login-submit" class="w-full bg-verde-ingles hover:bg-verde-hover text-white py-2.5 rounded-xl text-sm font-medium shadow-soft transition flex items-center justify-center gap-2">
                     <span>Ingresar</span>
                 </button>
-                <p class="text-center text-sm text-gray-500">¿No tenés cuenta? <button type="button" onclick="mostrarRegistro(true)" class="text-verde-ingles font-medium underline">Registrate</button></p>
+                <p class="text-center text-sm text-tinta/60">¿No tenés cuenta? <button type="button" onclick="mostrarRegistro(true)" class="text-verde-ingles font-medium underline">Registrate</button></p>
             </form>
 
             <form id="form-registro" onsubmit="ejecutarRegistro(event)" class="hidden space-y-4">
                 <div>
                     <label class="block text-sm font-medium text-verde-ingles mb-2">Nombre</label>
-                    <input type="text" id="reg-nombre" required placeholder="Tu nombre" class="w-full p-3 bg-beige-base border border-beige-border rounded-xl text-sm focus:ring-1 focus:ring-verde-ingles focus:outline-none">
+                    <input type="text" id="reg-nombre" required placeholder="Tu nombre" class="w-full p-3 bg-beige-base border border-beige-border rounded-xl text-sm focus:ring-2 focus:ring-verde-chip/25 focus:border-verde-chip focus:outline-none">
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-verde-ingles mb-2">Nombre de usuario</label>
-                    <input type="text" id="reg-usuario" required maxlength="20" autocapitalize="none" autocomplete="off" placeholder="tu_usuario" oninput="verificarUsuarioLive()" class="w-full p-3 bg-beige-base border border-beige-border rounded-xl text-sm focus:ring-1 focus:ring-verde-ingles focus:outline-none">
-                    <p id="reg-usuario-hint" class="text-xs text-gray-500 mt-2">3 a 20 caracteres: letras minúsculas, números y _</p>
+                    <input type="text" id="reg-usuario" required maxlength="20" autocapitalize="none" autocomplete="off" placeholder="tu_usuario" oninput="verificarUsuarioLive()" class="w-full p-3 bg-beige-base border border-beige-border rounded-xl text-sm focus:ring-2 focus:ring-verde-chip/25 focus:border-verde-chip focus:outline-none">
+                    <p id="reg-usuario-hint" class="text-xs text-tinta/60 mt-2">3 a 20 caracteres: letras minúsculas, números y _</p>
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-verde-ingles mb-2">Email</label>
-                    <input type="email" id="reg-email" required placeholder="tu@email.com" class="w-full p-3 bg-beige-base border border-beige-border rounded-xl text-sm focus:ring-1 focus:ring-verde-ingles focus:outline-none">
+                    <input type="email" id="reg-email" required placeholder="tu@email.com" class="w-full p-3 bg-beige-base border border-beige-border rounded-xl text-sm focus:ring-2 focus:ring-verde-chip/25 focus:border-verde-chip focus:outline-none">
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-verde-ingles mb-2">Contraseña</label>
-                    <input type="password" id="reg-password" required minlength="6" placeholder="Mínimo 6 caracteres" class="w-full p-3 bg-beige-base border border-beige-border rounded-xl text-sm focus:ring-1 focus:ring-verde-ingles focus:outline-none">
+                    <input type="password" id="reg-password" required minlength="6" placeholder="Mínimo 6 caracteres" class="w-full p-3 bg-beige-base border border-beige-border rounded-xl text-sm focus:ring-2 focus:ring-verde-chip/25 focus:border-verde-chip focus:outline-none">
                 </div>
 
                 <div id="reg-mensaje" class="hidden text-sm text-center font-medium p-2 rounded-lg border"></div>
@@ -147,28 +163,28 @@
                 <button type="submit" id="btn-registro-submit" class="w-full bg-verde-ingles hover:bg-verde-hover text-white py-2.5 rounded-xl text-sm font-medium shadow-soft transition flex items-center justify-center gap-2">
                     <span>Crear cuenta</span>
                 </button>
-                <p class="text-center text-sm text-gray-500">¿Ya tenés cuenta? <button type="button" onclick="mostrarRegistro(false)" class="text-verde-ingles font-medium underline">Ingresá</button></p>
+                <p class="text-center text-sm text-tinta/60">¿Ya tenés cuenta? <button type="button" onclick="mostrarRegistro(false)" class="text-verde-ingles font-medium underline">Ingresá</button></p>
             </form>
 
             <form id="form-olvide" onsubmit="enviarRecuperacion(event)" class="hidden space-y-5">
-                <p class="text-sm text-gray-500">Ingresá el email de tu cuenta y te enviamos un enlace para crear una contraseña nueva.</p>
+                <p class="text-sm text-tinta/60">Ingresá el email de tu cuenta y te enviamos un enlace para crear una contraseña nueva.</p>
                 <div>
                     <label class="block text-sm font-medium text-verde-ingles mb-2">Email</label>
-                    <input type="email" id="olvide-email" required placeholder="tu@email.com" class="w-full p-3 bg-beige-base border border-beige-border rounded-xl text-sm focus:ring-1 focus:ring-verde-ingles focus:outline-none">
+                    <input type="email" id="olvide-email" required placeholder="tu@email.com" class="w-full p-3 bg-beige-base border border-beige-border rounded-xl text-sm focus:ring-2 focus:ring-verde-chip/25 focus:border-verde-chip focus:outline-none">
                 </div>
                 <div id="olvide-mensaje" class="hidden"></div>
                 <button type="submit" id="btn-olvide" class="w-full bg-verde-ingles hover:bg-verde-hover text-white py-3 rounded-xl text-sm font-medium shadow-soft transition flex items-center justify-center gap-2"><span>Enviar enlace</span></button>
-                <p class="text-center text-sm text-gray-500"><button type="button" onclick="mostrarModoAuth('login')" class="text-verde-ingles font-medium underline">Volver a ingresar</button></p>
+                <p class="text-center text-sm text-tinta/60"><button type="button" onclick="mostrarModoAuth('login')" class="text-verde-ingles font-medium underline">Volver a ingresar</button></p>
             </form>
 
             <form id="form-nueva-clave" onsubmit="guardarNuevaClave(event)" class="hidden space-y-5">
                 <div>
                     <label class="block text-sm font-medium text-verde-ingles mb-2">Nueva contraseña</label>
-                    <input type="password" id="clave-nueva" required minlength="6" placeholder="Mínimo 6 caracteres" class="w-full p-3 bg-beige-base border border-beige-border rounded-xl text-sm focus:ring-1 focus:ring-verde-ingles focus:outline-none">
+                    <input type="password" id="clave-nueva" required minlength="6" placeholder="Mínimo 6 caracteres" class="w-full p-3 bg-beige-base border border-beige-border rounded-xl text-sm focus:ring-2 focus:ring-verde-chip/25 focus:border-verde-chip focus:outline-none">
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-verde-ingles mb-2">Repetir contraseña</label>
-                    <input type="password" id="clave-repetir" required minlength="6" placeholder="Repetí la contraseña" class="w-full p-3 bg-beige-base border border-beige-border rounded-xl text-sm focus:ring-1 focus:ring-verde-ingles focus:outline-none">
+                    <input type="password" id="clave-repetir" required minlength="6" placeholder="Repetí la contraseña" class="w-full p-3 bg-beige-base border border-beige-border rounded-xl text-sm focus:ring-2 focus:ring-verde-chip/25 focus:border-verde-chip focus:outline-none">
                 </div>
                 <div id="clave-mensaje" class="hidden"></div>
                 <button type="submit" id="btn-nueva-clave" class="w-full bg-verde-ingles hover:bg-verde-hover text-white py-3 rounded-xl text-sm font-medium shadow-soft transition flex items-center justify-center gap-2"><span>Guardar contraseña</span></button>
@@ -178,79 +194,78 @@
 
     <!-- APP PRINCIPAL -->
     <div id="app-principal" class="hidden min-h-screen flex flex-col">
-        <header class="bg-verde-ingles text-beige-card shadow-soft sticky top-0 z-30">
-            <div class="max-w-4xl mx-auto px-4 sm:px-6 pt-3.5 pb-2.5 flex flex-row justify-between items-center gap-3">
-                <div class="flex items-center gap-2.5">
-                    <div class="p-2 bg-verde-hover/60 rounded-xl">
-                        <svg class="w-5 h-5 text-mostaza" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
-                        </svg>
-                    </div>
-                    <h1 class="text-lg font-semibold text-white">Mi Recetario</h1>
-                </div>
+        <header class="sticky top-0 z-30 bg-fondo sm:bg-fondo/90 sm:backdrop-blur-md border-b border-beige-border">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-3">
+                <button type="button" onclick="cambiarPestana('inicio')" class="flex items-center gap-2.5 min-w-0" title="Inicio">
+                    <span class="w-9 h-9 rounded-xl bg-verde-ingles text-mostaza flex items-center justify-center shrink-0">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 11h14v4.5A4.5 4.5 0 0114.5 20h-5A4.5 4.5 0 015 15.5V11zM3 11h18M9.5 7.5c0-1 .7-1.5.7-2.5M13.8 7.5c0-1 .7-1.5.7-2.5"></path></svg>
+                    </span>
+                    <span class="font-display text-xl font-bold text-verde-ingles tracking-tight whitespace-nowrap">Mi Recetario</span>
+                </button>
 
-                <div class="flex items-center gap-2 sm:gap-3">
-                    <button onclick="cambiarPestana('agregar')" title="Agregar receta" class="flex items-center gap-1.5 bg-mostaza hover:bg-mostaza-hover text-white px-3 sm:px-4 py-2 rounded-xl text-sm font-medium transition">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                <div class="flex items-center gap-1 sm:gap-1.5">
+                    <button onclick="cambiarPestana('agregar')" title="Agregar receta" class="flex items-center gap-1.5 bg-mostaza hover:bg-mostaza-hover text-verde-ingles h-9 px-3 sm:px-4 rounded-xl text-sm font-semibold transition mr-1">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v14m7-7H5"></path></svg>
                         <span class="hidden sm:inline">Agregar receta</span>
                     </button>
-                    <button onclick="abrirNotificaciones()" title="Notificaciones" class="relative p-2 text-green-200 hover:text-white hover:bg-verde-hover/60 rounded-xl transition">
+                    <button onclick="abrirNotificaciones()" title="Notificaciones" class="relative w-9 h-9 flex items-center justify-center text-verde-ingles/70 hover:text-verde-ingles hover:bg-beige-base rounded-xl transition">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
-                        <span id="badge-notificaciones" class="hidden absolute -top-0.5 -right-0.5 min-w-[16px] h-4 px-1 rounded-full bg-mostaza text-white text-[10px] font-semibold flex items-center justify-center">0</span>
+                        <span id="badge-notificaciones" class="hidden absolute top-0.5 right-0.5 min-w-[17px] h-[17px] px-1 rounded-full bg-rojo-excluir text-white text-[10px] font-bold flex items-center justify-center ring-2 ring-fondo">0</span>
                     </button>
-                    <button onclick="abrirMensajes()" title="Mensajes" class="relative p-2 text-green-200 hover:text-white hover:bg-verde-hover/60 rounded-xl transition">
+                    <button onclick="abrirMensajes()" title="Mensajes" class="relative w-9 h-9 flex items-center justify-center text-verde-ingles/70 hover:text-verde-ingles hover:bg-beige-base rounded-xl transition">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
-                        <span id="badge-mensajes" class="hidden absolute -top-0.5 -right-0.5 min-w-[16px] h-4 px-1 rounded-full bg-mostaza text-white text-[10px] font-semibold flex items-center justify-center">0</span>
+                        <span id="badge-mensajes" class="hidden absolute top-0.5 right-0.5 min-w-[17px] h-[17px] px-1 rounded-full bg-rojo-excluir text-white text-[10px] font-bold flex items-center justify-center ring-2 ring-fondo">0</span>
                     </button>
-                    <button id="btn-avatar-header" onclick="verPerfilPropio()" title="Mi perfil" class="rounded-full ring-2 ring-white/20 hover:ring-white/70 transition"></button>
-                    <button onclick="cerrarSesion()" title="Cerrar Sesión" class="p-2 text-green-200 hover:text-white hover:bg-verde-hover/60 rounded-xl transition">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                    <button id="btn-avatar-header" onclick="verPerfilPropio()" title="Mi perfil" class="hidden sm:block ml-1 rounded-full ring-2 ring-transparent hover:ring-verde-chip/40 transition"></button>
+                    <button onclick="cerrarSesion()" title="Cerrar sesión" class="w-9 h-9 flex items-center justify-center text-verde-ingles/50 hover:text-rojo-excluir hover:bg-beige-base rounded-xl transition">
+                        <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
                     </button>
                 </div>
             </div>
-            <div class="max-w-4xl mx-auto px-4 sm:px-6 pb-3">
-                <nav class="flex gap-1 bg-verde-hover/50 p-1 rounded-xl">
-                        <button id="tab-btn-inicio" onclick="cambiarPestana('inicio')" class="flex-1">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
-                            <span>Inicio</span>
-                        </button>
-                        <button id="tab-btn-filtrar" onclick="cambiarPestana('filtrar')" class="flex-1">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
-                            <span>Recetas</span>
-                        </button>
-                        <button id="tab-btn-colecciones" onclick="cambiarPestana('colecciones')" class="flex-1">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
-                            <span>Colecciones</span>
-                        </button>
-                        <button id="tab-btn-explorar" onclick="cambiarPestana('explorar')" class="flex-1">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                            <span>Explorar</span>
-                        </button>
-                        <button id="tab-btn-perfil" onclick="verPerfilPropio()" class="flex-1">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
-                            <span>Perfil</span>
-                        </button>
-                </nav>
-            </div>
+            <!-- Pestañas: arriba en compu, barra fija abajo en el celular -->
+            <nav id="nav-pestanas" class="fixed sm:static bottom-0 inset-x-0 z-40 bg-white/95 sm:bg-transparent backdrop-blur-md sm:backdrop-blur-0 border-t sm:border-0 border-beige-border pb-[env(safe-area-inset-bottom)] sm:pb-0">
+                <div class="max-w-4xl mx-auto px-2 sm:px-6 flex sm:gap-1 sm:pb-3">
+                <button id="tab-btn-inicio" onclick="cambiarPestana('inicio')" class="">
+                    <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                    <span>Inicio</span>
+                </button>
+                <button id="tab-btn-filtrar" onclick="cambiarPestana('filtrar')" class="">
+                    <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
+                    <span>Recetas</span>
+                </button>
+                <button id="tab-btn-colecciones" onclick="cambiarPestana('colecciones')" class="">
+                    <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V7z"></path></svg>
+                    <span>Colecciones</span>
+                </button>
+                <button id="tab-btn-explorar" onclick="cambiarPestana('explorar')" class="">
+                    <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    <span>Explorar</span>
+                </button>
+                <button id="tab-btn-perfil" onclick="verPerfilPropio()" class="">
+                    <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                    <span>Perfil</span>
+                </button>
+                </div>
+            </nav>
         </header>
 
-        <main class="flex-grow max-w-4xl w-full mx-auto px-4 sm:px-6 py-10">
+        <main class="flex-grow max-w-4xl w-full mx-auto px-4 sm:px-6 pt-6 sm:pt-8 pb-12">
 
             <!-- PESTAÑA FILTRAR RECETAS -->
             <section id="pestana-filtrar" class="space-y-6">
-                <div id="card-filtros" class="bg-beige-card rounded-2xl p-5 sm:p-7 shadow-soft border border-beige-border space-y-5">
+                <div id="card-filtros" class="bg-beige-card rounded-2xl p-5 sm:p-7 shadow-soft ring-1 ring-beige-border space-y-5">
                     <div class="flex items-center justify-between pb-2 border-b border-beige-border/80">
                         <div class="flex items-center gap-2 text-verde-ingles font-semibold text-sm">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
-                            <span>Filtros de Búsqueda</span>
+                            <span>Filtros</span>
                         </div>
-                        <span id="contador-resultados" class="text-sm text-gray-500 bg-beige-base px-2.5 py-1 rounded-full border border-beige-border font-medium">
+                        <span id="contador-resultados" class="text-sm text-tinta/60 bg-beige-base px-2.5 py-1 rounded-full border border-beige-border font-medium">
                             0 recetas
                         </span>
                     </div>
 
                     <div>
-                        <label class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Mostrar</label>
+                        <label class="text-sm font-semibold text-verde-ingles">Mostrar</label>
                         <div id="filtro-categoria" class="flex flex-wrap gap-2 mt-1.5">
                             <button type="button" data-cat-filtro="propias" onclick="toggleCategoriaFiltro('propias')">Mis recetas</button>
                             <button type="button" data-cat-filtro="guardadas" onclick="toggleCategoriaFiltro('guardadas')">Guardadas</button>
@@ -266,8 +281,8 @@
                     </div>
 
                     <div class="relative">
-                        <svg class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                        <input type="text" id="input-busqueda-nombre" placeholder="Buscar por nombre o contenido..." oninput="filtrarRecetas()" class="w-full pl-10 pr-4 py-3 bg-beige-base border border-beige-border rounded-xl focus:outline-none focus:ring-1 focus:ring-verde-ingles text-sm">
+                        <svg class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-tinta/45" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                        <input type="text" id="input-busqueda-nombre" placeholder="Buscar por nombre o contenido..." oninput="filtrarRecetas()" class="w-full pl-10 pr-4 py-3 bg-beige-base border border-beige-border rounded-xl focus:outline-none focus:ring-2 focus:ring-verde-chip/25 focus:border-verde-chip text-sm">
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -278,15 +293,15 @@
                             </label>
                             <div class="relative">
                                 <button type="button" onclick="toggleDropdown('dropdown-incluir')" class="w-full bg-beige-base border border-beige-border rounded-xl p-3 text-left flex justify-between items-center text-sm shadow-sm hover:border-verde-ingles focus:outline-none">
-                                    <span class="text-gray-500 truncate" id="label-dropdown-incluir">Seleccionar ingrediente...</span>
-                                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                                    <span class="text-tinta/60 truncate" id="label-dropdown-incluir">Seleccionar ingrediente...</span>
+                                    <svg class="w-4 h-4 text-tinta/45" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                                 </button>
                                 <div id="dropdown-incluir" class="hidden absolute left-0 right-0 top-full mt-1 bg-white border border-beige-border rounded-xl shadow-soft-lg z-30 max-h-56 flex flex-col p-2 space-y-1.5">
-                                    <input type="text" id="search-incluir" placeholder="Buscar..." oninput="filtrarOpcionesDropdown('incluir')" class="w-full p-2.5 text-sm bg-beige-base border border-beige-border rounded-lg focus:outline-none focus:ring-1 focus:ring-verde-ingles">
+                                    <input type="text" id="search-incluir" placeholder="Buscar..." oninput="filtrarOpcionesDropdown('incluir')" class="w-full p-2.5 text-sm bg-beige-base border border-beige-border rounded-lg focus:outline-none focus:ring-2 focus:ring-verde-chip/25 focus:border-verde-chip">
                                     <div id="lista-opciones-incluir" class="overflow-y-auto space-y-0.5 flex-grow"></div>
                                 </div>
                             </div>
-                            <div id="container-chips-incluir" class="flex flex-wrap gap-1 min-h-[28px]"></div>
+                            <div id="container-chips-incluir" class="flex flex-wrap gap-1 empty:hidden"></div>
                         </div>
 
                         <div class="space-y-1.5">
@@ -296,20 +311,20 @@
                             </label>
                             <div class="relative">
                                 <button type="button" onclick="toggleDropdown('dropdown-excluir')" class="w-full bg-beige-base border border-beige-border rounded-xl p-3 text-left flex justify-between items-center text-sm shadow-sm hover:border-rojo-excluir focus:outline-none">
-                                    <span class="text-gray-500 truncate" id="label-dropdown-excluir">Seleccionar ingrediente...</span>
-                                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                                    <span class="text-tinta/60 truncate" id="label-dropdown-excluir">Seleccionar ingrediente...</span>
+                                    <svg class="w-4 h-4 text-tinta/45" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                                 </button>
                                 <div id="dropdown-excluir" class="hidden absolute left-0 right-0 top-full mt-1 bg-white border border-beige-border rounded-xl shadow-soft-lg z-30 max-h-56 flex flex-col p-2 space-y-1.5">
-                                    <input type="text" id="search-excluir" placeholder="Buscar..." oninput="filtrarOpcionesDropdown('excluir')" class="w-full p-2.5 text-sm bg-beige-base border border-beige-border rounded-lg focus:outline-none focus:ring-1 focus:ring-rojo-excluir">
+                                    <input type="text" id="search-excluir" placeholder="Buscar..." oninput="filtrarOpcionesDropdown('excluir')" class="w-full p-2.5 text-sm bg-beige-base border border-beige-border rounded-lg focus:outline-none focus:ring-2 focus:ring-rojo-excluir/20 focus:border-rojo-excluir">
                                     <div id="lista-opciones-excluir" class="overflow-y-auto space-y-0.5 flex-grow"></div>
                                 </div>
                             </div>
-                            <div id="container-chips-excluir" class="flex flex-wrap gap-1 min-h-[28px]"></div>
+                            <div id="container-chips-excluir" class="flex flex-wrap gap-1 empty:hidden"></div>
                         </div>
                     </div>
 
                     <div class="flex justify-end pt-1">
-                        <button type="button" onclick="limpiarFiltros()" class="text-sm text-gray-500 hover:text-verde-ingles font-medium flex items-center gap-1 transition">
+                        <button type="button" onclick="limpiarFiltros()" class="text-sm text-tinta/60 hover:text-verde-ingles font-medium flex items-center gap-1 transition">
                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
                             <span>Resetear filtros</span>
                         </button>
@@ -323,10 +338,10 @@
 
             <!-- PESTAÑA AGREGAR RECETA -->
             <section id="pestana-agregar" class="hidden">
-                <div class="bg-beige-card rounded-2xl p-6 sm:p-9 shadow-soft border border-beige-border space-y-6">
+                <div class="bg-beige-card rounded-2xl p-6 sm:p-9 shadow-soft ring-1 ring-beige-border space-y-6">
                     <div class="flex justify-between items-center border-b border-beige-border pb-3">
                         <h2 id="formulario-titulo" class="text-base font-semibold text-verde-ingles">Agregar Receta</h2>
-                        <button id="btn-cancelar-edicion" type="button" onclick="cancelarEdicion()" class="hidden text-sm text-gray-500 hover:text-rojo-excluir underline">
+                        <button id="btn-cancelar-edicion" type="button" onclick="cancelarEdicion()" class="hidden text-sm text-tinta/60 hover:text-rojo-excluir underline">
                             Cancelar edición
                         </button>
                     </div>
@@ -336,12 +351,12 @@
 
                         <div>
                             <label class="block text-sm font-semibold text-verde-ingles mb-2">Nombre de la receta *</label>
-                            <input type="text" id="input-nombre" required placeholder="Ej: Milanesas con Puré" class="w-full p-3 bg-beige-base border border-beige-border rounded-xl text-sm focus:ring-1 focus:ring-verde-ingles focus:outline-none">
+                            <input type="text" id="input-nombre" required placeholder="Ej: Milanesas con Puré" class="w-full p-3 bg-beige-base border border-beige-border rounded-xl text-sm focus:ring-2 focus:ring-verde-chip/25 focus:border-verde-chip focus:outline-none">
                         </div>
 
                         <div>
                             <label class="block text-sm font-semibold text-verde-ingles mb-2">Breve descripción (opcional)</label>
-                            <input type="text" id="input-descripcion" placeholder="Ej: Plato clásico crocante con puré cremoso" class="w-full p-3 bg-beige-base border border-beige-border rounded-xl text-sm focus:ring-1 focus:ring-verde-ingles focus:outline-none">
+                            <input type="text" id="input-descripcion" placeholder="Ej: Plato clásico crocante con puré cremoso" class="w-full p-3 bg-beige-base border border-beige-border rounded-xl text-sm focus:ring-2 focus:ring-verde-chip/25 focus:border-verde-chip focus:outline-none">
                         </div>
 
                         <div>
@@ -349,15 +364,15 @@
                             <div class="flex flex-wrap gap-2">
                                 <label class="cursor-pointer">
                                     <input type="radio" name="tipo-comida" value="almuerzo_cena" required class="sr-only peer">
-                                    <span class="block px-4 py-2.5 rounded-xl border border-beige-border bg-beige-base text-sm text-gray-600 peer-checked:bg-verde-ingles peer-checked:text-white peer-checked:border-verde-ingles transition">Almuerzo / cena</span>
+                                    <span class="block px-4 py-2.5 rounded-xl border border-beige-border bg-beige-base text-sm text-tinta/70 peer-checked:bg-verde-ingles peer-checked:text-white peer-checked:border-verde-ingles transition">Almuerzo / cena</span>
                                 </label>
                                 <label class="cursor-pointer">
                                     <input type="radio" name="tipo-comida" value="desayuno_merienda" required class="sr-only peer">
-                                    <span class="block px-4 py-2.5 rounded-xl border border-beige-border bg-beige-base text-sm text-gray-600 peer-checked:bg-verde-ingles peer-checked:text-white peer-checked:border-verde-ingles transition">Desayuno / merienda</span>
+                                    <span class="block px-4 py-2.5 rounded-xl border border-beige-border bg-beige-base text-sm text-tinta/70 peer-checked:bg-verde-ingles peer-checked:text-white peer-checked:border-verde-ingles transition">Desayuno / merienda</span>
                                 </label>
                                 <label class="cursor-pointer">
                                     <input type="radio" name="tipo-comida" value="postre" required class="sr-only peer">
-                                    <span class="block px-4 py-2.5 rounded-xl border border-beige-border bg-beige-base text-sm text-gray-600 peer-checked:bg-verde-ingles peer-checked:text-white peer-checked:border-verde-ingles transition">Postre</span>
+                                    <span class="block px-4 py-2.5 rounded-xl border border-beige-border bg-beige-base text-sm text-tinta/70 peer-checked:bg-verde-ingles peer-checked:text-white peer-checked:border-verde-ingles transition">Postre</span>
                                 </label>
                             </div>
                         </div>
@@ -366,12 +381,12 @@
                             <label class="block text-sm font-semibold text-verde-ingles">Ingredientes de la receta *</label>
                             <div class="relative">
                                 <button type="button" onclick="toggleDropdownFormIngredientes()" class="w-full bg-beige-base border border-beige-border rounded-xl p-3 text-left flex justify-between items-center text-sm shadow-sm hover:border-verde-ingles focus:outline-none">
-                                    <span class="text-gray-500" id="label-dropdown-form-ing">Buscar o agregar ingrediente...</span>
-                                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                                    <span class="text-tinta/60" id="label-dropdown-form-ing">Buscar o agregar ingrediente...</span>
+                                    <svg class="w-4 h-4 text-tinta/45" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                                 </button>
 
                                 <div id="dropdown-form-ingredientes" class="hidden absolute left-0 right-0 top-full mt-1 bg-white border border-beige-border rounded-xl shadow-soft-lg z-30 max-h-56 flex flex-col p-2 space-y-1.5">
-                                    <input type="text" id="input-buscar-ingrediente-form" placeholder="Escribe un ingrediente..." oninput="filtrarDropdownFormIngredientes()" class="w-full p-2.5 text-sm bg-beige-base border border-beige-border rounded-lg focus:outline-none focus:ring-1 focus:ring-verde-ingles">
+                                    <input type="text" id="input-buscar-ingrediente-form" placeholder="Escribe un ingrediente..." oninput="filtrarDropdownFormIngredientes()" class="w-full p-2.5 text-sm bg-beige-base border border-beige-border rounded-lg focus:outline-none focus:ring-2 focus:ring-verde-chip/25 focus:border-verde-chip">
                                     <div id="lista-opciones-form-ingredientes" class="overflow-y-auto space-y-0.5 flex-grow"></div>
                                 </div>
                             </div>
@@ -390,7 +405,7 @@
                                     </thead>
                                     <tbody id="tabla-body-cantidades" class="divide-y divide-beige-border">
                                         <tr id="row-sin-ingredientes">
-                                            <td colspan="2" class="p-3 text-center text-gray-400">Selecciona ingredientes arriba para cargar sus cantidades.</td>
+                                            <td colspan="2" class="p-3 text-center text-tinta/45">Selecciona ingredientes arriba para cargar sus cantidades.</td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -399,12 +414,12 @@
 
                         <div>
                             <label class="block text-sm font-semibold text-verde-ingles mb-2">Procedimiento (opcional)</label>
-                            <textarea id="input-procedimiento" rows="3" placeholder="Paso a paso para la preparación..." class="w-full p-3 bg-beige-base border border-beige-border rounded-xl text-sm focus:ring-1 focus:ring-verde-ingles focus:outline-none"></textarea>
+                            <textarea id="input-procedimiento" rows="3" placeholder="Paso a paso para la preparación..." class="w-full p-3 bg-beige-base border border-beige-border rounded-xl text-sm focus:ring-2 focus:ring-verde-chip/25 focus:border-verde-chip focus:outline-none"></textarea>
                         </div>
 
                         <div>
                             <label class="block text-sm font-semibold text-verde-ingles mb-2">¿Para cuántas personas rinde? (opcional)</label>
-                            <input type="number" id="input-porciones" min="1" max="200" step="1" placeholder="Ej: 4" class="w-full sm:w-40 p-3 bg-beige-base border border-beige-border rounded-xl text-sm focus:ring-1 focus:ring-verde-ingles focus:outline-none">
+                            <input type="number" id="input-porciones" min="1" max="200" step="1" placeholder="Ej: 4" class="w-full sm:w-40 p-3 bg-beige-base border border-beige-border rounded-xl text-sm focus:ring-2 focus:ring-verde-chip/25 focus:border-verde-chip focus:outline-none">
                         </div>
 
                         <div class="border-t border-beige-border pt-3 space-y-2">
@@ -428,7 +443,7 @@
                         <label class="flex items-center justify-between gap-4 p-4 rounded-xl border border-beige-border bg-beige-base cursor-pointer">
                             <span class="block">
                                 <span class="block text-sm font-semibold text-verde-ingles">Receta pública</span>
-                                <span class="block text-xs text-gray-500 mt-0.5">Otras personas podrán verla en tu perfil. Si la desactivás, solo la ves vos.</span>
+                                <span class="block text-xs text-tinta/60 mt-0.5">Otras personas podrán verla en tu perfil. Si la desactivás, solo la ves vos.</span>
                             </span>
                             <input type="checkbox" id="input-publica" checked class="sr-only peer">
                             <span class="relative w-11 h-6 shrink-0 rounded-full bg-gray-300 peer-checked:bg-verde-chip transition after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:w-5 after:h-5 after:rounded-full after:bg-white after:shadow after:transition peer-checked:after:translate-x-5"></span>
@@ -448,19 +463,19 @@
             <section id="pestana-inicio" class="hidden space-y-6">
                 <div class="flex items-start justify-between gap-3">
                     <div>
-                        <h2 class="text-xl font-semibold text-verde-ingles">Novedades</h2>
-                        <p class="text-sm text-gray-500 mt-1">Tus publicaciones y las de las personas que seguís.</p>
+                        <h2 class="text-2xl font-bold text-verde-ingles">Novedades</h2>
+                        <p class="text-sm text-tinta/60 mt-1">Tus publicaciones y las de las personas que seguís.</p>
                     </div>
-                    <button type="button" onclick="cargarTimeline(true)" title="Actualizar" class="p-2.5 rounded-xl border border-beige-border bg-white text-gray-500 hover:text-verde-ingles hover:bg-beige-base transition">
+                    <button type="button" onclick="cargarTimeline(true)" title="Actualizar" class="p-2.5 rounded-xl border border-beige-border bg-white text-tinta/60 hover:text-verde-ingles hover:bg-beige-base transition">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
                     </button>
                 </div>
                 <div id="timeline-lista" class="flex flex-col gap-5"></div>
                 <div id="timeline-sugerencias-bloque" class="hidden pt-4 space-y-4">
-                    <div class="flex items-center gap-2 pt-2 border-t border-beige-border">
-                        <span class="text-sm font-semibold text-verde-ingles pt-4">Quizás te interese</span>
+                    <div class="pt-6 border-t border-beige-border">
+                        <h2 class="text-2xl font-bold text-verde-ingles">Quizás te interese</h2>
+                        <p class="text-sm text-tinta/60 mt-1">Lo más valorado y guardado de personas que todavía no seguís.</p>
                     </div>
-                    <p class="text-xs text-gray-500 -mt-2">Lo más valorado y guardado de personas que todavía no seguís.</p>
                     <div id="timeline-sugerencias" class="flex flex-col gap-5"></div>
                 </div>
             </section>
@@ -470,8 +485,8 @@
                 <div class="space-y-6">
                     <div class="flex items-start justify-between gap-3">
                         <div>
-                            <h2 class="text-xl font-semibold text-verde-ingles">Mis colecciones</h2>
-                            <p class="text-sm text-gray-500 mt-1">Agrupá tus recetas y compartilas con un enlace.</p>
+                            <h2 class="text-2xl font-bold text-verde-ingles">Mis colecciones</h2>
+                            <p class="text-sm text-tinta/60 mt-1">Agrupá tus recetas y compartilas con un enlace.</p>
                         </div>
                         <button type="button" onclick="abrirEditorColeccion()" class="flex items-center gap-1.5 bg-verde-ingles hover:bg-verde-hover text-white px-4 py-2.5 rounded-xl text-sm font-medium shadow-soft transition shrink-0">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
@@ -482,8 +497,8 @@
                 </div>
                 <div id="bloque-col-guardadas" class="hidden space-y-6">
                     <div>
-                        <h2 class="text-xl font-semibold text-verde-ingles">Guardadas</h2>
-                        <p class="text-sm text-gray-500 mt-1">Colecciones de otras personas que guardaste.</p>
+                        <h2 class="text-2xl font-bold text-verde-ingles">Guardadas</h2>
+                        <p class="text-sm text-tinta/60 mt-1">Colecciones de otras personas que guardaste.</p>
                     </div>
                     <div id="colecciones-guardadas-lista" class="grid grid-cols-1 sm:grid-cols-2 gap-5"></div>
                 </div>
@@ -492,15 +507,15 @@
             <!-- EXPLORAR -->
             <section id="pestana-explorar" class="hidden space-y-6">
                 <div>
-                    <h2 class="text-xl font-semibold text-verde-ingles">Explorar</h2>
-                    <p class="text-sm text-gray-500 mt-1">Buscá personas por nombre o usuario.</p>
+                    <h2 class="text-2xl font-bold text-verde-ingles">Explorar</h2>
+                    <p class="text-sm text-tinta/60 mt-1">Buscá personas por nombre o usuario.</p>
                 </div>
                 <div class="relative">
-                    <svg class="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                    <input type="text" id="input-buscar-personas" oninput="buscarPersonasDebounce()" placeholder="Buscar personas..." class="w-full pl-11 pr-4 py-3 bg-white border border-beige-border rounded-xl text-sm focus:ring-1 focus:ring-verde-ingles focus:outline-none">
+                    <svg class="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-tinta/45" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    <input type="text" id="input-buscar-personas" oninput="buscarPersonasDebounce()" placeholder="Buscar personas..." class="w-full pl-11 pr-4 py-3 bg-white border border-beige-border rounded-xl text-sm focus:ring-2 focus:ring-verde-chip/25 focus:border-verde-chip focus:outline-none">
                 </div>
                 <div class="space-y-4">
-                    <h3 id="explorar-titulo" class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Personas nuevas</h3>
+                    <h3 id="explorar-titulo" class="text-sm font-semibold text-verde-ingles">Personas nuevas</h3>
                     <div id="explorar-lista" class="flex flex-col gap-3"></div>
                 </div>
             </section>
@@ -519,11 +534,11 @@
 
 
     <!-- MODAL EDITAR PERFIL -->
-    <div id="modal-perfil" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/30" onclick="if(event.target===this) cerrarEditorPerfil()">
+    <div id="modal-perfil" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-verde-ingles/25 backdrop-blur-[2px]" onclick="if(event.target===this) cerrarEditorPerfil()">
         <div class="bg-white w-full max-w-sm rounded-2xl p-7 shadow-soft-lg border border-beige-border space-y-6 max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center">
                 <h2 class="text-lg font-semibold text-verde-ingles">Editar perfil</h2>
-                <button type="button" onclick="cerrarEditorPerfil()" title="Cerrar" class="p-2 rounded-lg text-gray-400 hover:text-verde-ingles hover:bg-beige-base transition"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+                <button type="button" onclick="cerrarEditorPerfil()" title="Cerrar" class="p-2 rounded-lg text-tinta/45 hover:text-verde-ingles hover:bg-beige-base transition"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
             </div>
 
             <div class="flex flex-col items-center gap-3">
@@ -537,19 +552,19 @@
             <div class="space-y-5">
                 <div>
                     <span class="block text-sm font-medium text-verde-ingles mb-2">Usuario</span>
-                    <div id="perfil-usuario" class="text-sm text-gray-600 px-1"></div>
+                    <div id="perfil-usuario" class="text-sm text-tinta/70 px-1"></div>
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-verde-ingles mb-2">Nombre</label>
-                    <input type="text" id="perfil-nombre" maxlength="40" class="w-full p-3 bg-beige-base border border-beige-border rounded-xl text-sm focus:ring-1 focus:ring-verde-ingles focus:outline-none">
+                    <input type="text" id="perfil-nombre" maxlength="40" class="w-full p-3 bg-beige-base border border-beige-border rounded-xl text-sm focus:ring-2 focus:ring-verde-chip/25 focus:border-verde-chip focus:outline-none">
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-verde-ingles mb-2">Bio</label>
-                    <textarea id="perfil-bio" rows="3" maxlength="280" placeholder="Contá algo sobre vos y lo que te gusta cocinar" class="w-full p-3 bg-beige-base border border-beige-border rounded-xl text-sm focus:ring-1 focus:ring-verde-ingles focus:outline-none"></textarea>
+                    <textarea id="perfil-bio" rows="3" maxlength="280" placeholder="Contá algo sobre vos y lo que te gusta cocinar" class="w-full p-3 bg-beige-base border border-beige-border rounded-xl text-sm focus:ring-2 focus:ring-verde-chip/25 focus:border-verde-chip focus:outline-none"></textarea>
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-verde-ingles mb-2">Enlace (Instagram, web...)</label>
-                    <input type="text" id="perfil-link" maxlength="200" placeholder="https://instagram.com/tu_usuario" class="w-full p-3 bg-beige-base border border-beige-border rounded-xl text-sm focus:ring-1 focus:ring-verde-ingles focus:outline-none">
+                    <input type="text" id="perfil-link" maxlength="200" placeholder="https://instagram.com/tu_usuario" class="w-full p-3 bg-beige-base border border-beige-border rounded-xl text-sm focus:ring-2 focus:ring-verde-chip/25 focus:border-verde-chip focus:outline-none">
                 </div>
             </div>
 
@@ -560,24 +575,24 @@
     </div>
 
     <!-- MODAL COLECCIÓN -->
-    <div id="modal-coleccion" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/30" onclick="if(event.target===this) cerrarEditorColeccion()">
+    <div id="modal-coleccion" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-verde-ingles/25 backdrop-blur-[2px]" onclick="if(event.target===this) cerrarEditorColeccion()">
         <div class="bg-white w-full max-w-md rounded-2xl p-7 shadow-soft-lg border border-beige-border space-y-6 max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center">
                 <h2 id="col-titulo-modal" class="text-lg font-semibold text-verde-ingles">Nueva colección</h2>
-                <button type="button" onclick="cerrarEditorColeccion()" title="Cerrar" class="p-2 rounded-lg text-gray-400 hover:text-verde-ingles hover:bg-beige-base transition"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+                <button type="button" onclick="cerrarEditorColeccion()" title="Cerrar" class="p-2 rounded-lg text-tinta/45 hover:text-verde-ingles hover:bg-beige-base transition"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
             </div>
             <div>
                     <label class="block text-sm font-medium text-verde-ingles mb-2">Nombre</label>
-                    <input type="text" id="col-nombre" maxlength="60" placeholder="Ej: Cenas rápidas" class="w-full p-3 bg-beige-base border border-beige-border rounded-xl text-sm focus:ring-1 focus:ring-verde-ingles focus:outline-none">
+                    <input type="text" id="col-nombre" maxlength="60" placeholder="Ej: Cenas rápidas" class="w-full p-3 bg-beige-base border border-beige-border rounded-xl text-sm focus:ring-2 focus:ring-verde-chip/25 focus:border-verde-chip focus:outline-none">
                 </div>
             <div>
                     <label class="block text-sm font-medium text-verde-ingles mb-2">Descripción (opcional)</label>
-                    <input type="text" id="col-descripcion" maxlength="200" placeholder="Ej: Todo lo que cocino entre semana" class="w-full p-3 bg-beige-base border border-beige-border rounded-xl text-sm focus:ring-1 focus:ring-verde-ingles focus:outline-none">
+                    <input type="text" id="col-descripcion" maxlength="200" placeholder="Ej: Todo lo que cocino entre semana" class="w-full p-3 bg-beige-base border border-beige-border rounded-xl text-sm focus:ring-2 focus:ring-verde-chip/25 focus:border-verde-chip focus:outline-none">
                 </div>
             <label class="flex items-center justify-between gap-4 p-4 rounded-xl border border-beige-border bg-beige-base cursor-pointer">
                 <span class="block">
                     <span class="block text-sm font-semibold text-verde-ingles">Colección pública</span>
-                    <span class="block text-xs text-gray-500 mt-0.5">Otras personas podrán verla y guardarla. Solo se muestran las recetas públicas.</span>
+                    <span class="block text-xs text-tinta/60 mt-0.5">Otras personas podrán verla y guardarla. Solo se muestran las recetas públicas.</span>
                 </span>
                 <input type="checkbox" id="col-publica" checked class="sr-only peer">
                 <span class="relative w-11 h-6 shrink-0 rounded-full bg-gray-300 peer-checked:bg-verde-chip transition after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:w-5 after:h-5 after:rounded-full after:bg-white after:shadow after:transition peer-checked:after:translate-x-5"></span>
@@ -592,22 +607,22 @@
     </div>
 
     <!-- MODAL SEGUIDORES / SEGUIDOS -->
-    <div id="modal-personas" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/30" onclick="if(event.target===this) cerrarPersonas()">
+    <div id="modal-personas" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-verde-ingles/25 backdrop-blur-[2px]" onclick="if(event.target===this) cerrarPersonas()">
         <div class="bg-fondo w-full max-w-md rounded-2xl p-6 shadow-soft-lg border border-beige-border space-y-4 max-h-[85vh] flex flex-col">
             <div class="flex justify-between items-center">
                 <h2 id="personas-titulo" class="text-lg font-semibold text-verde-ingles">Seguidores</h2>
-                <button type="button" onclick="cerrarPersonas()" title="Cerrar" class="p-2 rounded-lg text-gray-400 hover:text-verde-ingles hover:bg-beige-base transition"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+                <button type="button" onclick="cerrarPersonas()" title="Cerrar" class="p-2 rounded-lg text-tinta/45 hover:text-verde-ingles hover:bg-beige-base transition"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
             </div>
             <div id="personas-lista" class="flex flex-col gap-3 overflow-y-auto pr-1"></div>
         </div>
     </div>
 
     <!-- MODAL AGREGAR A COLECCIÓN -->
-    <div id="modal-agregar-coleccion" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/30" onclick="if(event.target===this) cerrarAgregarAColeccion()">
+    <div id="modal-agregar-coleccion" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-verde-ingles/25 backdrop-blur-[2px]" onclick="if(event.target===this) cerrarAgregarAColeccion()">
         <div class="bg-white w-full max-w-sm rounded-2xl p-6 shadow-soft-lg border border-beige-border space-y-4 max-h-[80vh] flex flex-col">
             <div class="flex justify-between items-center">
                 <h2 class="text-base font-semibold text-verde-ingles">Agregar a colección</h2>
-                <button type="button" onclick="cerrarAgregarAColeccion()" title="Cerrar" class="p-2 rounded-lg text-gray-400 hover:text-verde-ingles hover:bg-beige-base transition"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+                <button type="button" onclick="cerrarAgregarAColeccion()" title="Cerrar" class="p-2 rounded-lg text-tinta/45 hover:text-verde-ingles hover:bg-beige-base transition"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
             </div>
             <div id="agregar-coleccion-lista" class="space-y-2 overflow-y-auto pr-1"></div>
             <button type="button" onclick="crearColeccionConReceta()" class="w-full text-sm font-medium text-verde-ingles border border-dashed border-beige-border rounded-xl py-2.5 hover:bg-beige-base transition">+ Nueva colección</button>
@@ -615,27 +630,27 @@
     </div>
 
     <!-- MODAL COMPARTIR AL GUARDAR (repost con descripción) -->
-    <div id="modal-compartir-post" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/30" onclick="if(event.target===this) rechazarCompartirPost()">
+    <div id="modal-compartir-post" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-verde-ingles/25 backdrop-blur-[2px]" onclick="if(event.target===this) rechazarCompartirPost()">
         <div class="bg-white w-full max-w-sm rounded-2xl p-6 shadow-soft-lg border border-beige-border space-y-4">
             <h2 id="compartir-post-titulo" class="text-base font-semibold text-verde-ingles">¿Compartir esta receta en tu perfil?</h2>
-            <p id="compartir-post-texto" class="text-sm text-gray-500">Se guardó en tu recetario. Si querés, también aparece como publicación tuya para quienes te siguen, con una descripción opcional.</p>
-            <div id="compartir-post-receta" class="text-sm font-medium text-gray-800 bg-beige-base border border-beige-border rounded-xl px-3 py-2.5 truncate"></div>
-            <textarea id="compartir-post-descripcion" rows="3" maxlength="500" placeholder="Agregá una descripción (opcional)..." class="w-full p-3 bg-beige-base border border-beige-border rounded-xl text-sm focus:ring-1 focus:ring-verde-ingles focus:outline-none"></textarea>
+            <p id="compartir-post-texto" class="text-sm text-tinta/60">Se guardó en tu recetario. Si querés, también aparece como publicación tuya para quienes te siguen, con una descripción opcional.</p>
+            <div id="compartir-post-receta" class="text-sm font-medium text-tinta bg-beige-base border border-beige-border rounded-xl px-3 py-2.5 truncate"></div>
+            <textarea id="compartir-post-descripcion" rows="3" maxlength="500" placeholder="Agregá una descripción (opcional)..." class="w-full p-3 bg-beige-base border border-beige-border rounded-xl text-sm focus:ring-2 focus:ring-verde-chip/25 focus:border-verde-chip focus:outline-none"></textarea>
             <div class="flex gap-2">
-                <button type="button" onclick="rechazarCompartirPost()" class="flex-1 py-2.5 rounded-xl text-sm font-medium border border-beige-border text-gray-600 hover:bg-beige-base transition">No, gracias</button>
+                <button type="button" onclick="rechazarCompartirPost()" class="flex-1 py-2.5 rounded-xl text-sm font-medium border border-beige-border text-tinta/70 hover:bg-beige-base transition">No, gracias</button>
                 <button type="button" id="btn-confirmar-post" onclick="confirmarCompartirPost()" class="flex-1 py-2.5 rounded-xl text-sm font-medium bg-verde-ingles hover:bg-verde-hover text-white transition disabled:opacity-60">Publicar</button>
             </div>
         </div>
     </div>
 
     <!-- MODAL NOTIFICACIONES -->
-    <div id="modal-notificaciones" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/30" onclick="if(event.target===this) cerrarNotificaciones()">
+    <div id="modal-notificaciones" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-verde-ingles/25 backdrop-blur-[2px]" onclick="if(event.target===this) cerrarNotificaciones()">
         <div class="bg-fondo w-full max-w-md rounded-2xl p-6 shadow-soft-lg border border-beige-border space-y-4 max-h-[85vh] flex flex-col">
             <div class="flex justify-between items-center">
                 <h2 class="text-lg font-semibold text-verde-ingles">Notificaciones</h2>
                 <div class="flex items-center gap-1">
-                    <button type="button" onclick="marcarTodasLeidas()" class="text-xs text-gray-500 hover:text-verde-ingles underline">Marcar todas leídas</button>
-                    <button type="button" onclick="cerrarNotificaciones()" title="Cerrar" class="p-2 rounded-lg text-gray-400 hover:text-verde-ingles hover:bg-beige-base transition"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+                    <button type="button" onclick="marcarTodasLeidas()" class="text-xs text-tinta/60 hover:text-verde-ingles underline">Marcar todas leídas</button>
+                    <button type="button" onclick="cerrarNotificaciones()" title="Cerrar" class="p-2 rounded-lg text-tinta/45 hover:text-verde-ingles hover:bg-beige-base transition"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
                 </div>
             </div>
             <div id="notificaciones-lista" class="flex flex-col gap-2 overflow-y-auto pr-1"></div>
@@ -643,27 +658,27 @@
     </div>
 
     <!-- MODAL MENSAJES -->
-    <div id="modal-mensajes" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/30" onclick="if(event.target===this) cerrarMensajes()">
+    <div id="modal-mensajes" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-verde-ingles/25 backdrop-blur-[2px]" onclick="if(event.target===this) cerrarMensajes()">
         <div class="bg-fondo w-full max-w-md rounded-2xl shadow-soft-lg border border-beige-border max-h-[85vh] flex flex-col overflow-hidden">
             <!-- Lista de conversaciones -->
             <div id="mensajes-vista-lista" class="p-6 space-y-4 flex flex-col min-h-0">
                 <div class="flex justify-between items-center">
                     <h2 class="text-lg font-semibold text-verde-ingles">Mensajes</h2>
-                    <button type="button" onclick="cerrarMensajes()" title="Cerrar" class="p-2 rounded-lg text-gray-400 hover:text-verde-ingles hover:bg-beige-base transition"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+                    <button type="button" onclick="cerrarMensajes()" title="Cerrar" class="p-2 rounded-lg text-tinta/45 hover:text-verde-ingles hover:bg-beige-base transition"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
                 </div>
-                <p class="text-xs text-gray-500 -mt-2">Solo podés escribirte con personas que se siguen mutuamente.</p>
+                <p class="text-xs text-tinta/60 -mt-2">Solo podés escribirte con personas que se siguen mutuamente.</p>
                 <div id="mensajes-lista-conversaciones" class="flex flex-col gap-2 overflow-y-auto pr-1"></div>
             </div>
             <!-- Chat abierto -->
             <div id="mensajes-vista-chat" class="hidden flex flex-col h-[70vh]">
                 <div class="flex items-center gap-2 p-4 border-b border-beige-border shrink-0">
-                    <button type="button" onclick="cerrarConversacion()" class="p-1.5 rounded-lg text-gray-400 hover:text-verde-ingles hover:bg-beige-base transition"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg></button>
+                    <button type="button" onclick="cerrarConversacion()" class="p-1.5 rounded-lg text-tinta/45 hover:text-verde-ingles hover:bg-beige-base transition"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg></button>
                     <div id="chat-cabecera-autor" class="flex-1 min-w-0"></div>
-                    <button type="button" onclick="cerrarMensajes()" title="Cerrar" class="p-2 rounded-lg text-gray-400 hover:text-verde-ingles hover:bg-beige-base transition"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+                    <button type="button" onclick="cerrarMensajes()" title="Cerrar" class="p-2 rounded-lg text-tinta/45 hover:text-verde-ingles hover:bg-beige-base transition"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
                 </div>
                 <div id="chat-mensajes" class="flex-1 overflow-y-auto p-4 space-y-2"></div>
                 <form onsubmit="enviarMensaje(event)" class="p-3 border-t border-beige-border flex gap-2 shrink-0">
-                    <input type="text" id="chat-input" maxlength="2000" placeholder="Escribí un mensaje..." class="flex-1 p-2.5 bg-beige-base border border-beige-border rounded-xl text-sm focus:ring-1 focus:ring-verde-ingles focus:outline-none">
+                    <input type="text" id="chat-input" maxlength="2000" placeholder="Escribí un mensaje..." class="flex-1 p-2.5 bg-beige-base border border-beige-border rounded-xl text-sm focus:ring-2 focus:ring-verde-chip/25 focus:border-verde-chip focus:outline-none">
                     <button type="submit" class="bg-verde-ingles hover:bg-verde-hover text-white px-4 rounded-xl text-sm font-medium transition">Enviar</button>
                 </form>
             </div>
@@ -672,7 +687,7 @@
 
     <div id="toast" class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] bg-verde-ingles text-white text-sm px-5 py-3 rounded-xl shadow-soft-lg max-w-[90vw] text-center"></div>
 
-    <footer class="w-full text-center py-5 px-4 text-xs text-gray-400 space-x-3">
+    <footer class="w-full text-center py-5 px-4 text-xs text-tinta/45 space-x-3">
         <a href="/pol_tica_de_privacidad.html" class="underline hover:text-verde-ingles transition">Política de privacidad</a>
         <span>·</span>
         <a href="/politica-seguridad.html" class="underline hover:text-verde-ingles transition">Política de seguridad</a>
@@ -699,7 +714,7 @@
             const url = perfil && perfil.avatar_url && perfil.avatar_url.startsWith(PREFIJO_AVATAR) ? perfil.avatar_url : '';
             if (url) return `<img src="${esc(url)}" alt="" class="${tam} rounded-full object-cover bg-beige-base block">`;
             const inicial = esc(((perfil && (perfil.nombre || perfil.usuario)) || '?').trim().charAt(0).toUpperCase());
-            return `<div class="${tam} rounded-full bg-mostaza text-white ${texto} font-semibold flex items-center justify-center">${inicial}</div>`;
+            return `<div class="${tam} rounded-full bg-verde-suave text-verde-ingles ${texto} font-display font-bold flex items-center justify-center shrink-0">${inicial}</div>`;
         }
         let perfilActual = null;
         let usuarioActual = null;
@@ -914,16 +929,16 @@
 
             const poner = (texto, clase) => { hint.innerText = texto; hint.className = 'text-xs mt-2 ' + clase; };
 
-            if (!v) return poner('3 a 20 caracteres: letras minúsculas, números y _', 'text-gray-500');
-            if (!REGEX_USUARIO.test(v)) return poner('Mínimo 3 caracteres.', 'text-gray-500');
+            if (!v) return poner('3 a 20 caracteres: letras minúsculas, números y _', 'text-tinta/60');
+            if (!REGEX_USUARIO.test(v)) return poner('Mínimo 3 caracteres.', 'text-tinta/60');
 
-            poner('Verificando...', 'text-gray-500');
+            poner('Verificando...', 'text-tinta/60');
             timerUsuario = setTimeout(async () => {
                 const disp = await usuarioDisponible(v);
                 if (input.value !== v) return;
                 if (disp === true) poner('Disponible', 'text-green-700 font-medium');
                 else if (disp === false) poner('Ese usuario ya está en uso', 'text-rojo-excluir font-medium');
-                else poner('3 a 20 caracteres: letras minúsculas, números y _', 'text-gray-500');
+                else poner('3 a 20 caracteres: letras minúsculas, números y _', 'text-tinta/60');
             }, 400);
         }
 
@@ -1062,15 +1077,15 @@
             const disponibles = lista.filter(i => !seleccionados.includes(i) && !opuesto.includes(i));
 
             if (disponibles.length === 0) {
-                contenedor.innerHTML = `<div class="text-sm text-gray-400 p-2 text-center">Sin opciones disponibles</div>`;
+                contenedor.innerHTML = `<div class="text-sm text-tinta/45 p-2 text-center">Sin opciones disponibles</div>`;
                 return;
             }
 
             disponibles.forEach(ing => {
                 const btn = document.createElement('button');
                 btn.type = 'button';
-                btn.className = 'w-full text-left px-2 py-1 text-sm rounded-md hover:bg-beige-base flex items-center justify-between text-gray-700 transition';
-                btn.innerHTML = `<span>${esc(ing)}</span> <svg class="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>`;
+                btn.className = 'w-full text-left px-2 py-1 text-sm rounded-md hover:bg-beige-base flex items-center justify-between text-tinta/80 transition';
+                btn.innerHTML = `<span>${esc(ing)}</span> <svg class="w-3.5 h-3.5 text-tinta/45" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>`;
                 btn.onclick = () => seleccionarIngrediente(tipo, ing);
                 contenedor.appendChild(btn);
             });
@@ -1157,7 +1172,7 @@
                 const on = categoriasFiltro.has(b.dataset.catFiltro);
                 b.className = CLASE_TIPO_BASE + (on
                     ? 'bg-verde-ingles text-white border-verde-ingles'
-                    : 'bg-white text-gray-600 border-beige-border hover:bg-beige-base');
+                    : 'bg-white text-tinta/70 border-beige-border hover:border-verde-chip/40 hover:text-verde-ingles');
             });
         }
 
@@ -1243,7 +1258,7 @@
             disponibles.forEach(ing => {
                 const btn = document.createElement('button');
                 btn.type = 'button';
-                btn.className = 'w-full text-left px-2 py-1 text-sm rounded-md hover:bg-beige-base flex items-center justify-between text-gray-700 transition';
+                btn.className = 'w-full text-left px-2 py-1 text-sm rounded-md hover:bg-beige-base flex items-center justify-between text-tinta/80 transition';
                 btn.innerHTML = `<span>${esc(ing)}</span> <svg class="w-3.5 h-3.5 text-verde-ingles" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>`;
                 btn.onclick = () => agregarIngredienteForm(ing);
                 contenedor.appendChild(btn);
@@ -1262,7 +1277,7 @@
             }
 
             if (disponibles.length === 0 && query.length === 0) {
-                contenedor.innerHTML = `<div class="text-sm text-gray-400 p-2 text-center">Escribe para buscar o agregar ingrediente</div>`;
+                contenedor.innerHTML = `<div class="text-sm text-tinta/45 p-2 text-center">Escribe para buscar o agregar ingrediente</div>`;
             }
         }
 
@@ -1310,7 +1325,7 @@
             if (ingredientesFormSeleccionados.length === 0) {
                 tbody.innerHTML = `
                     <tr id="row-sin-ingredientes">
-                        <td colspan="2" class="p-3 text-center text-gray-400">Selecciona ingredientes arriba para cargar sus cantidades.</td>
+                        <td colspan="2" class="p-3 text-center text-tinta/45">Selecciona ingredientes arriba para cargar sus cantidades.</td>
                     </tr>
                 `;
                 return;
@@ -1322,9 +1337,9 @@
                 tr.setAttribute('data-ingrediente', ing);
                 tr.className = "hover:bg-beige-card/50 transition border-b border-beige-border last:border-0";
                 tr.innerHTML = `
-                    <td class="p-2 font-medium text-gray-800 text-sm">${esc(ing)}</td>
+                    <td class="p-2 font-medium text-tinta text-sm">${esc(ing)}</td>
                     <td class="p-2">
-                        <input type="text" value="${esc(cantidadPrevia)}" placeholder="Ej: 200 g, 1 cda, a gusto" class="w-full p-1.5 text-sm bg-white border border-beige-border rounded-lg focus:ring-1 focus:ring-verde-ingles focus:outline-none">
+                        <input type="text" value="${esc(cantidadPrevia)}" placeholder="Ej: 200 g, 1 cda, a gusto" class="w-full p-1.5 text-sm bg-white border border-beige-border rounded-lg focus:ring-2 focus:ring-verde-chip/25 focus:border-verde-chip focus:outline-none">
                     </td>
                 `;
                 tbody.appendChild(tr);
@@ -1472,7 +1487,7 @@
         const ICONO_GUARDAR = 'M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z';
         const ICONO_COMPARTIR = 'M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z';
         const ICONO_USUARIOS = 'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z';
-        const ICONO_COLECCION = 'M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10';
+        const ICONO_COLECCION = 'M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V7z';
         const ICONO_CARPETA = 'M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V7z';
         const ICONO_CARPETA_MAS = 'M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V7zm9 3v6m-3-3h6';
         const ICONO_LINK = 'M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1';
@@ -1494,15 +1509,15 @@
         }
 
         function cargandoHTML() {
-            return '<div class="text-center py-16 text-sm text-gray-400">Cargando...</div>';
+            return '<div class="flex items-center justify-center gap-2 py-16 text-sm text-tinta/50"><span class="w-4 h-4 rounded-full border-2 border-verde-chip/30 border-t-verde-chip animate-spin"></span>Cargando…</div>';
         }
 
         function estadoVacioHTML(icono, titulo, texto, botonTexto, botonOnclick) {
             return `
-                <div class="text-center py-14 px-6 bg-white rounded-2xl border border-dashed border-beige-border">
-                    <div class="inline-flex p-4 bg-beige-base rounded-2xl text-mostaza mb-5">${svg(icono, 'w-8 h-8')}</div>
+                <div class="text-center py-12 px-6 bg-white/60 rounded-2xl border border-dashed border-beige-border">
+                    <div class="inline-flex w-14 h-14 items-center justify-center bg-yema-suave rounded-2xl text-[#7A5300] mb-4">${svg(icono, 'w-7 h-7')}</div>
                     <h3 class="text-lg font-semibold text-verde-ingles">${esc(titulo)}</h3>
-                    <p class="text-sm text-gray-500 mt-2 ${botonTexto ? 'mb-6' : ''}">${esc(texto)}</p>
+                    <p class="text-sm text-tinta/60 mt-1.5 max-w-sm mx-auto ${botonTexto ? 'mb-6' : ''}">${esc(texto)}</p>
                     ${botonTexto ? `<button type="button" onclick="${botonOnclick}" class="bg-verde-ingles text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-verde-hover transition shadow-soft">${esc(botonTexto)}</button>` : ''}
                 </div>`;
         }
@@ -1600,9 +1615,9 @@
         // ---------- Navegación ----------
         const TABS = ['inicio', 'filtrar', 'colecciones', 'explorar', 'perfil'];
         const VISTAS = ['inicio', 'filtrar', 'colecciones', 'explorar', 'perfil', 'agregar', 'detalle'];
-        const TAB_BASE = 'flex-1 flex flex-col sm:flex-row items-center justify-center gap-0.5 sm:gap-2 px-2 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition ';
-        const TAB_ACTIVA = TAB_BASE + 'bg-beige-card text-verde-ingles shadow-sm';
-        const TAB_INACTIVA = TAB_BASE + 'text-beige-card hover:text-white';
+        const TAB_BASE = 'flex-1 sm:flex-none flex flex-col sm:flex-row items-center justify-center gap-0.5 sm:gap-2 px-1 sm:px-3.5 pt-2 pb-1.5 sm:py-2 sm:rounded-xl text-[11px] sm:text-sm font-semibold transition ';
+        const TAB_ACTIVA = TAB_BASE + 'text-verde-ingles sm:bg-white sm:shadow-soft sm:ring-1 sm:ring-beige-border';
+        const TAB_INACTIVA = TAB_BASE + 'text-verde-ingles/50 hover:text-verde-ingles sm:hover:bg-white/60';
 
         function actualizarTabs() {
             let activa = vistaActual;
@@ -1717,8 +1732,8 @@
                 <button type="button" onclick="verPerfilPorId('${esc(userId)}')" class="flex items-center gap-3 min-w-0 text-left group">
                     ${avatarHTML(p, 'w-9 h-9', 'text-sm')}
                     <span class="min-w-0">
-                        <span class="block text-sm font-medium text-gray-800 truncate group-hover:text-verde-ingles">${esc(nombre)}</span>
-                        <span class="block text-xs text-gray-500 truncate">${p ? '@' + esc(p.usuario) : ''}${tiempo ? ' · ' + esc(tiempo) : ''}</span>
+                        <span class="block text-sm font-semibold leading-tight truncate group-hover:text-verde-ingles">${esc(nombre)}</span>
+                        <span class="block text-xs text-tinta/55 truncate">${p ? '@' + esc(p.usuario) : ''}${tiempo ? ' · ' + esc(tiempo) : ''}</span>
                     </span>
                 </button>`;
         }
@@ -1739,10 +1754,10 @@
         function botonGuardar(r) {
             const g = guardadasIds.has(r.id);
             const clase = g
-                ? 'text-mostaza bg-amber-50 border-amber-200 hover:bg-amber-100'
-                : 'text-gray-600 bg-white border-beige-border hover:bg-beige-base';
+                ? 'text-verde-ingles bg-mostaza border-mostaza hover:bg-mostaza-hover'
+                : 'text-verde-ingles bg-white border-beige-border hover:bg-beige-base';
             return `
-                <button type="button" onclick="alternarGuardada('${esc(r.id)}')" title="${g ? 'Quitar de guardadas' : 'Guardar en mi recetario'}" class="inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full border transition ${clase}">
+                <button type="button" onclick="alternarGuardada('${esc(r.id)}')" title="${g ? 'Quitar de guardadas' : 'Guardar en mi recetario'}" class="${PILDORA} ${clase}">
                     ${svg(ICONO_GUARDAR, 'w-3.5 h-3.5', g)}
                     <span>${g ? 'Guardada' : 'Guardar'}</span>
                 </button>`;
@@ -1762,15 +1777,15 @@
 
         function resumenResenas(id) {
             const c = resenasCache[id];
-            if (!c || !c.cantidad) return `<span class="text-xs text-gray-400">Sin calificaciones todavía</span>`;
-            return `${estrellasHTML(c.promedio)}<span class="text-xs text-gray-500 ml-1.5 align-middle">${c.promedio.toFixed(1)} de 5 · ${c.cantidad} ${c.cantidad === 1 ? 'calificación' : 'calificaciones'}</span>`;
+            if (!c || !c.cantidad) return `<span class="text-xs text-tinta/45">Sin calificaciones todavía</span>`;
+            return `${estrellasHTML(c.promedio)}<span class="text-xs text-tinta/60 ml-1.5 align-middle">${c.promedio.toFixed(1)} de 5 · ${c.cantidad} ${c.cantidad === 1 ? 'calificación' : 'calificaciones'}</span>`;
         }
 
         function resumenResenasCompacto(id) {
             const c = resenasCache[id];
             if (!c || !c.cantidad) return '';
-            return `<span class="inline-flex items-center gap-1 text-xs font-medium text-gray-600 shrink-0" title="Promedio ${c.promedio.toFixed(1)} de 5 · ${c.cantidad} ${c.cantidad === 1 ? 'calificación' : 'calificaciones'}">
-                <svg class="w-3.5 h-3.5 text-mostaza" fill="currentColor" viewBox="0 0 20 20"><path d="${PATH_ESTRELLA}"></path></svg>${c.promedio.toFixed(1)}<span class="text-gray-400 font-normal">(${c.cantidad})</span>
+            return `<span class="inline-flex items-center gap-1 text-xs font-medium text-tinta/70 shrink-0" title="Promedio ${c.promedio.toFixed(1)} de 5 · ${c.cantidad} ${c.cantidad === 1 ? 'calificación' : 'calificaciones'}">
+                <svg class="w-3.5 h-3.5 text-mostaza" fill="currentColor" viewBox="0 0 20 20"><path d="${PATH_ESTRELLA}"></path></svg>${c.promedio.toFixed(1)}<span class="text-tinta/45 font-normal">(${c.cantidad})</span>
             </span>`;
         }
 
@@ -1822,25 +1837,25 @@
                     ${avatarHTML(p, 'w-8 h-8', 'text-xs')}
                     <div class="min-w-0 flex-1">
                         <div class="flex flex-wrap items-center gap-x-2 gap-y-0.5">
-                            <span class="text-sm font-medium text-gray-800">${esc(p ? (p.nombre || p.usuario) : 'Alguien')}</span>
+                            <span class="text-sm font-medium text-tinta">${esc(p ? (p.nombre || p.usuario) : 'Alguien')}</span>
                             ${estrellasHTML(res.puntaje, 'text-xs')}
-                            <span class="text-xs text-gray-400">${tiempoRelativo(res.creada)}</span>
+                            <span class="text-xs text-tinta/45">${tiempoRelativo(res.creada)}</span>
                         </div>
-                        ${res.texto ? `<p class="text-sm text-gray-700 mt-1">${esc(res.texto)}</p>` : ''}
+                        ${res.texto ? `<p class="text-sm text-tinta/80 mt-1">${esc(res.texto)}</p>` : ''}
                     </div>
                 </div>`;
             }).join('');
 
             const formulario = propia
-                ? `<p class="text-xs text-gray-400 bg-beige-base/70 p-3 rounded-xl">No podés calificar tu propia receta. Vas a ver acá lo que opinen las demás personas.</p>`
+                ? `<p class="text-xs text-tinta/45 bg-beige-base/70 p-3 rounded-xl">No podés calificar tu propia receta. Vas a ver acá lo que opinen las demás personas.</p>`
                 : `<div class="bg-beige-base/70 p-4 rounded-xl space-y-3">
                     <div class="flex flex-wrap items-center gap-3">
                         ${estrellasInputHTML(id, valorActual)}
                         <span id="valor-resena-${esc(id)}" class="text-sm font-semibold text-verde-ingles">${valorActual.toFixed(1)}</span>
-                        <button type="button" onclick="setEstrellaInput('${esc(id)}', 0)" title="Poner 0 estrellas" class="text-xs text-gray-400 hover:text-verde-ingles underline">0</button>
+                        <button type="button" onclick="setEstrellaInput('${esc(id)}', 0)" title="Poner 0 estrellas" class="text-xs text-tinta/45 hover:text-verde-ingles underline">0</button>
                     </div>
-                    <p class="text-xs text-gray-400 -mt-1">Tocá la mitad izquierda de una estrella para media estrella.</p>
-                    <textarea id="texto-resena-${esc(id)}" rows="2" maxlength="1000" placeholder="Escribí una reseña (opcional)..." class="w-full p-2.5 bg-white border border-beige-border rounded-lg text-sm focus:ring-1 focus:ring-verde-ingles focus:outline-none">${esc(mia ? (mia.texto || '') : '')}</textarea>
+                    <p class="text-xs text-tinta/45 -mt-1">Tocá la mitad izquierda de una estrella para media estrella.</p>
+                    <textarea id="texto-resena-${esc(id)}" rows="2" maxlength="1000" placeholder="Escribí una reseña (opcional)..." class="w-full p-2.5 bg-white border border-beige-border rounded-lg text-sm focus:ring-2 focus:ring-verde-chip/25 focus:border-verde-chip focus:outline-none">${esc(mia ? (mia.texto || '') : '')}</textarea>
                     <div class="flex justify-end gap-3 items-center">
                         ${mia ? `<button type="button" onclick="eliminarResena('${esc(id)}')" class="text-xs text-rojo-excluir hover:underline">Borrar mi reseña</button>` : ''}
                         <button type="button" onclick="guardarResena('${esc(id)}')" class="px-4 py-2 rounded-xl text-sm font-medium bg-verde-ingles hover:bg-verde-hover text-white transition">${mia ? 'Actualizar reseña' : 'Publicar reseña'}</button>
@@ -1854,9 +1869,24 @@
                     <span>${resumenResenas(id)}</span>
                 </div>
                 ${formulario}
-                <div id="lista-resenas-${esc(id)}">${listaHTML || (propia ? '<p class="text-sm text-gray-400">Todavía no hay reseñas.</p>' : '<p class="text-sm text-gray-400">Todavía no hay otras reseñas.</p>')}</div>
+                <div id="lista-resenas-${esc(id)}">${listaHTML || (propia ? '<p class="text-sm text-tinta/45">Todavía no hay reseñas.</p>' : '<p class="text-sm text-tinta/45">Todavía no hay otras reseñas.</p>')}</div>
             </div>`;
         }
+
+        // ---------- Piezas visuales compartidas ----------
+        // Botón de ícono: siempre 36×36, ícono de 18px, mismo radio
+        const BTN_ICONO = 'w-9 h-9 shrink-0 inline-flex items-center justify-center rounded-xl transition ';
+        const BTN_ICONO_NEUTRO = BTN_ICONO + 'text-tinta/45 hover:text-verde-ingles hover:bg-beige-base';
+        // Píldoras de acción (Pública, Guardar, Publicar...): mismo alto para que alineen
+        const PILDORA = 'inline-flex items-center gap-1.5 h-8 px-3 rounded-full text-xs font-semibold border transition ';
+        // Colores por tipo de comida
+        const ESTILO_TIPO = {
+            almuerzo_cena: 'bg-verde-suave text-verde-ingles',
+            desayuno_merienda: 'bg-yema-suave text-[#7A5300]',
+            postre: 'bg-rosa-suave text-rosa-texto'
+        };
+        const LOGO_IG = '<svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.2c3.2 0 3.6 0 4.8.1 3.3.1 4.8 1.7 4.9 4.9.1 1.3.1 1.6.1 4.8s0 3.6-.1 4.8c-.1 3.2-1.7 4.8-4.9 4.9-1.3.1-1.6.1-4.8.1s-3.6 0-4.8-.1c-3.3-.1-4.8-1.7-4.9-4.9C2.2 15.6 2.2 15.2 2.2 12s0-3.6.1-4.8C2.4 3.9 3.9 2.4 7.2 2.3 8.4 2.2 8.8 2.2 12 2.2zm0 4.7a5.1 5.1 0 100 10.2 5.1 5.1 0 000-10.2zm0 8.4a3.3 3.3 0 110-6.6 3.3 3.3 0 010 6.6zm5.3-9.8a1.2 1.2 0 100 2.4 1.2 1.2 0 000-2.4z"/></svg>';
+        const LOGO_TT = '<svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor"><path d="M19.6 6.7a4.8 4.8 0 01-3.8-4.3V2h-3.4v13.7a2.9 2.9 0 01-5.2 1.7 2.9 2.9 0 013.2-4.5V9.4a6.3 6.3 0 00-5.4 10.8 6.3 6.3 0 0010.8-4.5V10a8.2 8.2 0 003.8 1V7.6a4.8 4.8 0 01-.1-.9z"/></svg>';
 
         function tarjetaReceta(r, ctx, opts) {
             opts = opts || {};
@@ -1869,109 +1899,97 @@
             const web = urlSegura(r.link);
 
             const filasTabla = (r.tablaCantidades || []).map(item => `
-                <tr class="border-b border-beige-border/60 last:border-0">
-                    <td class="py-2.5 px-4 font-medium text-gray-800">${esc(item.ingrediente)}</td>
-                    <td class="py-2.5 px-4 text-gray-600">${esc(item.cantidad || '-')}</td>
+                <tr class="border-b border-beige-border/70 last:border-0">
+                    <td class="py-2.5 px-4 font-medium">${esc(item.ingrediente)}</td>
+                    <td class="py-2.5 px-4 text-tinta/70 text-right">${esc(item.cantidad || '–')}</td>
                 </tr>`).join('');
 
+            // Línea de datos debajo del título: tipo de comida + porciones
             const chipTipo = r.tipo && TIPOS_COMIDA[r.tipo]
-                ? `<span class="px-3 py-1 rounded-full text-xs font-medium bg-amber-50 text-amber-800 border border-amber-200">${esc(TIPOS_COMIDA[r.tipo])}</span>`
+                ? `<span class="inline-flex items-center h-6 px-2.5 rounded-full text-xs font-semibold ${ESTILO_TIPO[r.tipo]}">${esc(TIPOS_COMIDA[r.tipo])}</span>`
                 : '';
             const chipPorciones = r.porciones
-                ? `<span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium bg-beige-base text-gray-600 border border-beige-border">${svg(ICONO_USUARIOS, 'w-3 h-3')}Rinde ${esc(r.porciones)} ${r.porciones === 1 ? 'porción' : 'porciones'}</span>`
+                ? `<span class="inline-flex items-center gap-1 text-xs font-medium text-tinta/60">${svg(ICONO_USUARIOS, 'w-3.5 h-3.5')}${esc(r.porciones)} ${r.porciones === 1 ? 'porción' : 'porciones'}</span>`
                 : '';
-            const chipsMeta = chipTipo + chipPorciones;
+            const lineaDatos = (chipTipo || chipPorciones)
+                ? `<div class="flex flex-wrap items-center gap-x-3 gap-y-1.5">${chipTipo}${chipPorciones}</div>` : '';
+
             const chipsIngredientes = r.ingredientes.map(ing => {
                 const esIncluido = ingredientesIncluidos.includes(ing);
-                const claseChip = esIncluido
-                    ? 'bg-verde-chip text-white font-medium'
-                    : 'bg-beige-base text-gray-600 border border-beige-border';
-                return `<span class="px-3 py-1 rounded-full text-xs ${claseChip}">${esc(ing)}</span>`;
+                return `<span class="inline-flex items-center h-7 px-2.5 rounded-lg text-xs ${esIncluido ? 'bg-verde-chip text-white font-semibold' : 'bg-beige-base text-tinta/75'}">${esc(ing)}</span>`;
             }).join('');
 
-            const pill = (href, texto, clase) => `
-                <a href="${esc(href)}" target="_blank" rel="noopener noreferrer nofollow" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition ${clase}">
-                    ${svg(ICONO_EXTERNO, 'w-3.5 h-3.5')}<span>${texto}</span>
-                </a>`;
+            const pill = (href, icono, texto, clase) => `
+                <a href="${esc(href)}" target="_blank" rel="noopener noreferrer nofollow" class="${PILDORA} ${clase}">${icono}<span>${texto}</span></a>`;
             const enlaces = [
-                ig ? pill(enlaceSalida(r, 'ig', ig), 'Instagram', 'bg-pink-50 text-pink-700 border-pink-200 hover:bg-pink-100') : '',
-                tt ? pill(enlaceSalida(r, 'tt', tt), 'TikTok', 'bg-gray-100 text-gray-800 border-gray-300 hover:bg-gray-200') : '',
-                web ? pill(enlaceSalida(r, 'web', web), 'Enlace web', 'bg-amber-50 text-amber-800 border-amber-200 hover:bg-amber-100') : ''
+                ig ? pill(enlaceSalida(r, 'ig', ig), LOGO_IG, 'Instagram', 'bg-white text-[#B1306E] border-[#F0C6D9] hover:bg-[#FDF0F6]') : '',
+                tt ? pill(enlaceSalida(r, 'tt', tt), LOGO_TT, 'TikTok', 'bg-white text-tinta border-beige-border hover:bg-beige-base') : '',
+                web ? pill(enlaceSalida(r, 'web', web), svg(ICONO_LINK, 'w-3.5 h-3.5'), 'Web', 'bg-white text-verde-ingles border-beige-border hover:bg-beige-base') : ''
             ].join('');
 
-            const badgeClase = r.publica
-                ? 'text-verde-chip bg-green-50 border-green-200 hover:bg-green-100'
-                : 'text-gray-600 bg-beige-base border-beige-border hover:bg-beige-border/60';
-
             const togglePrivacidad = `
-                <button type="button" onclick="alternarPrivacidad('${idAttr}')" title="${r.publica ? 'Pública: tocá para hacerla privada' : 'Privada: tocá para hacerla pública'}" class="inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full border transition ${badgeClase}">
+                <button type="button" onclick="alternarPrivacidad('${idAttr}')" title="${r.publica ? 'Pública: tocá para hacerla privada' : 'Privada: tocá para hacerla pública'}" class="${PILDORA} ${r.publica ? 'text-verde-chip bg-verde-suave/60 border-transparent hover:bg-verde-suave' : 'text-tinta/60 bg-beige-base border-transparent hover:bg-beige-border/60'}">
                     ${svg(r.publica ? ICONO_MUNDO : ICONO_CANDADO, 'w-3.5 h-3.5')}
                     <span>${r.publica ? 'Pública' : 'Privada'}</span>
                 </button>`;
 
             const enAlgunaColeccion = misColecciones.some(c => c.recetaIds.includes(r.id));
-            const botonColeccion = `<button type="button" onclick="abrirAgregarAColeccion('${idAttr}')" title="Agregar a una colección" class="p-2 rounded-lg transition hover:bg-beige-base ${enAlgunaColeccion ? 'text-mostaza hover:text-mostaza-hover' : 'text-gray-400 hover:text-verde-ingles'}">${svg(enAlgunaColeccion ? ICONO_CARPETA : ICONO_CARPETA_MAS)}</button>`;
+            const botonColeccion = `<button type="button" onclick="abrirAgregarAColeccion('${idAttr}')" title="Agregar a una colección" class="${BTN_ICONO} ${enAlgunaColeccion ? 'text-mostaza-hover hover:bg-yema-suave' : 'text-tinta/45 hover:text-verde-ingles hover:bg-beige-base'}">${svg(enAlgunaColeccion ? ICONO_CARPETA : ICONO_CARPETA_MAS, 'w-[18px] h-[18px]', enAlgunaColeccion)}</button>`;
 
-            // Arriba a la derecha: puntaje promedio · carpeta (colecciones) · editar/borrar o guardar
+            // Arriba a la derecha: carpeta (colecciones) · editar/borrar o guardar
             const arribaDerecha = propia ? `
-                <div class="flex items-center gap-0.5 shrink-0">
-                    <span class="mr-1">${resumenResenasCompacto(r.id)}</span>
+                <div class="flex items-center -mr-2 shrink-0">
                     ${botonColeccion}
-                    <button onclick="prepararEdicion('${idAttr}')" title="Editar" class="p-2 rounded-lg text-gray-400 hover:text-verde-ingles hover:bg-beige-base transition">${svg(ICONO_EDITAR)}</button>
-                    <button onclick="eliminarReceta('${idAttr}')" title="Eliminar" class="p-2 rounded-lg text-gray-400 hover:text-rojo-excluir hover:bg-beige-base transition">${svg(ICONO_BASURA)}</button>
+                    <button onclick="prepararEdicion('${idAttr}')" title="Editar" class="${BTN_ICONO_NEUTRO}">${svg(ICONO_EDITAR, 'w-[18px] h-[18px]')}</button>
+                    <button onclick="eliminarReceta('${idAttr}')" title="Eliminar" class="${BTN_ICONO} text-tinta/45 hover:text-rojo-excluir hover:bg-red-50">${svg(ICONO_BASURA, 'w-[18px] h-[18px]')}</button>
                 </div>` : `
-                <div class="flex items-center gap-1 shrink-0">
-                    <span class="mr-1">${resumenResenasCompacto(r.id)}</span>
+                <div class="flex items-center gap-1 -mr-1 shrink-0">
                     ${botonColeccion}
                     ${botonGuardar(r)}
                 </div>`;
 
             const claseArticulo = opts.anidada
-                ? 'bg-beige-base/50 p-5 space-y-4'
-                : 'bg-white rounded-2xl p-6 shadow-soft border border-beige-border space-y-4';
+                ? 'p-5 space-y-4'
+                : 'bg-white rounded-2xl p-5 sm:p-6 shadow-soft ring-1 ring-beige-border space-y-4';
 
             return `
             <article class="${claseArticulo}">
-                ${(propia || opts.ocultarAutor) ? '' : `<div class="pb-1">${chipAutor(r.userId, ctx === 'inicio' ? tiempoRelativo(r.creada) : '')}</div>`}
+                ${(propia || opts.ocultarAutor) ? '' : `<div>${chipAutor(r.userId, ctx === 'inicio' ? tiempoRelativo(r.creada) : '')}</div>`}
 
                 <div class="flex justify-between items-start gap-3">
-                    <div class="min-w-0 space-y-1">
-                        <h3 class="text-lg font-semibold text-verde-ingles leading-snug">${esc(r.nombre)}</h3>
-                        ${r.descripcion ? `<p class="text-sm text-gray-500">${esc(r.descripcion)}</p>` : ''}
+                    <div class="min-w-0 space-y-2">
+                        <h3 class="font-display text-2xl font-bold text-verde-ingles leading-tight">${esc(r.nombre)}</h3>
+                        ${r.descripcion ? `<p class="text-sm text-tinta/65 leading-snug">${esc(r.descripcion)}</p>` : ''}
+                        ${lineaDatos}
                     </div>
                     ${arribaDerecha}
                 </div>
 
-                <div class="flex flex-wrap gap-2">${chipsIngredientes}</div>
+                <div class="flex flex-wrap gap-1.5">${chipsIngredientes}</div>
 
                 ${enlaces ? `<div class="flex flex-wrap gap-2">${enlaces}</div>` : ''}
 
-                <div class="flex items-center justify-between gap-3 pt-2">
-                    <div class="flex items-center gap-2">
+                <div class="flex items-center justify-between gap-3 pt-3 border-t border-beige-border/70">
+                    <div class="flex items-center gap-1.5 min-w-0">
                         ${propia ? togglePrivacidad : ''}
-                        <button type="button" onclick="compartirReceta('${idAttr}')" title="Copiar enlace para compartir" class="p-2 rounded-full text-gray-400 hover:text-verde-ingles hover:bg-beige-base transition">${svg(ICONO_COMPARTIR)}</button>
-                        ${propia && r.publica ? `<button type="button" onclick="abrirCompartirPost('${idAttr}', 'propia')" title="Publicar en tu perfil" class="inline-flex items-center gap-1.5 text-xs font-medium px-2.5 sm:px-3 py-1.5 rounded-full border border-beige-border text-gray-600 bg-white hover:bg-beige-base transition">${svg('M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z', 'w-3.5 h-3.5')}<span class="hidden sm:inline">Publicar</span></button>` : ''}
+                        ${propia && r.publica ? `<button type="button" onclick="abrirCompartirPost('${idAttr}', 'propia')" title="Publicar en tu perfil" class="${PILDORA} bg-white text-tinta/70 border-beige-border hover:bg-beige-base">${svg('M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z', 'w-3.5 h-3.5')}<span class="hidden sm:inline">Publicar</span></button>` : ''}
+                        <button type="button" onclick="compartirReceta('${idAttr}')" title="Copiar enlace para compartir" class="${BTN_ICONO_NEUTRO} !w-8 !h-8 !rounded-full">${svg(ICONO_COMPARTIR, 'w-4 h-4')}</button>
+                        <span class="ml-1">${resumenResenasCompacto(r.id)}</span>
                     </div>
-                    <button id="btn-det-${ctx}-${idAttr}" onclick="toggleDetalle('${ctx}', '${idAttr}')" class="px-3.5 py-1.5 rounded-full text-verde-ingles hover:bg-beige-base transition border border-beige-border flex items-center gap-1.5 text-sm font-medium">${etiquetaVerMas(abierta)}</button>
+                    <button id="btn-det-${ctx}-${idAttr}" onclick="toggleDetalle('${ctx}', '${idAttr}')" class="${PILDORA} shrink-0 bg-white text-verde-ingles border-beige-border hover:bg-beige-base">${etiquetaVerMas(abierta)}</button>
                 </div>
 
-                <div id="det-${ctx}-${idAttr}" class="${abierta ? '' : 'hidden'} pt-5 border-t border-beige-border space-y-5">
-                    ${chipsMeta ? `<div class="flex flex-wrap gap-2">${chipsMeta}</div>` : ''}
+                <div id="det-${ctx}-${idAttr}" class="${abierta ? '' : 'hidden'} pt-1 space-y-5">
                     <div class="space-y-2">
-                        <span class="text-sm font-semibold text-verde-ingles">Ingredientes y cantidades</span>
-                        <div class="border border-beige-border rounded-xl overflow-hidden bg-white">
-                            <table class="w-full text-left text-sm">
-                                <thead class="bg-beige-base text-verde-ingles font-semibold border-b border-beige-border">
-                                    <tr><th class="py-2.5 px-4">Ingrediente</th><th class="py-2.5 px-4">Cantidad</th></tr>
-                                </thead>
-                                <tbody>${filasTabla}</tbody>
-                            </table>
+                        <h4 class="text-sm font-semibold text-verde-ingles">Ingredientes${r.porciones ? ` <span class="font-normal text-tinta/55">· para ${esc(r.porciones)}</span>` : ''}</h4>
+                        <div class="rounded-xl overflow-hidden ring-1 ring-beige-border bg-white">
+                            <table class="w-full text-left text-sm"><tbody>${filasTabla}</tbody></table>
                         </div>
                     </div>
                     ${r.procedimiento ? `
                     <div class="space-y-2">
-                        <span class="text-sm font-semibold text-verde-ingles">Procedimiento</span>
-                        <p class="text-sm text-gray-700 leading-relaxed whitespace-pre-line bg-beige-base/70 p-4 rounded-xl">${esc(r.procedimiento)}</p>
+                        <h4 class="text-sm font-semibold text-verde-ingles">Preparación</h4>
+                        <p class="text-[15px] leading-relaxed whitespace-pre-line bg-beige-base/70 p-4 rounded-xl">${esc(r.procedimiento)}</p>
                     </div>` : ''}
                     ${bloqueResenas(r)}
                 </div>
@@ -2011,15 +2029,15 @@
         function tarjetaAnuncio(indice) {
             if (ANUNCIOS_ACTIVOS) {
                 return `
-            <div class="bg-white border border-beige-border rounded-2xl p-4 shadow-soft space-y-2 overflow-hidden">
-                <span class="block text-[10px] font-semibold uppercase tracking-widest text-gray-400">Publicidad</span>
+            <div class="bg-white ring-1 ring-beige-border rounded-2xl p-4 space-y-2 overflow-hidden">
+                <span class="block text-xs text-tinta/40">Publicidad</span>
                 <ins class="adsbygoogle" style="display:block" data-ad-client="${esc(ADSENSE_CLIENTE)}" data-ad-slot="${esc(ADSENSE_BLOQUE)}" data-ad-format="auto" data-full-width-responsive="true"></ins>
             </div>`;
             }
             return `
-            <div class="bg-beige-base/70 border border-dashed border-beige-border rounded-2xl p-5 text-center space-y-1">
-                <span class="text-[10px] font-semibold uppercase tracking-widest text-gray-400">Espacio publicitario</span>
-                <div id="anuncio-slot-${indice}" class="min-h-[90px] flex items-center justify-center text-xs text-gray-400">Acá va a aparecer un anuncio</div>
+            <div class="rounded-2xl border border-dashed border-beige-border p-4 space-y-1">
+                <span class="block text-xs text-tinta/40">Publicidad</span>
+                <div id="anuncio-slot-${indice}" class="min-h-[90px] rounded-xl bg-beige-base/60 flex items-center justify-center text-xs text-tinta/40">Espacio para un anuncio</div>
             </div>`;
         }
 
@@ -2027,16 +2045,15 @@
             const r = p.receta;
             if (!r) return '';
             const esRepost = p.userId !== r.userId;
-            const caption = p.descripcion ? `<p class="text-sm text-gray-700 whitespace-pre-line">${esc(p.descripcion)}</p>` : '';
+            const caption = p.descripcion ? `<p class="text-[15px] leading-relaxed whitespace-pre-line">${esc(p.descripcion)}</p>` : '';
             const notaRepost = esRepost
-                ? `<div class="flex items-center gap-1.5 text-xs text-gray-500">${svg(ICONO_COMPARTIR, 'w-3 h-3')}<span>Compartió esta receta</span></div>`
+                ? `<span class="inline-flex items-center gap-1 text-xs text-tinta/55">${svg('M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15', 'w-3.5 h-3.5')}compartió una receta</span>`
                 : '';
             return `
-            <article class="bg-white rounded-2xl p-5 shadow-soft border border-beige-border space-y-3">
-                <div>${chipAutor(p.userId, tiempoRelativo(p.creada))}</div>
+            <article class="bg-white rounded-2xl p-4 sm:p-5 shadow-soft ring-1 ring-beige-border space-y-3">
+                <div class="flex items-center justify-between gap-3">${chipAutor(p.userId, tiempoRelativo(p.creada))}${notaRepost}</div>
                 ${caption}
-                ${notaRepost}
-                <div class="border border-beige-border rounded-xl overflow-hidden">
+                <div class="bg-fondo/70 ring-1 ring-beige-border rounded-xl overflow-hidden">
                     ${tarjetaReceta(r, ctx + 'p' + String(p.id).replace(/[^a-zA-Z0-9_-]/g, ''), { ocultarAutor: !esRepost, anidada: true })}
                 </div>
             </article>`;
@@ -2215,9 +2232,9 @@
         function botonSeguir(id) {
             const sig = seguidos.has(id);
             const clase = sig
-                ? 'bg-white text-verde-ingles border border-verde-ingles/40 hover:bg-red-50 hover:text-rojo-excluir hover:border-rojo-excluir/40'
+                ? 'bg-white text-verde-ingles border border-beige-border hover:bg-red-50 hover:text-rojo-excluir hover:border-rojo-excluir/40'
                 : 'bg-verde-ingles text-white border border-verde-ingles hover:bg-verde-hover';
-            return `<button type="button" onclick="event.stopPropagation(); alternarSeguir('${esc(id)}')" class="px-4 py-2 rounded-xl text-sm font-medium transition shrink-0 ${clase}">${sig ? 'Siguiendo' : 'Seguir'}</button>`;
+            return `<button type="button" onclick="event.stopPropagation(); alternarSeguir('${esc(id)}')" class="h-9 px-4 rounded-xl text-sm font-semibold transition shrink-0 ${clase}">${sig ? 'Siguiendo' : 'Seguir'}</button>`;
         }
 
         async function alternarSeguir(id) {
@@ -2244,12 +2261,12 @@
         function filaPersona(p) {
             const yo = p.id === usuarioActual.id;
             return `
-                <div onclick="verPerfilPorId('${esc(p.id)}')" class="flex items-center gap-4 bg-white rounded-2xl p-4 border border-beige-border shadow-soft cursor-pointer hover:border-verde-chip transition">
+                <div onclick="verPerfilPorId('${esc(p.id)}')" class="flex items-center gap-4 bg-white rounded-2xl p-4 ring-1 ring-beige-border shadow-soft cursor-pointer hover:ring-verde-chip/40 transition">
                     ${avatarHTML(p, 'w-12 h-12', 'text-lg')}
                     <div class="min-w-0 flex-1">
-                        <div class="text-sm font-semibold text-gray-800 truncate">${esc(p.nombre || p.usuario)}</div>
-                        <div class="text-xs text-gray-500 truncate">@${esc(p.usuario)}</div>
-                        ${p.bio ? `<div class="text-xs text-gray-500 mt-1 truncate">${esc(p.bio)}</div>` : ''}
+                        <div class="text-sm font-semibold text-tinta truncate">${esc(p.nombre || p.usuario)}</div>
+                        <div class="text-xs text-tinta/60 truncate">@${esc(p.usuario)}</div>
+                        ${p.bio ? `<div class="text-xs text-tinta/60 mt-1 truncate">${esc(p.bio)}</div>` : ''}
                     </div>
                     ${yo ? '' : botonSeguir(p.id)}
                 </div>`;
@@ -2437,7 +2454,7 @@
         function renderExplorar() {
             const cont = el('explorar-lista');
             if (!explorarPersonas.length) {
-                cont.innerHTML = '<div class="text-center py-12 text-sm text-gray-500 bg-white rounded-2xl border border-dashed border-beige-border">No encontramos a nadie.</div>';
+                cont.innerHTML = '<div class="text-center py-12 text-sm text-tinta/60 bg-white rounded-2xl border border-dashed border-beige-border">No encontramos a nadie.</div>';
                 return;
             }
             cont.innerHTML = explorarPersonas.map(filaPersona).join('');
@@ -2466,7 +2483,7 @@
         function renderListaPersonas() {
             el('personas-lista').innerHTML = listaPersonas.length
                 ? listaPersonas.map(filaPersona).join('')
-                : '<div class="text-center py-10 text-sm text-gray-500">Todavía no hay nadie acá.</div>';
+                : '<div class="text-center py-10 text-sm text-tinta/60">Todavía no hay nadie acá.</div>';
         }
 
         function cerrarPersonas() {
@@ -2493,7 +2510,7 @@
                 const { data: p, error } = await q.maybeSingle();
                 if (error) throw error;
                 if (!p) {
-                    el('perfil-contenido').innerHTML = `<button onclick="volverVista()" class="mb-4 text-sm text-gray-500 hover:text-verde-ingles">← Volver</button>` +
+                    el('perfil-contenido').innerHTML = `<button onclick="volverVista()" class="mb-4 text-sm text-tinta/60 hover:text-verde-ingles">← Volver</button>` +
                         estadoVacioHTML(ICONO_USUARIOS, 'Este perfil no existe', 'Puede que el usuario haya cambiado o ya no esté.', '', '');
                     return;
                 }
@@ -2539,10 +2556,10 @@
         function botonGuardarColeccion(c) {
             const g = guardadasColIds.has(c.id);
             const clase = g
-                ? 'text-mostaza bg-amber-50 border-amber-200 hover:bg-amber-100'
-                : 'text-gray-600 bg-white border-beige-border hover:bg-beige-base';
+                ? 'text-verde-ingles bg-mostaza border-mostaza hover:bg-mostaza-hover'
+                : 'text-verde-ingles bg-white border-beige-border hover:bg-beige-base';
             return `
-                <button type="button" onclick="event.stopPropagation(); alternarColeccionGuardada('${esc(c.id)}')" title="${g ? 'Quitar de guardadas' : 'Guardar esta colección'}" class="inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full border transition ${clase}">
+                <button type="button" onclick="event.stopPropagation(); alternarColeccionGuardada('${esc(c.id)}')" title="${g ? 'Quitar de guardadas' : 'Guardar esta colección'}" class="${PILDORA} ${clase}">
                     ${svg(ICONO_GUARDAR, 'w-3.5 h-3.5', g)}
                     <span>${g ? 'Guardada' : 'Guardar'}</span>
                 </button>`;
@@ -2552,26 +2569,26 @@
             const cantidad = propia ? c.recetaIds.length : c.cantidad;
             const idAttr = esc(c.id);
             return `
-                <article onclick="abrirColeccion('${idAttr}')" class="bg-white rounded-2xl p-6 shadow-soft border border-beige-border cursor-pointer hover:border-verde-chip transition flex flex-col gap-4">
+                <article onclick="abrirColeccion('${idAttr}')" class="bg-white rounded-2xl p-5 sm:p-6 shadow-soft ring-1 ring-beige-border cursor-pointer hover:ring-verde-chip/40 transition flex flex-col gap-4">
                     ${conAutor ? `<div onclick="event.stopPropagation()">${chipAutor(c.user_id, '')}</div>` : ''}
                     <div class="flex justify-between items-start gap-3">
                         <div class="min-w-0 space-y-1">
-                            <h3 class="text-lg font-semibold text-verde-ingles leading-snug">${esc(c.nombre)}</h3>
-                            ${c.descripcion ? `<p class="text-sm text-gray-500">${esc(c.descripcion)}</p>` : ''}
+                            <h3 class="font-display text-xl font-semibold text-verde-ingles leading-tight">${esc(c.nombre)}</h3>
+                            ${c.descripcion ? `<p class="text-sm text-tinta/60">${esc(c.descripcion)}</p>` : ''}
                         </div>
-                        <div class="text-mostaza shrink-0">${svg(ICONO_COLECCION, 'w-6 h-6')}</div>
+                        <div class="w-11 h-11 rounded-xl bg-yema-suave text-[#7A5300] flex items-center justify-center shrink-0">${svg(ICONO_COLECCION, 'w-[22px] h-[22px]')}</div>
                     </div>
                     <div class="flex items-center justify-between gap-2 mt-auto">
-                        <div class="flex items-center gap-2 text-sm text-gray-500">
+                        <div class="flex items-center gap-2 text-sm text-tinta/60">
                             <span>${cantidad} ${cantidad === 1 ? 'receta' : 'recetas'}</span>
-                            ${propia ? `<span class="inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full border ${c.publica ? 'text-verde-chip bg-green-50 border-green-200' : 'text-gray-600 bg-beige-base border-beige-border'}">${svg(c.publica ? ICONO_MUNDO : ICONO_CANDADO, 'w-3 h-3')}${c.publica ? 'Pública' : 'Privada'}</span>` : ''}
+                            ${propia ? `<span class="inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full border ${c.publica ? 'text-verde-chip bg-green-50 border-green-200' : 'text-tinta/70 bg-beige-base border-beige-border'}">${svg(c.publica ? ICONO_MUNDO : ICONO_CANDADO, 'w-3 h-3')}${c.publica ? 'Pública' : 'Privada'}</span>` : ''}
                         </div>
                         <div class="flex items-center gap-1" onclick="event.stopPropagation()">
                             ${propia ? '' : botonGuardarColeccion(c)}
-                            <button type="button" onclick="compartirColeccion('${idAttr}')" title="Compartir" class="p-2 rounded-lg text-gray-400 hover:text-verde-ingles hover:bg-beige-base transition">${svg(ICONO_COMPARTIR)}</button>
+                            <button type="button" onclick="compartirColeccion('${idAttr}')" title="Compartir" class="p-2 rounded-lg text-tinta/45 hover:text-verde-ingles hover:bg-beige-base transition">${svg(ICONO_COMPARTIR)}</button>
                             ${propia ? `
-                            <button type="button" onclick="abrirEditorColeccion('${idAttr}')" title="Editar" class="p-2 rounded-lg text-gray-400 hover:text-verde-ingles hover:bg-beige-base transition">${svg(ICONO_EDITAR)}</button>
-                            <button type="button" onclick="eliminarColeccion('${idAttr}')" title="Eliminar" class="p-2 rounded-lg text-gray-400 hover:text-rojo-excluir hover:bg-beige-base transition">${svg(ICONO_BASURA)}</button>` : ''}
+                            <button type="button" onclick="abrirEditorColeccion('${idAttr}')" title="Editar" class="p-2 rounded-lg text-tinta/45 hover:text-verde-ingles hover:bg-beige-base transition">${svg(ICONO_EDITAR)}</button>
+                            <button type="button" onclick="eliminarColeccion('${idAttr}')" title="Eliminar" class="p-2 rounded-lg text-tinta/45 hover:text-rojo-excluir hover:bg-beige-base transition">${svg(ICONO_BASURA)}</button>` : ''}
                         </div>
                     </div>
                 </article>`;
@@ -2583,9 +2600,9 @@
             const p = pv.perfil;
             const yo = p.id === usuarioActual.id;
             const linkSeguro = urlSegura(p.link);
-            const tabBase = 'px-4 py-2.5 rounded-xl text-sm font-medium transition border ';
+            const tabBase = 'inline-flex items-center h-9 px-4 rounded-full text-sm font-semibold transition border ';
             const tabOn = tabBase + 'bg-verde-ingles text-white border-verde-ingles';
-            const tabOff = tabBase + 'bg-white text-gray-600 border-beige-border hover:bg-beige-base';
+            const tabOff = tabBase + 'bg-white text-tinta/70 border-beige-border hover:text-verde-ingles hover:border-verde-chip/40';
 
             let contenido;
             if (subPerfil === 'recetas') {
@@ -2599,29 +2616,29 @@
             }
 
             el('perfil-contenido').innerHTML = `
-                ${yo ? '' : `<button type="button" onclick="volverVista()" class="mb-4 inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-verde-ingles">${svg('M15 19l-7-7 7-7')}<span>Volver</span></button>`}
+                ${yo ? '' : `<button type="button" onclick="volverVista()" class="mb-4 inline-flex items-center gap-1.5 text-sm text-tinta/60 hover:text-verde-ingles">${svg('M15 19l-7-7 7-7')}<span>Volver</span></button>`}
                 <div class="space-y-6">
-                    <div class="bg-white rounded-2xl p-6 sm:p-8 shadow-soft border border-beige-border space-y-5">
+                    <div class="bg-white rounded-2xl p-6 sm:p-8 shadow-soft ring-1 ring-beige-border space-y-5">
                         <div class="flex flex-col sm:flex-row sm:items-center gap-5">
                             <div class="shrink-0">${avatarHTML(p, 'w-24 h-24', 'text-3xl')}</div>
                             <div class="min-w-0 flex-1 space-y-1">
-                                <h2 class="text-xl font-semibold text-verde-ingles truncate">${esc(p.nombre || p.usuario)}</h2>
-                                <div class="text-sm text-gray-500">@${esc(p.usuario)}</div>
+                                <h2 class="text-3xl font-bold text-verde-ingles truncate">${esc(p.nombre || p.usuario)}</h2>
+                                <div class="text-sm text-tinta/60">@${esc(p.usuario)}</div>
                                 <div class="flex gap-5 pt-2 text-sm">
-                                    <button type="button" onclick="abrirListaPersonas('seguidores', '${esc(p.id)}')" class="hover:text-verde-ingles transition"><span class="font-semibold text-gray-800">${pv.nSeguidores}</span> <span class="text-gray-500">${pv.nSeguidores === 1 ? 'seguidor' : 'seguidores'}</span></button>
-                                    <button type="button" onclick="abrirListaPersonas('seguidos', '${esc(p.id)}')" class="hover:text-verde-ingles transition"><span class="font-semibold text-gray-800">${pv.nSeguidos}</span> <span class="text-gray-500">siguiendo</span></button>
+                                    <button type="button" onclick="abrirListaPersonas('seguidores', '${esc(p.id)}')" class="hover:text-verde-ingles transition"><span class="font-display text-lg font-bold text-tinta">${pv.nSeguidores}</span> <span class="text-tinta/60">${pv.nSeguidores === 1 ? 'seguidor' : 'seguidores'}</span></button>
+                                    <button type="button" onclick="abrirListaPersonas('seguidos', '${esc(p.id)}')" class="hover:text-verde-ingles transition"><span class="font-display text-lg font-bold text-tinta">${pv.nSeguidos}</span> <span class="text-tinta/60">siguiendo</span></button>
                                 </div>
                             </div>
                             <div class="flex gap-2 shrink-0">
                                 ${yo
                                     ? `<button type="button" onclick="abrirEditorPerfil()" class="px-4 py-2 rounded-xl text-sm font-medium border border-beige-border bg-white text-verde-ingles hover:bg-beige-base transition">Editar perfil</button>`
                                     : botonSeguir(p.id)}
-                                <button type="button" onclick="compartirPerfil()" title="Compartir perfil" class="p-2.5 rounded-xl border border-beige-border text-gray-500 hover:text-verde-ingles hover:bg-beige-base transition">${svg(ICONO_COMPARTIR)}</button>
+                                <button type="button" onclick="compartirPerfil()" title="Compartir perfil" class="p-2.5 rounded-xl border border-beige-border text-tinta/60 hover:text-verde-ingles hover:bg-beige-base transition">${svg(ICONO_COMPARTIR)}</button>
                             </div>
                         </div>
-                        ${p.bio ? `<p class="text-sm text-gray-700 leading-relaxed whitespace-pre-line">${esc(p.bio)}</p>` : (yo ? '<p class="text-sm text-gray-400">Todavía no escribiste una bio. Podés agregarla desde Editar perfil.</p>' : '')}
+                        ${p.bio ? `<p class="text-sm text-tinta/80 leading-relaxed whitespace-pre-line">${esc(p.bio)}</p>` : (yo ? '<p class="text-sm text-tinta/45">Todavía no escribiste una bio. Podés agregarla desde Editar perfil.</p>' : '')}
                         ${linkSeguro ? `<a href="${esc(linkSeguro)}" target="_blank" rel="noopener noreferrer nofollow" class="inline-flex items-center gap-2 text-sm font-medium text-verde-ingles underline underline-offset-4 hover:text-verde-hover">${svg(ICONO_LINK)}<span>${esc(etiquetaLink(linkSeguro))}</span></a>` : ''}
-                        ${yo ? '<p class="text-xs text-gray-400">Así ven tu perfil las demás personas: solo tus recetas y colecciones públicas.</p>' : ''}
+                        ${yo ? '<p class="text-xs text-tinta/45">Así ven tu perfil las demás personas: solo tus recetas y colecciones públicas.</p>' : ''}
                     </div>
 
                     <div class="flex gap-2">
@@ -2772,10 +2789,10 @@
                 ? disponibles.map(r => `
                     <label class="flex items-center gap-3 p-3 rounded-xl border border-beige-border hover:bg-beige-base cursor-pointer">
                         <input type="checkbox" value="${esc(r.id)}" ${marcadas.has(r.id) ? 'checked' : ''} class="w-4 h-4 accent-[#2d6a4f]">
-                        <span class="text-sm text-gray-800 flex-1 min-w-0 truncate">${esc(r.nombre)}</span>
-                        ${r.userId !== usuarioActual.id ? '<span class="text-xs text-gray-400 shrink-0">guardada</span>' : (r.publica ? '' : '<span class="text-xs text-gray-400 shrink-0">privada</span>')}
+                        <span class="text-sm text-tinta flex-1 min-w-0 truncate">${esc(r.nombre)}</span>
+                        ${r.userId !== usuarioActual.id ? '<span class="text-xs text-tinta/45 shrink-0">guardada</span>' : (r.publica ? '' : '<span class="text-xs text-tinta/45 shrink-0">privada</span>')}
                     </label>`).join('')
-                : '<p class="text-sm text-gray-500 text-center py-4">Primero cargá o guardá alguna receta para agregarla.</p>';
+                : '<p class="text-sm text-tinta/60 text-center py-4">Primero cargá o guardá alguna receta para agregarla.</p>';
 
             el('col-mensaje').classList.add('hidden');
             el('modal-coleccion').classList.remove('hidden');
@@ -2905,7 +2922,7 @@
         function renderDetalle() {
             const d = detalleActual;
             if (!d) return;
-            const volver = `<button type="button" onclick="volverVista()" class="mb-4 inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-verde-ingles">${svg('M15 19l-7-7 7-7')}<span>Volver</span></button>`;
+            const volver = `<button type="button" onclick="volverVista()" class="mb-4 inline-flex items-center gap-1.5 text-sm text-tinta/60 hover:text-verde-ingles">${svg('M15 19l-7-7 7-7')}<span>Volver</span></button>`;
             if (d.error) {
                 el('detalle-contenido').innerHTML = volver + estadoVacioHTML(ICONO_COLECCION, 'No disponible', d.error, '', '');
                 return;
@@ -2917,22 +2934,22 @@
                 const propia = c.user_id === usuarioActual.id;
                 const idAttr = esc(c.id);
                 cabecera = `
-                    <div class="bg-white rounded-2xl p-6 sm:p-8 shadow-soft border border-beige-border space-y-5">
+                    <div class="bg-white rounded-2xl p-6 sm:p-8 shadow-soft ring-1 ring-beige-border space-y-5">
                         <div class="flex justify-between items-start gap-3">
                             <div class="min-w-0 space-y-1">
-                                <div class="text-xs font-semibold uppercase tracking-wide text-mostaza">Colección</div>
-                                <h2 class="text-xl font-semibold text-verde-ingles">${esc(c.nombre)}</h2>
-                                ${c.descripcion ? `<p class="text-sm text-gray-500">${esc(c.descripcion)}</p>` : ''}
+                                <div class="inline-flex items-center gap-1.5 text-xs font-semibold text-[#7A5300] bg-yema-suave h-6 px-2.5 rounded-full">${svg(ICONO_CARPETA, 'w-3.5 h-3.5')}Colección</div>
+                                <h2 class="text-2xl font-bold text-verde-ingles">${esc(c.nombre)}</h2>
+                                ${c.descripcion ? `<p class="text-sm text-tinta/60">${esc(c.descripcion)}</p>` : ''}
                             </div>
                             <div class="flex items-center gap-1 shrink-0">
                                 ${propia ? '' : botonGuardarColeccion(c)}
-                                <button type="button" onclick="compartirColeccion('${idAttr}')" title="Compartir" class="p-2 rounded-lg text-gray-400 hover:text-verde-ingles hover:bg-beige-base transition">${svg(ICONO_COMPARTIR)}</button>
-                                ${propia ? `<button type="button" onclick="abrirEditorColeccion('${idAttr}')" title="Editar" class="p-2 rounded-lg text-gray-400 hover:text-verde-ingles hover:bg-beige-base transition">${svg(ICONO_EDITAR)}</button>` : ''}
+                                <button type="button" onclick="compartirColeccion('${idAttr}')" title="Compartir" class="p-2 rounded-lg text-tinta/45 hover:text-verde-ingles hover:bg-beige-base transition">${svg(ICONO_COMPARTIR)}</button>
+                                ${propia ? `<button type="button" onclick="abrirEditorColeccion('${idAttr}')" title="Editar" class="p-2 rounded-lg text-tinta/45 hover:text-verde-ingles hover:bg-beige-base transition">${svg(ICONO_EDITAR)}</button>` : ''}
                             </div>
                         </div>
                         <div class="flex items-center justify-between gap-3">
                             ${chipAutor(c.user_id, '')}
-                            <span class="text-sm text-gray-500">${d.recetas.length} ${d.recetas.length === 1 ? 'receta' : 'recetas'}</span>
+                            <span class="text-sm text-tinta/60">${d.recetas.length} ${d.recetas.length === 1 ? 'receta' : 'recetas'}</span>
                         </div>
                     </div>`;
             }
@@ -2955,13 +2972,13 @@
         };
         let tipoFiltro = '';
 
-        const CLASE_TIPO_BASE = 'px-4 py-2 rounded-xl text-sm font-medium transition border ';
+        const CLASE_TIPO_BASE = 'inline-flex items-center h-9 px-3.5 rounded-full text-sm font-semibold transition border ';
         function pintarTipoFiltro() {
             document.querySelectorAll('[data-tipo-filtro]').forEach(b => {
                 const on = b.dataset.tipoFiltro === tipoFiltro;
                 b.className = CLASE_TIPO_BASE + (on
                     ? 'bg-verde-ingles text-white border-verde-ingles'
-                    : 'bg-white text-gray-600 border-beige-border hover:bg-beige-base');
+                    : 'bg-white text-tinta/70 border-beige-border hover:border-verde-chip/40 hover:text-verde-ingles');
             });
         }
 
@@ -3102,7 +3119,7 @@
             Object.keys(mapa).forEach(m => el(mapa[m]).classList.toggle('hidden', m !== modo));
             el('bloque-google').classList.toggle('hidden', !(modo === 'login' || modo === 'registro'));
             const subs = {
-                login: 'Inicia sesión para ver tus recetas',
+                login: 'Iniciá sesión para ver tus recetas',
                 registro: 'Creá tu cuenta con tu email',
                 olvide: 'Recuperá tu contraseña',
                 nuevaclave: 'Elegí tu nueva contraseña'
@@ -3201,9 +3218,9 @@
                 ? misColecciones.map(c => `
                     <label class="flex items-center gap-3 p-3 rounded-xl border border-beige-border cursor-pointer hover:bg-beige-base">
                         <input type="checkbox" ${c.recetaIds.includes(recetaId) ? 'checked' : ''} onchange="toggleRecetaEnColeccion('${esc(c.id)}', this.checked)" class="w-4 h-4 accent-[#2d6a4f]">
-                        <span class="text-sm text-gray-800">${esc(c.nombre)}</span>
+                        <span class="text-sm text-tinta">${esc(c.nombre)}</span>
                     </label>`).join('')
-                : '<p class="text-sm text-gray-500 text-center py-4">Todavía no tenés colecciones.</p>';
+                : '<p class="text-sm text-tinta/60 text-center py-4">Todavía no tenés colecciones.</p>';
             el('modal-agregar-coleccion').classList.remove('hidden');
         }
 
@@ -3301,8 +3318,8 @@
                 <button type="button" onclick="clickNotificacion('${esc(n.id)}')" class="w-full text-left flex items-start gap-3 p-3 rounded-xl border transition ${n.leida ? 'bg-white border-beige-border' : 'bg-amber-50 border-amber-200'} hover:bg-beige-base">
                     <span class="mt-0.5 text-mostaza shrink-0">${svg(iconoNotificacion(n.tipo), 'w-4 h-4')}</span>
                     <span class="min-w-0 flex-1">
-                        <span class="block text-sm text-gray-800">${textoNotificacion(n)}</span>
-                        <span class="block text-xs text-gray-400 mt-0.5">${tiempoRelativo(n.created_at)}</span>
+                        <span class="block text-sm text-tinta">${textoNotificacion(n)}</span>
+                        <span class="block text-xs text-tinta/45 mt-0.5">${tiempoRelativo(n.created_at)}</span>
                     </span>
                 </button>`).join('');
         }
@@ -3393,10 +3410,10 @@
                 <button type="button" onclick="abrirConversacion('${esc(c.otroId)}')" class="w-full text-left flex items-center gap-3 p-3 rounded-xl border border-beige-border hover:bg-beige-base transition">
                     ${avatarHTML(p, 'w-10 h-10', 'text-sm')}
                     <span class="min-w-0 flex-1">
-                        <span class="block text-sm font-medium text-gray-800 truncate">${esc(p ? (p.nombre || p.usuario) : 'Alguien')}</span>
-                        <span class="block text-xs text-gray-500 truncate">${esc(c.ultimoTexto || 'Sin mensajes todavía')}</span>
+                        <span class="block text-sm font-medium text-tinta truncate">${esc(p ? (p.nombre || p.usuario) : 'Alguien')}</span>
+                        <span class="block text-xs text-tinta/60 truncate">${esc(c.ultimoTexto || 'Sin mensajes todavía')}</span>
                     </span>
-                    ${c.noLeidos ? `<span class="shrink-0 min-w-[18px] h-[18px] px-1 rounded-full bg-mostaza text-white text-[10px] font-semibold flex items-center justify-center">${c.noLeidos}</span>` : ''}
+                    ${c.noLeidos ? `<span class="shrink-0 min-w-[18px] h-[18px] px-1 rounded-full bg-rojo-excluir text-white text-[10px] font-bold flex items-center justify-center">${c.noLeidos}</span>` : ''}
                 </button>`;
             }).join('');
 
@@ -3405,11 +3422,11 @@
                 return `
                 <button type="button" onclick="abrirConversacion('${esc(id)}')" class="w-full text-left flex items-center gap-3 p-3 rounded-xl border border-dashed border-beige-border hover:bg-beige-base transition">
                     ${avatarHTML(p, 'w-9 h-9', 'text-xs')}
-                    <span class="text-sm text-gray-700 truncate">Escribirle a ${esc(p ? (p.nombre || p.usuario) : 'esta persona')}</span>
+                    <span class="text-sm text-tinta/80 truncate">Escribirle a ${esc(p ? (p.nombre || p.usuario) : 'esta persona')}</span>
                 </button>`;
             }).join('');
 
-            const contenido = filasConv + (nuevosContactos.length ? `<div class="text-xs font-semibold text-gray-400 uppercase tracking-wide pt-2">Empezar una conversación</div>${filasNuevos}` : '');
+            const contenido = filasConv + (nuevosContactos.length ? `<div class="text-sm font-semibold text-verde-ingles pt-3">Empezar una conversación</div>${filasNuevos}` : '');
             cont.innerHTML = contenido || estadoVacioHTML(ICONO_MENSAJE, 'Sin conversaciones', 'Cuando se sigan mutuamente con alguien, van a poder escribirse acá.', '', '');
         }
 
@@ -3446,7 +3463,7 @@
                 el('mensajes-vista-chat').classList.remove('hidden');
                 await asegurarPerfiles([otroId]);
                 const p = perfilesCache[otroId];
-                el('chat-cabecera-autor').innerHTML = `<span class="text-sm font-medium text-gray-800">${esc(p ? (p.nombre || p.usuario) : 'Chat')}</span>`;
+                el('chat-cabecera-autor').innerHTML = `<span class="text-sm font-medium text-tinta">${esc(p ? (p.nombre || p.usuario) : 'Chat')}</span>`;
                 await cargarMensajesConversacion();
                 suscribirseAMensajes(conv.id);
             } catch (err) {
@@ -3470,7 +3487,7 @@
             cont.innerHTML = conversacionAbierta.mensajes.map(m => {
                 const mio = m.remitente_id === usuarioActual.id;
                 return `<div class="flex ${mio ? 'justify-end' : 'justify-start'}">
-                    <div class="max-w-[75%] px-3.5 py-2 rounded-2xl text-sm ${mio ? 'bg-verde-ingles text-white rounded-br-sm' : 'bg-beige-base text-gray-800 rounded-bl-sm'}">
+                    <div class="max-w-[75%] px-3.5 py-2 rounded-2xl text-sm ${mio ? 'bg-verde-ingles text-white rounded-br-sm' : 'bg-beige-base text-tinta rounded-bl-sm'}">
                         <span class="whitespace-pre-line">${esc(m.texto)}</span>
                     </div>
                 </div>`;
