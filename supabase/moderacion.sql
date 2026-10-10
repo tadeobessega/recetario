@@ -183,3 +183,7 @@ create policy sanciones_ver on public.sanciones for select to authenticated
 create policy admins_ver on public.administradores for select to authenticated
   using (user_id = auth.uid());
 create policy publicaciones_borrar_admin on public.publicaciones for delete to authenticated using (public.es_admin());
+
+-- es_admin y esta_sancionado solo para usuarios con sesión
+revoke execute on function public.es_admin(), public.esta_sancionado(uuid) from public, anon;
+grant execute on function public.es_admin(), public.esta_sancionado(uuid) to authenticated;
