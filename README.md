@@ -9,7 +9,8 @@ Recetario social: cargás tus recetas, las organizás en colecciones, seguís a 
 
 ## Puesta en marcha
 
-1. **Base de datos.** En Supabase → *SQL Editor* → *New query*, pegá `supabase/esquema.sql` completo y apretá *Run*. Se puede correr más de una vez: crea lo que falta, no borra datos y deja las reglas de acceso como las espera la app. Correlo de nuevo cada vez que cambie este archivo.
+1. **Base de datos.** La base de producción ya está al día (ver `supabase/aplicado-2026-10-10.sql`). Para armar una base nueva desde cero, en Supabase → *SQL Editor* pegá `supabase/esquema.sql` completo y apretá *Run*: crea todo lo que la app necesita.
+   Ojo: en el plan gratis, Supabase pausa el proyecto después de una semana sin uso. Si la app deja de cargar, entrá al panel y apretá *Restore project*.
 2. **Google y recuperación de contraseña.** En Supabase → *Authentication* → *URL Configuration*, poné tu dominio en *Site URL* y en *Redirect URLs*. El ingreso con Google es gratis: se activa en *Authentication → Providers → Google*, con el Client ID y el Secret de Google Cloud.
 3. **Deploy.** Cloudflare Workers publica el repo con `wrangler.jsonc` (los assets salen de la raíz).
 
