@@ -1,0 +1,5 @@
+supabase
+*.md
+wrangler.jsonc
+worker.js
+.git
