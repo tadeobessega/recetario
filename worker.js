@@ -208,7 +208,21 @@ function adsTxt(env) {
   });
 }
 
+// Latido diario (cron de Cloudflare, ver "triggers" en wrangler.jsonc): una consulta liviana a la
+// base para que Supabase no pause el proyecto por inactividad (en el plan gratis lo pausa a los 7 días).
+async function latido() {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/titulo_de_receta`, {
+    method: 'POST',
+    headers: cabecerasSupabase,
+    body: JSON.stringify({ p_receta: 'latido' })
+  });
+  console.log('Latido a Supabase:', res.status);
+}
+
 export default {
+  async scheduled(event, env, ctx) {
+    ctx.waitUntil(latido());
+  },
   async fetch(request, env) {
     const url = new URL(request.url);
     if (url.pathname === '/go') return manejarSalida(url, env);

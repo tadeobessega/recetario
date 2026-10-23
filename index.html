@@ -514,6 +514,10 @@
                         <p class="text-sm text-tinta/60 mt-1">Elegí qué vas a cocinar cada día y te avisamos antes.</p>
                     </div>
                     <div class="flex items-center gap-2">
+                        <button type="button" onclick="verMiDiario()" class="inline-flex items-center gap-1.5 h-9 px-3.5 rounded-xl text-sm font-semibold border border-beige-border bg-white text-verde-ingles hover:bg-beige-base transition">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+                            <span>Mi diario</span>
+                        </button>
                         <button type="button" onclick="abrirAvisos()" class="inline-flex items-center gap-1.5 h-9 px-3.5 rounded-xl text-sm font-semibold border border-beige-border bg-white text-verde-ingles hover:bg-beige-base transition">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
                             <span>Avisos</span>
@@ -535,6 +539,7 @@
                         <button type="button" onclick="abrirPlantillas()" class="h-9 px-3.5 rounded-xl text-sm font-semibold border border-beige-border bg-white text-verde-ingles hover:bg-beige-base transition">Plantillas</button>
                     </div>
                 </div>
+                <div id="plan-progreso"></div>
                 <div id="plan-grilla" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-7 gap-3"></div>
             </section>
 
@@ -576,6 +581,11 @@
                         <h2 class="text-xl font-bold text-verde-ingles">Quizás te interese</h2>
                         <p class="text-sm text-tinta/60 mt-0.5 mb-3">Lo más valorado y guardado de gente que todavía no seguís.</p>
                         <div id="timeline-sugerencias" class="flex flex-col -mx-2"></div>
+                    </div>
+                    <div id="bloque-cocinaron" class="hidden bg-white rounded-2xl ring-1 ring-beige-border shadow-soft p-4 sm:p-5">
+                        <h3 class="font-display text-lg font-semibold text-verde-ingles">Lo que cocinaron</h3>
+                        <p class="text-xs text-tinta/55 mt-0.5 mb-3">Del diario de la gente que seguís.</p>
+                        <div id="cocinaron-lista" class="space-y-1"></div>
                     </div>
                     <div id="bloque-gente-sugerida" class="hidden bg-white rounded-2xl ring-1 ring-beige-border shadow-soft p-4 sm:p-5">
                         <h2 class="text-xl font-bold text-verde-ingles mb-3">Gente para seguir</h2>
@@ -843,6 +853,64 @@
                 <button type="button" onclick="guardarSemanaComoPlantilla()" class="h-10 px-3.5 rounded-xl text-sm font-semibold bg-verde-ingles hover:bg-verde-hover text-white transition shrink-0">Guardar esta semana</button>
             </div>
             <div id="plantillas-lista" class="space-y-2"></div>
+        </div>
+    </div>
+
+    <!-- MODAL DIARIO -->
+    <div id="modal-diario" class="hidden fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4 bg-verde-ingles/25 backdrop-blur-[2px]" onclick="if(event.target===this) cerrarModalDiario()">
+        <div class="bg-white w-full sm:max-w-md rounded-t-3xl sm:rounded-2xl p-5 sm:p-6 shadow-soft-lg space-y-4 max-h-[92vh] overflow-y-auto">
+            <div class="flex justify-between items-start gap-3">
+                <div>
+                    <h2 id="diario-modal-titulo" class="text-lg font-bold text-verde-ingles">Anotar en el diario</h2>
+                    <p id="diario-modal-sub" class="text-sm text-tinta/60 mt-0.5">Lo que cocinaste, cuándo y cómo te salió.</p>
+                </div>
+                <button type="button" onclick="cerrarModalDiario()" title="Cerrar" class="w-9 h-9 shrink-0 inline-flex items-center justify-center rounded-xl text-tinta/45 hover:text-verde-ingles hover:bg-beige-base transition"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+            </div>
+            <div>
+                <span class="block text-xs font-semibold text-verde-ingles mb-1">¿Qué cocinaste?</span>
+                <div id="diario-receta-elegida" class="hidden"></div>
+                <div id="diario-buscador">
+                    <input type="text" id="diario-buscar" oninput="filtrarRecetasDiario()" autocomplete="off" placeholder="Buscá entre tus recetas y guardadas…" class="w-full h-10 px-3 bg-beige-base border border-transparent rounded-xl text-sm focus:ring-2 focus:ring-verde-chip/25 focus:border-verde-chip focus:outline-none">
+                    <div id="diario-resultados" class="mt-2 max-h-40 overflow-y-auto space-y-1"></div>
+                    <input type="text" id="diario-titulo-libre" maxlength="120" placeholder="…o escribilo (ej. Milanesas de la abuela)" class="w-full h-10 px-3 bg-beige-base border border-transparent rounded-xl text-sm focus:ring-2 focus:ring-verde-chip/25 focus:border-verde-chip focus:outline-none mt-2">
+                </div>
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+                <label class="block"><span class="block text-xs font-semibold text-verde-ingles mb-1">Día</span><input type="date" id="diario-fecha" class="w-full h-10 px-3 bg-beige-base border border-transparent rounded-xl text-sm focus:ring-2 focus:ring-verde-chip/25 focus:border-verde-chip focus:outline-none"></label>
+                <label class="block"><span class="block text-xs font-semibold text-verde-ingles mb-1">Comida (opcional)</span>
+                    <select id="diario-momento" class="w-full h-10 px-3 bg-beige-base border border-transparent rounded-xl text-sm focus:ring-2 focus:ring-verde-chip/25 focus:border-verde-chip focus:outline-none"><option value="">—</option><option value="desayuno">Desayuno</option><option value="almuerzo">Almuerzo</option><option value="merienda">Merienda</option><option value="cena">Cena</option></select></label>
+            </div>
+            <div class="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                    <span class="block text-xs font-semibold text-verde-ingles mb-1">¿Cómo te salió?</span>
+                    <div class="flex items-center gap-2">
+                        <div id="estrellas-input-diario"></div>
+                        <span id="valor-resena-diario" class="text-sm font-semibold text-tinta/60 w-7"></span>
+                        <button type="button" onclick="setEstrellaInput('diario', 0); el('valor-resena-diario').innerText = ''" class="text-xs text-tinta/45 hover:text-rojo-excluir">Borrar</button>
+                    </div>
+                </div>
+                <button type="button" id="diario-me-gusto" onclick="alternarMeGustoDiario()" title="Me encantó" class="w-11 h-11 inline-flex items-center justify-center rounded-xl ring-1 ring-beige-border text-tinta/35 hover:text-rosa-texto transition"></button>
+            </div>
+            <label class="block"><span class="block text-xs font-semibold text-verde-ingles mb-1">Nota (opcional)</span>
+                <textarea id="diario-nota" rows="3" maxlength="1000" placeholder="Qué cambiarías, con quién lo comiste, cómo quedó…" class="w-full h-10 px-3 bg-beige-base border border-transparent rounded-xl text-sm focus:ring-2 focus:ring-verde-chip/25 focus:border-verde-chip focus:outline-none h-auto py-2 resize-none"></textarea></label>
+            <div>
+                <span class="block text-xs font-semibold text-verde-ingles mb-1">Fotos (opcional)</span>
+                <div id="fotos-diario"></div>
+                <input type="file" id="input-fotos-diario" accept="image/*" multiple class="hidden" onchange="agregarFotosForm('diario', this)">
+            </div>
+            <label class="flex items-center justify-between gap-4 p-3 rounded-xl bg-beige-base cursor-pointer">
+                <span class="text-sm"><span class="font-semibold">Visible en tu perfil</span><span class="block text-xs text-tinta/55">Si lo apagás, solo lo ves vos.</span></span>
+                <input type="checkbox" id="diario-publica" class="sr-only peer" checked>
+                <span class="relative w-11 h-6 shrink-0 rounded-full bg-gray-300 peer-checked:bg-verde-chip transition after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:w-5 after:h-5 after:rounded-full after:bg-white after:shadow after:transition peer-checked:after:translate-x-5"></span>
+            </label>
+            <label id="diario-no-preguntar-fila" class="hidden items-center gap-2 text-xs text-tinta/60 cursor-pointer select-none">
+                <input type="checkbox" id="diario-no-preguntar" class="w-4 h-4 accent-[#2E7D57]"> No preguntarme cada vez que marco una comida como hecha
+            </label>
+            <div class="flex gap-2 pt-1">
+                <button type="button" id="btn-diario-borrar" onclick="borrarDiario()" class="hidden h-10 px-4 rounded-xl text-sm font-semibold text-rojo-excluir border border-beige-border hover:bg-red-50 transition">Borrar</button>
+                <button type="button" id="btn-diario-ahora-no" onclick="cerrarModalDiario()" class="hidden h-10 px-4 rounded-xl text-sm font-semibold text-tinta/70 border border-beige-border hover:bg-beige-base transition">Ahora no</button>
+                <button type="button" id="btn-diario-guardar" onclick="guardarDiario()" class="flex-1 h-10 rounded-xl text-sm font-semibold bg-verde-ingles hover:bg-verde-hover text-white transition disabled:opacity-50">Guardar en el diario</button>
+            </div>
         </div>
     </div>
 
@@ -2178,7 +2246,7 @@
 
         // ---------- Fotos (recetas y posts) ----------
         const PREFIJO_FOTOS = SUPABASE_URL + '/storage/v1/object/public/fotos/';
-        const MAX_FOTOS = { receta: 8, post: 4 };
+        const MAX_FOTOS = { receta: 8, post: 4, diario: 4 };
         function fotoSegura(u) { return typeof u === 'string' && u.startsWith(PREFIJO_FOTOS); }
 
         // Achica la foto en el navegador (lado mayor 1600 px, JPEG) para que suba rápido y pese poco
@@ -2217,7 +2285,7 @@
         }
 
         // Fotos elegidas en un formulario, antes de guardar: { url } ya subida o { archivo, vista } nueva
-        const fotosForm = { receta: [], post: [] };
+        const fotosForm = { receta: [], post: [], diario: [] };
         let fotosQuitadas = [];
 
         function agregarFotosForm(tipo, input) {
@@ -2249,7 +2317,7 @@
         }
 
         function pintarFotosForm(tipo) {
-            const cont = el(tipo === 'receta' ? 'fotos-form' : 'fotos-post');
+            const cont = el(tipo === 'receta' ? 'fotos-form' : 'fotos-' + tipo);
             if (!cont) return;
             const lista = fotosForm[tipo];
             const miniaturas = lista.map((f, i) => `
@@ -2264,10 +2332,10 @@
             const agregar = lista.length < MAX_FOTOS[tipo] ? `
                 <label for="input-fotos-${tipo}" class="aspect-square rounded-xl border-2 border-dashed border-verde-chip/35 bg-verde-suave/40 hover:bg-verde-suave text-verde-ingles flex flex-col items-center justify-center gap-1 cursor-pointer transition text-center px-1">
                     ${svg('M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9zM15 13a3 3 0 11-6 0 3 3 0 016 0z', 'w-6 h-6')}
-                    <span class="text-xs font-semibold leading-tight">${tipo === 'post' && !lista.length ? 'Agregar fotos' : 'Agregar'}</span>
+                    <span class="text-xs font-semibold leading-tight">${tipo !== 'receta' && !lista.length ? 'Agregar fotos' : 'Agregar'}</span>
                 </label>` : '';
-            cont.className = tipo === 'post' && !lista.length ? 'grid grid-cols-1' : (tipo === 'receta' ? 'grid grid-cols-3 sm:grid-cols-4 gap-2' : 'grid grid-cols-4 sm:grid-cols-6 gap-2');
-            cont.innerHTML = miniaturas + (tipo === 'post' && !lista.length
+            cont.className = tipo !== 'receta' && !lista.length ? 'grid grid-cols-1' : (tipo === 'receta' ? 'grid grid-cols-3 sm:grid-cols-4 gap-2' : 'grid grid-cols-4 sm:grid-cols-6 gap-2');
+            cont.innerHTML = miniaturas + (tipo !== 'receta' && !lista.length
                 ? agregar.replace('aspect-square', 'h-14 !flex-row').replace('w-6 h-6', 'w-5 h-5')
                 : agregar);
         }
@@ -2458,6 +2526,7 @@
                         ${propia ? togglePrivacidad : ''}
                         ${propia && r.publica ? `<button type="button" onclick="abrirCompartirPost('${idAttr}', 'propia')" title="Publicar en tu perfil" class="${PILDORA} bg-white text-tinta/70 border-beige-border hover:bg-beige-base">${svg('M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z', 'w-3.5 h-3.5')}<span class="hidden sm:inline">Publicar</span></button>` : ''}
                         <button type="button" onclick="compartirReceta('${idAttr}')" title="Copiar enlace para compartir" class="${BTN_ICONO_NEUTRO} !w-8 !h-8 !rounded-full">${svg(ICONO_COMPARTIR, 'w-4 h-4')}</button>
+                        <button type="button" onclick="abrirModalDiario({ recetaId: '${idAttr}' })" title="La hice: anotarla en mi diario" class="${BTN_ICONO_NEUTRO} !w-8 !h-8 !rounded-full">${svg(ICONO_HECHO, 'w-4 h-4')}</button>
                         <span class="ml-1">${resumenResenasCompacto(r.id)}</span>
                     </div>
                     <button id="btn-det-${ctx}-${idAttr}" onclick="toggleDetalle('${ctx}', '${idAttr}')" class="${PILDORA} shrink-0 bg-verde-suave/60 text-verde-ingles border-transparent hover:bg-verde-suave">${etiquetaVerMas(abierta)}</button>
@@ -2760,8 +2829,8 @@
             spam: 'Spam o publicidad engañosa',
             otro: 'Otro motivo'
         };
-        const NOMBRE_TIPO = { publicacion: 'publicación', comentario: 'comentario', receta: 'receta', resena: 'reseña' };
-        const ETIQUETA_TIPO = { publicacion: 'Publicación', comentario: 'Comentario', receta: 'Receta', resena: 'Reseña' };
+        const NOMBRE_TIPO = { publicacion: 'publicación', comentario: 'comentario', receta: 'receta', resena: 'reseña', diario: 'entrada del diario' };
+        const ETIQUETA_TIPO = { publicacion: 'Publicación', comentario: 'Comentario', receta: 'Receta', resena: 'Reseña', diario: 'Diario' };
         let denunciaActual = null;
 
         function abrirDenuncia(tipo, id) {
@@ -2837,12 +2906,13 @@
         }
 
         async function traerObjetos(lista) {
-            const porTipo = { publicacion: [], comentario: [], receta: [], resena: [] };
+            const porTipo = { publicacion: [], comentario: [], receta: [], resena: [], diario: [] };
             lista.forEach(d => { if (porTipo[d.tipo]) porTipo[d.tipo].push(d.objeto_id); });
             const pedidos = [];
             if (porTipo.publicacion.length) pedidos.push(db.from('publicaciones').select('*, recetas(*)').in('id', porTipo.publicacion).then(r => (r.data || []).forEach(x => { moderacion.objetos['publicacion:' + x.id] = x; })));
             if (porTipo.comentario.length) pedidos.push(db.from('comentarios').select('*').in('id', porTipo.comentario).then(r => (r.data || []).forEach(x => { moderacion.objetos['comentario:' + x.id] = x; })));
             if (porTipo.receta.length) pedidos.push(db.from('recetas').select('*').in('id', porTipo.receta).then(r => (r.data || []).forEach(x => { moderacion.objetos['receta:' + x.id] = x; })));
+            if (porTipo.diario.length) pedidos.push(db.from('diario').select('*').in('id', porTipo.diario).then(r => (r.data || []).forEach(x => { moderacion.objetos['diario:' + x.id] = x; })));
             if (porTipo.resena.length) pedidos.push(db.from('resenas').select('*').in('id', porTipo.resena).then(r => (r.data || []).forEach(x => { moderacion.objetos['resena:' + x.id] = x; })));
             await Promise.all(pedidos);
         }
@@ -2900,6 +2970,15 @@
                     ${obj.descripcion ? `<p class="text-[15px] whitespace-pre-line">${esc(obj.descripcion)}</p>` : ''}
                     ${grillaFotos(fotos, 'mod-p-' + obj.id)}
                     ${obj.recetas ? `<div class="text-sm bg-beige-base rounded-xl p-3"><span class="text-tinta/55">Receta:</span> <button type="button" onclick="abrirReceta('${esc(obj.recetas.id)}')" class="font-semibold text-verde-ingles hover:underline">${esc(obj.recetas.titulo)}</button>${rf.length ? tiraFotos(rf.length > 1 ? rf : [...rf, ...rf].slice(0, 2), 'mod-pr-' + obj.id) : ''}</div>` : ''}
+                </div>`;
+            }
+            if (tipo === 'diario') {
+                const fotos = (obj.fotos || []).filter(fotoSegura);
+                return `<div class="space-y-2">${oculto}
+                    <div class="font-semibold text-verde-ingles">${esc(obj.titulo || 'Entrada del diario')} <span class="text-xs font-normal text-tinta/50">· ${esc(obj.fecha)}</span></div>
+                    ${obj.puntaje ? estrellasHTML(parseFloat(obj.puntaje)) : ''}
+                    ${obj.nota ? `<p class="text-[15px] whitespace-pre-line">${esc(obj.nota)}</p>` : ''}
+                    ${grillaFotos(fotos, 'mod-d-' + obj.id)}
                 </div>`;
             }
             if (tipo === 'comentario') return `<div class="space-y-1">${oculto}<p class="text-[15px] bg-beige-base rounded-2xl px-3 py-2 inline-block whitespace-pre-line">${esc(obj.texto)}</p></div>`;
@@ -3264,7 +3343,7 @@
                 timeline.items.push(...nuevas);
                 timeline.offset += filas.length;
                 timeline.fin = filas.length < PAGINA_TIMELINE;
-                if (reiniciar) await cargarSugerenciasTimeline();
+                if (reiniciar) await Promise.all([cargarSugerenciasTimeline(), cargarCocinaron()]);
             } catch (err) {
                 console.error('Error en la timeline:', err);
                 toast('No se pudieron cargar las novedades.');
@@ -3529,11 +3608,12 @@
                 perfilesCache[p.id] = p;
                 await asegurarProgreso([p.id]);
 
-                const [recRes, colRes, segRes, sigRes] = await Promise.all([
+                const [recRes, colRes, segRes, sigRes, diaRes] = await Promise.all([
                     db.from('recetas').select('*').eq('user_id', p.id).eq('publica', true).order('created_at', { ascending: false }),
                     db.from('colecciones').select('*').eq('user_id', p.id).eq('publica', true).order('created_at', { ascending: false }),
                     db.from('seguidores').select('*', { count: 'exact', head: true }).eq('seguido_id', p.id),
-                    db.from('seguidores').select('*', { count: 'exact', head: true }).eq('seguidor_id', p.id)
+                    db.from('seguidores').select('*', { count: 'exact', head: true }).eq('seguidor_id', p.id),
+                    db.from('diario').select('*', { count: 'exact', head: true }).eq('user_id', p.id)
                 ]);
 
                 const recs = (recRes.data || []).map(mapearReceta);
@@ -3550,11 +3630,14 @@
                     cantidad: items.filter(i => i.coleccion_id === c.id && publicas.has(String(i.receta_id))).length
                 }));
 
-                perfilVisto = { perfil: p, recetas: recs, colecciones, nSeguidores: segRes.count || 0, nSeguidos: sigRes.count || 0 };
-                subPerfil = 'recetas';
+                perfilVisto = { perfil: p, recetas: recs, colecciones, nSeguidores: segRes.count || 0, nSeguidos: sigRes.count || 0, nDiario: diaRes && !diaRes.error ? (diaRes.count || 0) : undefined };
+                subPerfil = subPerfilPendiente || 'recetas';
+                perfilVisto.irAPestanas = !!subPerfilPendiente;
+                subPerfilPendiente = null;
                 actualizarTabs();
                 await cargarResenasPara(recs.map(r => r.id));
-                renderPerfil();
+                if (subPerfil === 'diario') cargarDiarioPerfil();
+                else renderPerfil();
             } catch (err) {
                 console.error('Error al cargar el perfil:', err);
                 el('perfil-contenido').innerHTML = estadoVacioHTML(ICONO_USUARIOS, 'No se pudo cargar el perfil', 'Probá de nuevo en un momento.', '', '');
@@ -3563,6 +3646,7 @@
 
         function cambiarSubPerfil(sub) {
             subPerfil = sub;
+            if (sub === 'diario' && perfilVisto && perfilVisto.diario === undefined) return cargarDiarioPerfil();
             renderPerfil();
         }
 
@@ -3618,7 +3702,9 @@
             const tabOff = tabBase + 'bg-white text-tinta/70 border-beige-border hover:text-verde-ingles hover:border-verde-chip/40';
 
             let contenido;
-            if (subPerfil === 'recetas') {
+            if (subPerfil === 'diario') {
+                contenido = diarioPerfilHTML(pv, yo);
+            } else if (subPerfil === 'recetas') {
                 contenido = pv.recetas.length
                     ? `<div class="grid grid-cols-1 lg:grid-cols-2 gap-5 items-start">${listaTarjetas(pv.recetas, 'perfil')}</div>`
                     : estadoVacioHTML(ICONO_COLECCION, 'Todavía no hay recetas públicas', yo ? 'Las recetas nuevas son públicas por defecto.' : 'Cuando publique alguna, la vas a ver acá.', '', '');
@@ -3662,9 +3748,10 @@
                         ${yo ? `<button type="button" onclick="cerrarSesion()" class="sm:hidden inline-flex items-center gap-1.5 text-sm font-semibold text-rojo-excluir">${svg('M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1', 'w-4 h-4')}Cerrar sesión</button>` : ''}
                     </div>
 
-                    <div class="flex gap-2">
+                    <div id="perfil-pestanas" class="flex flex-wrap gap-2 scroll-mt-40">
                         <button type="button" onclick="cambiarSubPerfil('recetas')" class="${subPerfil === 'recetas' ? tabOn : tabOff}">Recetas (${pv.recetas.length})</button>
                         <button type="button" onclick="cambiarSubPerfil('colecciones')" class="${subPerfil === 'colecciones' ? tabOn : tabOff}">Colecciones (${pv.colecciones.length})</button>
+                        <button type="button" onclick="cambiarSubPerfil('diario')" class="${subPerfil === 'diario' ? tabOn : tabOff}">${svg(ICONO_LIBRO, 'w-4 h-4 mr-1.5')}Diario${pv.nDiario !== undefined ? ` (${pv.nDiario})` : ''}</button>
                     </div>
 
                     ${contenido}
@@ -4754,9 +4841,10 @@
             const r = it.recetas;
             const foto = r && (r.fotos || []).filter(fotoSegura)[0];
             const sinAviso = it.aviso === 'sin_aviso';
+            const futura = it.fecha > hoyISO();
             return `
                 <div class="group flex items-start gap-2 rounded-xl p-2 ${it.hecha ? 'bg-verde-suave/50' : 'bg-white ring-1 ring-beige-border'}">
-                    <button type="button" onclick="alternarHecha('${esc(it.id)}')" title="${it.hecha ? 'Hecha' : 'Marcar como hecha (+3 puntos)'}" class="mt-0.5 w-5 h-5 shrink-0 rounded-md border-2 inline-flex items-center justify-center transition ${it.hecha ? 'bg-verde-chip border-verde-chip text-white' : 'border-beige-border text-transparent hover:border-verde-chip'}">${svg(ICONO_CHECK, 'w-3 h-3')}</button>
+                    <button type="button" onclick="alternarHecha('${esc(it.id)}')" ${futura ? 'disabled' : ''} title="${it.hecha ? 'Hecha · está en tu diario' : (futura ? 'Se marca cuando llegue el día' : 'Marcar como hecha (+3 puntos, se anota en tu diario)')}" class="mt-0.5 w-5 h-5 shrink-0 rounded-md border-2 inline-flex items-center justify-center transition ${it.hecha ? 'bg-verde-chip border-verde-chip text-white' : (futura ? 'border-beige-border/60 text-transparent cursor-not-allowed' : 'border-beige-border text-transparent hover:border-verde-chip')}">${svg(ICONO_CHECK, 'w-3 h-3')}</button>
                     <button type="button" onclick="abrirModalPlan({ id: '${esc(it.id)}' })" class="min-w-0 flex-1 text-left">
                         <span class="flex items-center gap-2">
                             ${foto ? `<img src="${esc(foto)}" alt="" loading="lazy" class="w-7 h-7 rounded-lg object-cover shrink-0 xl:hidden">` : ''}
@@ -4786,6 +4874,7 @@
             if (soloCabecera || !plan.cargado) { grilla.innerHTML = `<div class="col-span-full">${cargandoHTML()}</div>`; return; }
 
             const hoy = hoyISO();
+            pintarProgresoPlan();
             grilla.innerHTML = DIAS_SEMANA.map((nombreDia, i) => {
                 const fecha = sumarDias(lunes, i);
                 const esHoy = fecha === hoy;
@@ -4979,12 +5068,14 @@
         async function alternarHecha(id) {
             const it = plan.items.find(x => x.id === id);
             if (!it) return;
+            if (!it.hecha && it.fecha > hoyISO()) return toast('Se marca como hecha cuando llegue el día.');
             it.hecha = !it.hecha;
             renderPlan();
             const { error } = await db.from('plan_comidas').update({ hecha: it.hecha }).eq('id', id);
-            if (error) { it.hecha = !it.hecha; renderPlan(); return toast(errorAmigable(error, 'actualizar')); }
-            if (it.hecha) notarPuntos();
-            else refrescarProgreso();
+            if (error) { it.hecha = !it.hecha; renderPlan(); return toast(/llegó ese día/.test(error.message || '') ? 'Se marca como hecha cuando llegue el día.' : errorAmigable(error, 'actualizar')); }
+            if (it.hecha) { await notarPuntos(); ofrecerDiarioDesdePlan(id); }
+            else { await quitarDelDiarioPorPlan(id); }
+            pintarProgresoPlan();
         }
 
         // ---------- Plantillas ----------
@@ -4993,6 +5084,10 @@
             const sel = el('plan-plantilla');
             sel.disabled = true;
             try {
+                // primero se saca lo que había puesto la plantilla anterior (lo ya hecho y lo agregado a mano quedan)
+                const limpiar = await db.from('plan_comidas').delete().eq('user_id', usuarioActual.id)
+                    .gte('fecha', lunes).lte('fecha', sumarDias(lunes, 6)).not('plantilla_id', 'is', null).eq('hecha', false);
+                if (limpiar.error) throw limpiar.error;
                 if (!valor) {
                     const { error } = await db.rpc('quitar_plantilla_semana', { p_semana: lunes });
                     if (error) throw error;
@@ -5240,6 +5335,9 @@
             ['Que alguien guarde una receta tuya', 2, ''],
             ['Recibir 4 estrellas o más', 2, ''],
             ['Marcar como hecha una comida del plan', 3, 'hasta 4 por día'],
+            ['Cumplir tu plan de la semana (todo lo planeado, mínimo 5 comidas)', 30, 'una vez por semana'],
+            ['Anotar en tu diario algo que cocinaste', 2, 'hasta 3 por día'],
+            ['Racha cocinando: 3 · 7 · 14 · 30 · 60 · 100 días', '5 a 120', 'bonus'],
             ['Llegar a 7 días de racha', 10, 'bonus'],
             ['Llegar a 30 días de racha', 30, 'bonus']
         ];
@@ -5260,7 +5358,7 @@
             if (!faltan.length) return;
             faltan.forEach(id => { progresoCache[id] = { puntos: 0, racha_actual: 0, desafios: 0, _pedido: true }; });
             try {
-                const { data } = await db.from('progreso').select('user_id, puntos, racha_actual, desafios').in('user_id', faltan);
+                const { data } = await db.from('progreso').select('user_id, puntos, racha_actual, desafios, racha_cocina, semanas_cumplidas').in('user_id', faltan);
                 (data || []).forEach(p => { progresoCache[p.user_id] = p; });
             } catch (e) { /* sin medallas si la tabla no está */ }
         }
@@ -5281,6 +5379,12 @@
             if ((p.racha_actual || 0) >= 7) {
                 partes.push(`<span title="Racha de ${p.racha_actual} días" class="inline-flex items-center gap-0.5 shrink-0 ${grande ? 'h-6 px-2 text-xs' : 'h-[18px] px-1.5 text-[10px]'} rounded-full font-bold bg-yema-suave text-[#9A5B00]"><svg class="${icono}" fill="currentColor" viewBox="0 0 24 24"><path d="${ICONO_LLAMA}"></path></svg>${p.racha_actual}</span>`);
             }
+            if ((p.racha_cocina || 0) >= 3) {
+                partes.push(`<span title="${p.racha_cocina} días seguidos cocinando" class="inline-flex items-center gap-0.5 shrink-0 ${grande ? 'h-6 px-2 text-xs' : 'h-[18px] px-1.5 text-[10px]'} rounded-full font-bold bg-verde-suave text-verde-ingles">${svg(ICONO_OLLA, icono)}${p.racha_cocina}</span>`);
+            }
+            if ((p.semanas_cumplidas || 0) >= 1) {
+                partes.push(`<span title="${p.semanas_cumplidas} ${p.semanas_cumplidas === 1 ? 'semana cumplida' : 'semanas cumplidas'} del plan" class="${tam} shrink-0 inline-flex items-center justify-center rounded-full bg-mostaza text-verde-ingles ring-2 ring-white">${svg(ICONO_SEMANA_OK, icono)}</span>`);
+            }
             if ((p.desafios || 0) >= 1) {
                 partes.push(`<span title="${p.desafios} ${p.desafios === 1 ? 'desafío completado' : 'desafíos completados'}" class="${tam} shrink-0 inline-flex items-center justify-center rounded-full bg-verde-ingles text-mostaza ring-2 ring-white">${svg(ICONO_TROFEO, icono)}</span>`);
             }
@@ -5296,6 +5400,7 @@
                 miProgreso = data;
                 progresoCache[usuarioActual.id] = { user_id: usuarioActual.id, puntos: data.puntos, racha_actual: data.racha_actual, desafios: data.desafios };
                 pintarRacha();
+                refrescarProgreso();
                 if (antes === null && data.racha_actual > 1) mostrarPuntos(null, `${data.racha_actual} días seguidos`);
             } catch (e) { /* la función todavía no existe */ }
         }
@@ -5308,6 +5413,7 @@
                 miProgreso = Object.assign({}, miProgreso || {}, data, { nivel: nivelDe(data.puntos), nombre_nivel: NIVELES[nivelDe(data.puntos)].nombre });
                 progresoCache[usuarioActual.id] = data;
                 pintarRacha();
+                if (vistaActual === 'plan') pintarProgresoPlan();
                 return data.puntos - antes;
             } catch (e) { return 0; }
         }
@@ -5382,12 +5488,13 @@
                 </div>
                 ${barraNivelHTML(p.puntos)}
                 ${bloqueVisibilidadHTML()}
-                <div class="grid grid-cols-3 gap-2 text-center">
-                    <div class="rounded-xl bg-yema-suave p-3"><div class="flex items-center justify-center gap-1 font-display text-2xl font-bold text-[#9A5B00]">${svg(ICONO_LLAMA, 'w-5 h-5')}${p.racha_actual || 0}</div><div class="text-[11px] text-[#7A5300] font-semibold">días seguidos</div></div>
-                    <div class="rounded-xl bg-beige-base p-3"><div class="font-display text-2xl font-bold text-verde-ingles">${p.racha_mejor || 0}</div><div class="text-[11px] text-tinta/60 font-semibold">mejor racha</div></div>
+                <div class="grid grid-cols-2 gap-2 text-center">
+                    <div class="rounded-xl bg-yema-suave p-3"><div class="flex items-center justify-center gap-1 font-display text-2xl font-bold text-[#9A5B00]">${svg(ICONO_LLAMA, 'w-5 h-5')}${p.racha_actual || 0}</div><div class="text-[11px] text-[#7A5300] font-semibold">días seguidos entrando · mejor ${p.racha_mejor || 0}</div></div>
+                    <div class="rounded-xl bg-verde-suave p-3"><div class="flex items-center justify-center gap-1 font-display text-2xl font-bold text-verde-ingles">${svg(ICONO_OLLA, 'w-5 h-5')}${p.racha_cocina || 0}</div><div class="text-[11px] text-verde-ingles font-semibold">días seguidos cocinando · mejor ${p.racha_cocina_mejor || 0}</div></div>
+                    <div class="rounded-xl bg-beige-base p-3"><div class="font-display text-2xl font-bold text-verde-ingles">${p.semanas_cumplidas || 0}</div><div class="text-[11px] text-tinta/60 font-semibold">${p.semanas_cumplidas === 1 ? 'semana cumplida' : 'semanas cumplidas'} del plan</div></div>
                     <div class="rounded-xl bg-beige-base p-3"><div class="font-display text-2xl font-bold text-verde-ingles">${p.desafios || 0}</div><div class="text-[11px] text-tinta/60 font-semibold">desafíos</div></div>
                 </div>
-                <p class="text-xs text-tinta/60 leading-relaxed -mt-2"><strong class="font-semibold text-tinta">Comodín semanal:</strong> la racha cuenta los días que entrás o cocinás. Si un día te lo salteás, no se corta: tenés un día de gracia por semana.</p>
+                <p class="text-xs text-tinta/60 leading-relaxed -mt-2"><strong class="font-semibold text-tinta">Rachas con comodín:</strong> si un día te lo salteás, no se cortan (un día de gracia por semana). La de cocina cuenta los días con algo en tu diario, anotado ese día o al siguiente. <button type="button" onclick="cerrarProgreso(); verMiDiario()" class="font-semibold text-verde-chip hover:underline">Ver mi diario</button></p>
                 ${desafioActual ? `<div class="rounded-xl ring-1 ring-mostaza/50 bg-yema-suave/50 p-3.5 flex items-start gap-3">
                     <span class="w-9 h-9 shrink-0 rounded-xl bg-verde-ingles text-mostaza inline-flex items-center justify-center">${svg(ICONO_TROFEO, 'w-5 h-5')}</span>
                     <div class="min-w-0 flex-1">
@@ -5406,7 +5513,7 @@
                                 <span class="text-[11px] text-tinta/55 text-right">${i === 0 ? 'Sin medalla' : 'Visibilidad: ' + VISIBILIDAD_NIVEL[i]}</span>
                             </div>`).join('')}
                     </div>
-                    <p class="text-xs text-tinta/55 leading-relaxed">Además de la medalla de nivel, todos ven la <span class="font-semibold text-[#9A5B00]">llama</span> cuando tenés 7 días o más de racha y el <span class="font-semibold text-verde-ingles">trofeo</span> cuando completaste algún desafío.</p>
+                    <p class="text-xs text-tinta/55 leading-relaxed">Además de la medalla de nivel, todos ven la <span class="font-semibold text-[#9A5B00]">llama</span> con 7 días o más entrando, la <span class="font-semibold text-verde-ingles">olla</span> con 3 días o más cocinando, el <span class="font-semibold text-[#9A5B00]">calendario</span> si cumpliste alguna semana del plan y el <span class="font-semibold text-verde-ingles">trofeo</span> si completaste algún desafío.</p>
                 </div>
                 <div class="space-y-2">
                     <h3 class="text-sm font-semibold text-verde-ingles">Cómo sumar puntos</h3>
@@ -5559,6 +5666,413 @@
             toast('Desafío borrado');
         }
 
+        // =====================================================
+        //  Diario de cocina (estilo Letterboxd)
+        // =====================================================
+        const ICONO_LIBRO = 'M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253';
+        const ICONO_CORAZON = 'M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z';
+        const ICONO_REPETIR = 'M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15';
+        const ICONO_OLLA = 'M5 11h14v4.5A4.5 4.5 0 0114.5 20h-5A4.5 4.5 0 015 15.5V11zM3 11h18M9.5 7.5c0-1 .7-1.5.7-2.5M13.8 7.5c0-1 .7-1.5.7-2.5';
+        const ICONO_HECHO = 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z';
+        const ICONO_SEMANA_OK = 'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z M9 15l2 2 4-4';
+        const DIAS_CORTOS = ['dom', 'lun', 'mar', 'mié', 'jue', 'vie', 'sáb'];
+        const NOMBRE_MOMENTO = { desayuno: 'Desayuno', almuerzo: 'Almuerzo', merienda: 'Merienda', cena: 'Cena' };
+        const diarioVisto = {};          // id de entrada -> entrada (para editar o denunciar)
+        let diarioEdicion = null;        // { id, recetaId, nombreReceta, planId, meGusto, desdePlan }
+
+        function nombreEntrada(e) { return (e.recetas && e.recetas.titulo) || e.titulo || 'Comida'; }
+
+        function fotoEntrada(e) {
+            const propias = (e.fotos || []).filter(fotoSegura);
+            if (propias.length) return propias[0];
+            const r = e.recetas;
+            return r ? (r.fotos || []).filter(fotoSegura)[0] || null : null;
+        }
+
+        // ---------- Ventana para anotar / editar ----------
+        async function abrirModalDiario(op) {
+            op = op || {};
+            let e = op.id ? diarioVisto[op.id] : null;
+            if (op.id && !e) {
+                const { data } = await db.from('diario').select('*, recetas(id, titulo, fotos, tipo_comida)').eq('id', op.id).maybeSingle();
+                e = data;
+                if (e) diarioVisto[e.id] = e;
+            }
+            const recetaId = e ? (e.receta_id ? String(e.receta_id) : null) : (op.recetaId || null);
+            const r = recetaId ? buscarReceta(recetaId) : null;
+            diarioEdicion = {
+                id: e ? e.id : null, recetaId,
+                nombreReceta: e ? nombreEntrada(e) : (r ? r.nombre : null),
+                planId: e ? e.plan_id : null,
+                meGusto: e ? !!e.me_gusto : false,
+                desdePlan: !!op.desdePlan
+            };
+            el('diario-modal-titulo').innerText = op.desdePlan ? '¡Hecho! ¿Cómo te salió?' : (e ? 'Editar entrada' : 'Anotar en el diario');
+            el('diario-modal-sub').innerText = op.desdePlan
+                ? 'Ya quedó en tu diario. Si querés, sumale puntaje, una nota o una foto.'
+                : 'Lo que cocinaste, cuándo y cómo te salió.';
+            const hoy = hoyISO();
+            el('diario-fecha').max = hoy;
+            el('diario-fecha').value = e ? e.fecha : (op.fecha && op.fecha <= hoy ? op.fecha : hoy);
+            el('diario-momento').value = e ? (e.momento || '') : (op.momento || '');
+            el('diario-buscar').value = '';
+            el('diario-titulo-libre').value = e && !e.receta_id ? (e.titulo || '') : (op.titulo || '');
+            el('diario-nota').value = e ? (e.nota || '') : '';
+            let publica = true;
+            try { publica = localStorage.getItem('recetario-diario-publica') !== '0'; } catch (err) { /* por defecto, visible */ }
+            el('diario-publica').checked = e ? e.publica !== false : publica;
+            const puntaje = e && e.puntaje !== null && e.puntaje !== undefined ? parseFloat(e.puntaje) : 0;
+            el('estrellas-input-diario').innerHTML = estrellasInputHTML('diario', puntaje);
+            estadoResenaForm.diario = puntaje;
+            el('valor-resena-diario').innerText = puntaje ? puntaje.toFixed(1) : '';
+            fotosForm.diario = (e ? (e.fotos || []).filter(fotoSegura) : []).map(url => ({ url }));
+            fotosQuitadas = [];
+            pintarFotosForm('diario');
+            pintarMeGustoDiario();
+            el('btn-diario-borrar').classList.toggle('hidden', !e || op.desdePlan);
+            el('btn-diario-ahora-no').classList.toggle('hidden', !op.desdePlan);
+            el('diario-no-preguntar-fila').classList.toggle('hidden', !op.desdePlan);
+            el('diario-no-preguntar-fila').classList.toggle('flex', !!op.desdePlan);
+            el('diario-no-preguntar').checked = false;
+            pintarRecetaElegidaDiario();
+            filtrarRecetasDiario();
+            el('modal-diario').classList.remove('hidden');
+        }
+
+        function cerrarModalDiario() {
+            if (diarioEdicion && diarioEdicion.desdePlan && el('diario-no-preguntar').checked) {
+                try { localStorage.setItem('recetario-diario-no-preguntar', '1'); } catch (err) { /* ignorar */ }
+            }
+            el('modal-diario').classList.add('hidden');
+            limpiarFotosForm('diario');
+            diarioEdicion = null;
+        }
+
+        function pintarMeGustoDiario() {
+            const b = el('diario-me-gusto');
+            const on = diarioEdicion && diarioEdicion.meGusto;
+            b.innerHTML = svg(ICONO_CORAZON, 'w-6 h-6', on);
+            b.className = 'w-11 h-11 inline-flex items-center justify-center rounded-xl ring-1 transition ' +
+                (on ? 'ring-rosa-texto/40 bg-rosa-suave text-rosa-texto' : 'ring-beige-border text-tinta/35 hover:text-rosa-texto');
+            b.title = on ? 'Me encantó' : 'Marcar «me encantó»';
+        }
+        function alternarMeGustoDiario() { diarioEdicion.meGusto = !diarioEdicion.meGusto; pintarMeGustoDiario(); }
+
+        function pintarRecetaElegidaDiario() {
+            const cont = el('diario-receta-elegida');
+            const id = diarioEdicion && diarioEdicion.recetaId;
+            el('diario-buscador').classList.toggle('hidden', !!id);
+            cont.classList.toggle('hidden', !id);
+            if (!id) { cont.innerHTML = ''; return; }
+            const r = buscarReceta(id);
+            const foto = r && r.fotos[0];
+            cont.innerHTML = `
+                <div class="flex items-center gap-3 p-2.5 rounded-xl bg-verde-suave/40 ring-1 ring-verde-chip/30">
+                    ${foto ? `<img src="${esc(foto)}" alt="" class="w-10 h-10 rounded-lg object-cover shrink-0">` : `<span class="w-10 h-10 rounded-lg shrink-0 inline-flex items-center justify-center bg-white text-verde-ingles">${svg(ICONO_OLLA, 'w-5 h-5')}</span>`}
+                    <span class="min-w-0 flex-1 text-sm font-semibold text-verde-ingles line-clamp-2">${esc(r ? r.nombre : (diarioEdicion.nombreReceta || 'Receta'))}</span>
+                    ${diarioEdicion.planId ? '' : `<button type="button" onclick="quitarRecetaDiario()" class="text-xs font-semibold text-tinta/55 hover:text-rojo-excluir shrink-0">Cambiar</button>`}
+                </div>`;
+        }
+        function quitarRecetaDiario() { diarioEdicion.recetaId = null; pintarRecetaElegidaDiario(); filtrarRecetasDiario(); setTimeout(() => el('diario-buscar').focus(), 30); }
+        function elegirRecetaDiario(id) { diarioEdicion.recetaId = id; el('diario-titulo-libre').value = ''; pintarRecetaElegidaDiario(); }
+
+        function filtrarRecetasDiario() {
+            const q = el('diario-buscar').value.trim().toLowerCase();
+            const lista = recetasParaPlan()
+                .filter(r => !q || r.nombre.toLowerCase().includes(q) || (r.ingredientes || []).some(i => i.toLowerCase().includes(q)))
+                .slice(0, q ? 30 : 6);
+            el('diario-resultados').innerHTML = lista.length ? lista.map(r => `
+                <button type="button" onclick="elegirRecetaDiario('${esc(r.id)}')" class="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-left hover:bg-beige-base">
+                    ${r.fotos[0] ? `<img src="${esc(r.fotos[0])}" alt="" loading="lazy" class="w-8 h-8 rounded-lg object-cover shrink-0">` : `<span class="w-8 h-8 rounded-lg shrink-0 inline-flex items-center justify-center text-sm font-bold ${ESTILO_TIPO[r.tipo] || 'bg-verde-suave text-verde-ingles'}">${esc(r.nombre.charAt(0).toUpperCase())}</span>`}
+                    <span class="min-w-0 flex-1 text-sm truncate">${esc(r.nombre)}</span>
+                </button>`).join('')
+                : `<p class="text-xs text-tinta/50 px-1 py-2">${q ? 'No hay recetas con ese nombre: escribilo abajo.' : 'Escribí abajo lo que cocinaste.'}</p>`;
+        }
+
+        async function guardarDiario() {
+            const d = diarioEdicion;
+            if (!d) return;
+            const libre = el('diario-titulo-libre').value.trim();
+            if (!d.recetaId && !libre) return toast('Elegí una receta o escribí qué cocinaste.');
+            const fecha = el('diario-fecha').value;
+            if (!fecha) return toast('Elegí el día.');
+            if (fecha > hoyISO()) return toast('El diario es para lo que ya cocinaste: elegí hoy o un día anterior.');
+            const puntaje = estadoResenaForm.diario || null;
+            const btn = el('btn-diario-guardar');
+            btn.disabled = true;
+            try {
+                const fotos = await subirFotosForm('diario', (n, total) => { btn.innerText = `Subiendo ${n} de ${total}…`; });
+                btn.innerText = 'Guardando…';
+                const r = d.recetaId ? buscarReceta(d.recetaId) : null;
+                const fila = {
+                    fecha,
+                    momento: el('diario-momento').value || null,
+                    receta_id: d.recetaId || null,
+                    titulo: d.recetaId ? ((r && r.nombre) || d.nombreReceta || null) : libre,
+                    puntaje,
+                    me_gusto: !!d.meGusto,
+                    nota: el('diario-nota').value.trim() || null,
+                    fotos,
+                    publica: el('diario-publica').checked
+                };
+                try { localStorage.setItem('recetario-diario-publica', fila.publica ? '1' : '0'); } catch (err) { /* ignorar */ }
+                const res = d.id
+                    ? await db.from('diario').update(fila).eq('id', d.id)
+                    : await db.from('diario').insert(Object.assign({ user_id: usuarioActual.id }, fila));
+                if (res.error) throw res.error;
+                borrarFotos(fotosQuitadas);
+                fotosQuitadas = [];
+                const nueva = !d.id;
+                cerrarModalDiario();
+                toast(nueva ? 'Anotado en tu diario' : 'Diario actualizado');
+                if (nueva) notarPuntos(); else refrescarProgreso();
+                refrescarDiarioVisible();
+            } catch (err) {
+                toast(/llegó ese día/.test(err.message || '') ? 'El diario es para lo que ya cocinaste.' : errorAmigable(err, 'guardar en el diario'));
+            } finally {
+                btn.disabled = false;
+                btn.innerText = 'Guardar en el diario';
+            }
+        }
+
+        async function borrarDiario() {
+            const d = diarioEdicion;
+            if (!d || !d.id || !confirm('¿Borrar esta entrada del diario?')) return;
+            const e = diarioVisto[d.id];
+            const { error } = await db.from('diario').delete().eq('id', d.id);
+            if (error) return toast(errorAmigable(error, 'borrar'));
+            if (e) borrarFotos(e.fotos);
+            delete diarioVisto[d.id];
+            el('modal-diario').classList.add('hidden');
+            limpiarFotosForm('diario');
+            diarioEdicion = null;
+            toast('Entrada borrada');
+            refrescarProgreso();
+            refrescarDiarioVisible();
+        }
+
+        // Después de marcar una comida del plan como hecha: ofrecer contarlo en el diario
+        async function ofrecerDiarioDesdePlan(planId) {
+            let noPreguntar = false;
+            try { noPreguntar = localStorage.getItem('recetario-diario-no-preguntar') === '1'; } catch (err) { /* ignorar */ }
+            if (noPreguntar) return;
+            const { data } = await db.from('diario').select('*, recetas(id, titulo, fotos, tipo_comida)').eq('plan_id', planId).maybeSingle();
+            if (!data) return;
+            diarioVisto[data.id] = data;
+            abrirModalDiario({ id: data.id, desdePlan: true });
+        }
+
+        // Al desmarcar una comida hecha, se saca del diario (preguntando si ya tenía nota, puntaje o fotos)
+        async function quitarDelDiarioPorPlan(planId) {
+            const { data } = await db.from('diario').select('id, nota, puntaje, fotos').eq('plan_id', planId).maybeSingle();
+            if (!data) return;
+            const conAlgo = data.nota || data.puntaje || (data.fotos || []).length;
+            if (conAlgo && !confirm('Esta comida ya tenía nota, puntaje o fotos en tu diario. ¿Sacarla también del diario?')) return;
+            await db.from('diario').delete().eq('id', data.id);
+            if (conAlgo) borrarFotos(data.fotos);
+            refrescarProgreso();
+        }
+
+        // ---------- Diario en el perfil ----------
+        async function cargarDiarioPerfil() {
+            const pv = perfilVisto;
+            if (!pv) return;
+            pv.diario = null;
+            renderPerfil();
+            try {
+                const { data, error } = await db.from('diario').select('*, recetas(id, titulo, fotos, tipo_comida)')
+                    .eq('user_id', pv.perfil.id).order('fecha', { ascending: false }).order('created_at', { ascending: false }).limit(300);
+                if (error) throw error;
+                if (perfilVisto !== pv) return;
+                pv.diario = data || [];
+                pv.diario.forEach(e => { diarioVisto[e.id] = e; });
+                pv.nDiario = pv.diario.length;
+                await asegurarProgreso([pv.perfil.id]);
+            } catch (err) {
+                console.error('Error al cargar el diario:', err);
+                if (perfilVisto === pv) pv.diario = [];
+            }
+            if (perfilVisto === pv && subPerfil === 'diario') {
+                renderPerfil();
+                if (pv.irAPestanas) {
+                    pv.irAPestanas = false;
+                    const t = el('perfil-pestanas');
+                    if (t) setTimeout(() => t.scrollIntoView({ behavior: 'smooth', block: 'start' }), 60);
+                }
+            }
+        }
+
+        function verMiDiario() {
+            subPerfilPendiente = 'diario';
+            verPerfilPropio();
+        }
+        let subPerfilPendiente = null;
+
+        function refrescarDiarioVisible() {
+            if (vistaActual === 'perfil' && perfilVisto && perfilVisto.perfil.id === usuarioActual.id) {
+                if (subPerfil === 'diario') cargarDiarioPerfil();
+                else perfilVisto.diario = undefined;
+            }
+            if (vistaActual === 'plan') cargarPlan();
+        }
+
+        function filaDiarioHTML(e, propio) {
+            const d = desdeISO(e.fecha);
+            const foto = fotoEntrada(e);
+            const nombre = nombreEntrada(e);
+            const claveGal = 'd-' + e.id;
+            const propias = (e.fotos || []).filter(fotoSegura);
+            const puntaje = e.puntaje !== null && e.puntaje !== undefined ? parseFloat(e.puntaje) : 0;
+            const miniatura = foto
+                ? `<img src="${esc(foto)}" alt="" loading="lazy" class="w-14 h-14 sm:w-16 sm:h-16 rounded-xl object-cover bg-beige-base shrink-0 ring-1 ring-beige-border">`
+                : `<span class="w-14 h-14 sm:w-16 sm:h-16 rounded-xl shrink-0 flex items-center justify-center font-display text-2xl font-bold ${(e.recetas && ESTILO_TIPO[e.recetas.tipo_comida]) || 'bg-verde-suave text-verde-ingles'}">${esc(nombre.charAt(0).toUpperCase())}</span>`;
+            const items = propio
+                ? [{ texto: 'Editar', accion: `abrirModalDiario({ id: '${esc(e.id)}' })` }]
+                : [{ texto: 'Denunciar', accion: `abrirDenuncia('diario', '${esc(e.id)}')`, peligro: true }];
+            if (e.receta_id && e.recetas) items.unshift({ texto: 'Ver la receta', accion: `abrirReceta('${esc(e.receta_id)}')` });
+            return `
+                <div class="flex items-start gap-3 sm:gap-4 py-3.5">
+                    <div class="w-10 shrink-0 text-center pt-0.5">
+                        <div class="font-display text-2xl font-bold leading-none text-verde-ingles">${d.getDate()}</div>
+                        <div class="text-[11px] uppercase tracking-wide text-tinta/45 mt-0.5">${DIAS_CORTOS[d.getDay()]}</div>
+                    </div>
+                    <button type="button" onclick="${propio ? `abrirModalDiario({ id: '${esc(e.id)}' })` : (e.receta_id && e.recetas ? `abrirReceta('${esc(e.receta_id)}')` : `abrirVisor('${claveGal}', 0)`)}" class="shrink-0">${miniatura}</button>
+                    <div class="min-w-0 flex-1">
+                        <div class="flex items-start justify-between gap-2">
+                            <div class="min-w-0">
+                                <div class="font-semibold text-tinta leading-snug">${esc(nombre)}</div>
+                                <div class="flex flex-wrap items-center gap-x-2 gap-y-1 mt-1">
+                                    ${puntaje ? estrellasHTML(puntaje, 'text-[15px]') : ''}
+                                    ${e.me_gusto ? `<span title="Me encantó" class="text-rosa-texto">${svg(ICONO_CORAZON, 'w-4 h-4', true)}</span>` : ''}
+                                    ${e.repetida ? `<span title="La volvió a hacer" class="text-verde-chip">${svg(ICONO_REPETIR, 'w-4 h-4')}</span>` : ''}
+                                    ${e.momento ? `<span class="text-[11px] font-semibold px-2 h-5 inline-flex items-center rounded-full ${(MOMENTOS.find(m => m.k === e.momento) || {}).clase || ''}">${esc(NOMBRE_MOMENTO[e.momento])}</span>` : ''}
+                                    ${e.plan_id ? `<span title="Estaba en el plan semanal" class="inline-flex items-center gap-1 text-[11px] font-semibold text-verde-chip">${svg(ICONO_CALENDARIO, 'w-3.5 h-3.5')}del plan</span>` : ''}
+                                    ${propio && e.publica === false ? `<span class="inline-flex items-center gap-1 text-[11px] text-tinta/50">${svg(ICONO_CANDADO, 'w-3.5 h-3.5')}solo vos</span>` : ''}
+                                    ${e.moderada ? '<span class="text-[11px] font-semibold text-rojo-hover">Oculta por moderación</span>' : ''}
+                                </div>
+                            </div>
+                            <div class="-mr-2 -mt-1">${menuAcciones('diario-' + e.id, items)}</div>
+                        </div>
+                        ${e.nota ? `<p class="text-sm text-tinta/75 leading-relaxed mt-1.5 whitespace-pre-line">${esc(e.nota)}</p>` : ''}
+                        ${propias.length ? `<div class="mt-2">${propias.length > 1 ? tiraFotos(propias, claveGal) : `<button type="button" onclick="abrirVisor('${claveGal}', 0)" class="block w-28 h-28 rounded-xl overflow-hidden ring-1 ring-beige-border"><img src="${esc(propias[0])}" alt="" loading="lazy" class="w-full h-full object-cover"></button>`}</div>` : ''}
+                    </div>
+                </div>`;
+        }
+
+        function diarioPerfilHTML(pv, yo) {
+            if (pv.diario === null || pv.diario === undefined) return cargandoHTML();
+            const lista = pv.diario;
+            (lista || []).forEach(e => { const p = e.fotos && e.fotos.filter(fotoSegura); if (p && p.length) galerias['d-' + e.id] = p; });
+            const pr = progresoCache[pv.perfil.id] || {};
+            const anio = String(new Date().getFullYear());
+            const mes = hoyISO().slice(0, 7);
+            const estad = (n, t, extra) => `<div class="rounded-xl ${extra || 'bg-beige-base'} p-3 text-center"><div class="font-display text-2xl font-bold text-verde-ingles leading-none">${n}</div><div class="text-[11px] font-semibold text-tinta/55 mt-1">${t}</div></div>`;
+            const cabecera = `
+                <div class="bg-white rounded-2xl ring-1 ring-beige-border shadow-soft p-4 sm:p-5 space-y-4">
+                    <div class="flex flex-wrap items-center justify-between gap-3">
+                        <div>
+                            <h3 class="font-display text-xl font-bold text-verde-ingles">${yo ? 'Tu diario de cocina' : 'Diario de cocina'}</h3>
+                            <p class="text-sm text-tinta/60">${yo ? 'Todo lo que cocinaste, con puntaje y notas. Lo que marcás como hecho en el plan se anota solo.' : 'Lo que cocinó, día por día.'}</p>
+                        </div>
+                        ${yo ? `<button type="button" onclick="abrirModalDiario()" class="inline-flex items-center gap-1.5 h-10 px-4 rounded-xl text-sm font-semibold bg-verde-ingles hover:bg-verde-hover text-white transition">${svg('M12 4v16m8-8H4', 'w-4 h-4')}Anotar</button>` : ''}
+                    </div>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                        ${estad(lista.filter(e => e.fecha.startsWith(anio)).length, 'en ' + anio)}
+                        ${estad(lista.filter(e => e.fecha.startsWith(mes)).length, 'este mes')}
+                        ${estad(`<span class="inline-flex items-center gap-1">${svg(ICONO_OLLA, 'w-5 h-5')}${pr.racha_cocina || 0}</span>`, 'días seguidos cocinando', 'bg-verde-suave')}
+                        ${estad(pr.semanas_cumplidas || 0, (pr.semanas_cumplidas === 1 ? 'semana cumplida' : 'semanas cumplidas'))}
+                    </div>
+                </div>`;
+            if (!lista.length) {
+                return cabecera + `<div class="mt-5">${estadoVacioHTML(ICONO_LIBRO, yo ? 'Tu diario está vacío' : 'Todavía no anotó nada', yo ? 'Anotá lo que cocinás, o marcá como hechas las comidas de tu plan: se suman solas.' : 'Cuando cocine algo y lo anote, lo vas a ver acá.', yo ? 'Anotar algo que cociné' : '', yo ? 'abrirModalDiario()' : '')}</div>`;
+            }
+            const grupos = [];
+            lista.forEach(e => {
+                const k = e.fecha.slice(0, 7);
+                if (!grupos.length || grupos[grupos.length - 1].k !== k) grupos.push({ k, items: [] });
+                grupos[grupos.length - 1].items.push(e);
+            });
+            return cabecera + grupos.map(g => {
+                const [a, m] = g.k.split('-').map(Number);
+                return `
+                <section class="mt-5">
+                    <h4 class="sticky top-[8.5rem] sm:top-[9.5rem] z-10 inline-flex items-center h-7 px-3 rounded-full bg-verde-ingles text-white text-xs font-bold uppercase tracking-wide mb-2">${MESES[m - 1]} ${a}</h4>
+                    <div class="bg-white rounded-2xl ring-1 ring-beige-border shadow-soft px-4 sm:px-5 divide-y divide-beige-border">${g.items.map(e => filaDiarioHTML(e, yo)).join('')}</div>
+                </section>`;
+            }).join('');
+        }
+
+        // ---------- "Lo que cocinaron" en el inicio ----------
+        let cocinaron = [];
+        async function cargarCocinaron() {
+            cocinaron = [];
+            if (!seguidos.size) return pintarCocinaron();
+            try {
+                const { data } = await db.from('diario').select('*, recetas(id, titulo, fotos, tipo_comida)')
+                    .in('user_id', [...seguidos]).eq('publica', true).order('created_at', { ascending: false }).limit(6);
+                cocinaron = data || [];
+                cocinaron.forEach(e => { diarioVisto[e.id] = e; });
+                await asegurarPerfiles(cocinaron.map(e => e.user_id));
+            } catch (e) { cocinaron = []; }
+            pintarCocinaron();
+        }
+
+        function pintarCocinaron() {
+            const bloque = el('bloque-cocinaron');
+            bloque.classList.toggle('hidden', !cocinaron.length);
+            el('cocinaron-lista').innerHTML = cocinaron.map(e => {
+                const p = perfilesCache[e.user_id];
+                const puntaje = e.puntaje ? parseFloat(e.puntaje) : 0;
+                return `
+                <button type="button" onclick="verDiarioDe('${esc(e.user_id)}')" class="w-full text-left flex items-start gap-3 p-2 rounded-xl hover:bg-beige-base transition">
+                    ${avatarHTML(p, 'w-9 h-9', 'text-xs')}
+                    <span class="min-w-0 flex-1 text-sm leading-snug">
+                        <span class="font-semibold">${esc(p ? (p.nombre || p.usuario) : 'Alguien')}</span>
+                        <span class="text-tinta/60">${e.repetida ? 'volvió a hacer' : 'hizo'}</span>
+                        <span class="font-semibold text-verde-ingles">${esc(nombreEntrada(e))}</span>
+                        <span class="flex items-center gap-1.5 mt-0.5">${puntaje ? estrellasHTML(puntaje, 'text-xs') : ''}${e.me_gusto ? `<span class="text-rosa-texto">${svg(ICONO_CORAZON, 'w-3.5 h-3.5', true)}</span>` : ''}<span class="text-xs text-tinta/45">${tiempoRelativo(e.created_at)}</span></span>
+                    </span>
+                </button>`;
+            }).join('');
+        }
+
+        function verDiarioDe(id) {
+            subPerfilPendiente = 'diario';
+            verPerfilPorId(id);
+        }
+
+        // ---------- Progreso de la semana en el plan ----------
+        function pintarProgresoPlan() {
+            const cont = el('plan-progreso');
+            if (!cont) return;
+            const lunes = plan.semana;
+            const total = plan.items.length;
+            const hechas = plan.items.filter(x => x.hecha).length;
+            const pr = (miProgreso || {});
+            const racha = pr.racha_cocina || 0;
+            if (!plan.cargado || lunes < sumarDias(lunesDe(hoyISO()), -7 * 8)) { cont.innerHTML = ''; return; }
+            const pct = total ? Math.round(hechas / total * 100) : 0;
+            const cumplida = total >= 5 && hechas === total;
+            const pasada = sumarDias(lunes, 6) < hoyISO();
+            let mensaje;
+            if (!total) mensaje = 'Planeá al menos 5 comidas y hacelas todas: cumplir la semana suma <strong>+30 puntos</strong> y la medalla de semana cumplida.';
+            else if (cumplida) mensaje = '<strong>¡Semana cumplida!</strong> Hiciste todo lo que planeaste.';
+            else if (total < 5) mensaje = `Te faltan ${5 - total} ${5 - total === 1 ? 'comida' : 'comidas'} en el plan para que la semana cuente (mínimo 5). Al cumplirla sumás <strong>+30 puntos</strong>.`;
+            else mensaje = pasada ? `Hiciste ${hechas} de ${total}. ¡La próxima sale!` : `Te ${total - hechas === 1 ? 'falta' : 'faltan'} ${total - hechas} para cumplir la semana y sumar <strong>+30 puntos</strong>.`;
+            cont.innerHTML = `
+                <div class="rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-5 ${cumplida ? 'bg-verde-ingles text-white' : 'bg-white ring-1 ring-beige-border shadow-soft'}">
+                    <div class="flex items-center gap-3 sm:w-56 shrink-0">
+                        <span class="w-11 h-11 rounded-xl inline-flex items-center justify-center shrink-0 ${cumplida ? 'bg-mostaza text-verde-ingles' : 'bg-verde-suave text-verde-ingles'}">${svg(cumplida ? ICONO_SEMANA_OK : ICONO_HECHO, 'w-6 h-6')}</span>
+                        <div>
+                            <div class="font-display text-xl font-bold leading-none ${cumplida ? '' : 'text-verde-ingles'}">${hechas} <span class="text-sm font-semibold ${cumplida ? 'text-white/70' : 'text-tinta/50'}">de ${total} hechas</span></div>
+                            <div class="h-2 w-40 rounded-full mt-2 overflow-hidden ${cumplida ? 'bg-white/20' : 'bg-beige-base'}"><div class="h-full rounded-full ${cumplida ? 'bg-mostaza' : 'bg-verde-chip'}" style="width:${Math.max(total ? 4 : 0, pct)}%"></div></div>
+                        </div>
+                    </div>
+                    <p class="text-sm leading-snug flex-1 ${cumplida ? 'text-white/90' : 'text-tinta/70'}">${mensaje}</p>
+                    <button type="button" onclick="abrirProgreso()" title="Días seguidos con algo en tu diario" class="inline-flex items-center gap-1.5 h-9 px-3 rounded-xl text-sm font-bold shrink-0 ${cumplida ? 'bg-white/10 text-mostaza' : 'bg-verde-suave text-verde-ingles'}">${svg(ICONO_OLLA, 'w-4 h-4')}${racha} ${racha === 1 ? 'día' : 'días'} cocinando</button>
+                </div>`;
+        }
+
         // ---------- Inicio y cierre de sesión ----------
         async function mostrarAppPrincipal() {
             if (appIniciada) return;
@@ -5607,6 +6121,9 @@
             plan = { semana: null, items: [], activa: null, plantillas: [], conteoPlantillas: {}, prefs: null, cargado: false };
             desafioActual = null;
             participantesDesafio = [];
+            cocinaron = [];
+            subPerfilPendiente = null;
+            Object.keys(diarioVisto).forEach(k => delete diarioVisto[k]);
             limpiarFotosForm('post');
             recetas = [];
             seguidos = new Set();
@@ -5634,7 +6151,7 @@
             Object.keys(recetasVistas).forEach(k => delete recetasVistas[k]);
             vistaActual = 'filtrar';
             vistaPrevia = null;
-            ['modal-perfil', 'modal-coleccion', 'modal-personas', 'modal-notificaciones', 'panel-mensajes', 'chat-dock', 'chat-burbuja', 'modal-agregar-coleccion', 'modal-compartir-post', 'modal-plan', 'modal-avisos', 'modal-plantillas', 'modal-progreso'].forEach(id => el(id).classList.add('hidden'));
+            ['modal-perfil', 'modal-coleccion', 'modal-personas', 'modal-notificaciones', 'panel-mensajes', 'chat-dock', 'chat-burbuja', 'modal-agregar-coleccion', 'modal-compartir-post', 'modal-plan', 'modal-avisos', 'modal-plantillas', 'modal-progreso', 'modal-diario'].forEach(id => el(id).classList.add('hidden'));
             document.getElementById('app-principal').classList.add('hidden');
             document.getElementById('pantalla-login').classList.remove('hidden');
             mostrarModoAuth('login');

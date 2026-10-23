@@ -21,6 +21,10 @@
     "MONETIZAR_URL": ""
     // Todo vacío = salida directa, sin monetizar.
   },
+  // Latido diario a la base (09:17 UTC) para que Supabase no pause el proyecto por inactividad
+  "triggers": {
+    "crons": ["17 9 * * *"]
+  },
   "rules": [
     {
       "type": "Text",

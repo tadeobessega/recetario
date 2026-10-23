@@ -1,6 +1,6 @@
 -- =====================================================================
 --  Plan semanal con avisos + rachas, puntos, niveles y desafíos
---  Se aplica una sola vez en Supabase → SQL Editor (todo es "if not exists" / "or replace").
+--  Aplicado en producción el 22/10/2026.
 -- =====================================================================
 
 -- ---------------------------------------------------------------------
@@ -530,8 +530,8 @@ alter table public.plan_semanas enable row level security;
 
 alter table public.plan_comidas add column if not exists plantilla_id uuid references public.plantillas_plan (id) on delete set null;
 
--- Activa una plantilla en una semana: reemplaza lo que había puesto otra plantilla
--- (lo que agregaste a mano y lo que ya marcaste como hecho se conserva)
+-- Activa una plantilla en una semana. Antes, la app saca lo que había puesto la plantilla
+-- anterior (lo agregado a mano y lo ya hecho se conserva); acá solo se agregan las comidas nuevas.
 create or replace function public.aplicar_plantilla(p_plantilla uuid, p_semana date) returns int
 language plpgsql security definer set search_path = public as $$
 declare u uuid := auth.uid(); lunes date := date_trunc('week', p_semana)::date; n int;
@@ -539,7 +539,6 @@ begin
   if u is null or not exists (select 1 from plantillas_plan where id = p_plantilla and user_id = u) then
     raise exception 'Esa plantilla no es tuya';
   end if;
-  delete from plan_comidas where user_id = u and fecha between lunes and lunes + 6 and plantilla_id is not null and not hecha;
   insert into plan_comidas (user_id, fecha, momento, receta_id, titulo, nota, aviso, aviso_dias, aviso_hora, plantilla_id)
   select u, lunes + (i.dia - 1), i.momento, i.receta_id, i.titulo, i.nota, i.aviso, i.aviso_dias, i.aviso_hora, p_plantilla
   from plantilla_items i where i.plantilla_id = p_plantilla and (i.receta_id is not null or i.titulo is not null);
@@ -549,14 +548,13 @@ begin
   return n;
 end $$;
 
--- Desactiva la plantilla de una semana (saca lo que había puesto, salvo lo ya hecho)
+-- Desactiva la plantilla de la semana (la app saca antes sus comidas pendientes)
 create or replace function public.quitar_plantilla_semana(p_semana date) returns void
 language plpgsql security definer set search_path = public as $$
 declare u uuid := auth.uid(); lunes date := date_trunc('week', p_semana)::date;
 begin
   if u is null then raise exception 'Necesitás iniciar sesión'; end if;
-  delete from plan_comidas where user_id = u and fecha between lunes and lunes + 6 and plantilla_id is not null and not hecha;
-  delete from plan_semanas where user_id = u and semana = lunes;
+  update plan_semanas set plantilla_id = null where user_id = u and semana = lunes;
 end $$;
 
 -- Guarda la semana tal como está como una plantilla nueva
@@ -605,3 +603,7 @@ select cron.schedule('avisos-plan', '*/5 * * * *', $cron$
     body    := '{}'::jsonb)
   where exists (select 1 from public.cola_push where enviada_at is null and intentos < 5);
 $cron$);
+
+-- Ajuste sugerido por Supabase
+alter function public.nivel_de(int) set search_path = public;
+alter function public.nombre_nivel(int) set search_path = public;
